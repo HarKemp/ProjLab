@@ -81,3 +81,5 @@ Saite uz risinājumu: https://www.prepostseo.com/image-to-text
 Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
 Pieejamie formāti no JPG, PNG, JPEG, GIF, JFIF uz text </br>
 Saite uz risinājumu: https://picturetotext.info/
+
+# Lietotājstāsti
