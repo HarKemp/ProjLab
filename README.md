@@ -38,6 +38,10 @@ Apraksts: GitHub projekts, kurš Spēj nolasīt tabulas un rakstzīmes no pdf fo
 Licence: MIT Lincense</br>
 Saite uz risinājumu: https://github.com/cseas/ocr-table
 
+* Carbonfox
+Apraksts: Rīks, kas reāllaikā apstrādā uzņēmumu pavadzīmes ar MI palīdzību, lai uzņēmumi varētu sekot līdzi savām GHG(greenhouse gases) emisijām.</br>
+Saite uz risinājumu: https://www.snowfox.ai/carbonfox-realtime-insights-for-co2-emissions
+
 * Manga OCR
 Apraksts: GitHub projekts, kurš pārveido tekstu no Japāņu manga komiksiem par nolasāmu tekstu.
 2024\. gada septembrī šim projektam ir visvairāk zvaigznītes GitHub projektiem Python programmēšanas valodā,
