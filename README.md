@@ -87,3 +87,24 @@ Pieejamie formāti no JPG, PNG, JPEG, GIF, JFIF uz text </br>
 Saite uz risinājumu: https://picturetotext.info/
 
 # Lietotājstāsti
+
+| Nr. | Lietotājstāsts | MoSCoW prioritāte |
+|-----|----------------|-------------------|
+| 1. | Lietotājs vēlas augšupielādēt rēķinu, lai sistēma aprēķinātu CO2 nospiedumu. | Must have |
+| 2. | Lietotājs vēlas ērti augšupielādēt vairākus rēķinus, lai ietaupītu laiku. | Should have |
+| 3. | Lietotājs vēlas, lai sistēma pārbauda, ka fails ir PDF formātā, lai nepieļautu nepareiza formāta augšupielādi | Must have |
+| 4. | Lietotājs vēlas, lai viņam ir iespēja rediģēt sava augšupielādētā rēķina apstrādātos datus. | Should have |
+| 5. | Lietotājs vēlas, lai programma ar OCR iegūtu nepieciešamo informāciju no augšupielādētā rēķina (nr., datums, pasūtītāja informācija, produkti, apjoms, cenas, un to kopējās summas, jo tas var tikt izmantots CO2 aprēķinam | Must have |
+| 6. | Lietotājs vēlas, lai augšupielādētie rēķini tiktu saglabāti datu bāzē, jo tad nav nepieciešams tos atkārtoti augšupielādēt | Could have |
+| 7. | Lietotājs vēlas, lai informācija par apstrādātiem rēķiniem datu bāzē tiktu uzglabāta atsevišķi kā CSV fails, lai to varētu vēlāk lejupielādēt vai izmantot apstrādei. | Should have |
+| 8. | Lietotājs vēlas pievienot rēķinu manuāli, lai papildinātu esošo informāciju par CO2 izmešu aprēķinam | Should have |
+| 9. | Lietotājs vēlas izveidot savu unikālu lietotāja kontu, jo tad citiem nav piekļuves viņa augšupielādēto rēķinu datiem. | Must have |
+| 10. | Lietotājs vēlas  piesaistīt kontu  e-pasta adresei, jo tad var nodrošināt sava konta atkopšanu | Would not have |
+| 11. | Lietotājs vēlas grafisko saskarni, ar filtru, lai atrastu ierakstus pēc dažādiem kritērijiem. | Should have |
+| 12. | Lietotājs vēlas savu rēķinu atskaites saglabāt dažādos formātos/ izkārtojumos, atskaites atbilstu dažādu organizāciju prasībām. | Could have |
+| 13. | Lietotājs vēlas, lai datu bāze uzglabātu informāciju par izmešiem no dažādiem produktiem/pakalpojumiem, lai tos varētu ērti pārskatīt un izmantot aprēķinam. | Should have |
+| 14. | Lietotāji vēlas pievienot datu bāzē papildus produktus/pakalpojumus vai izmainīt to izmešu vērtības, lai precīzāk atspoguļotu kopējos izmešus konkrētajam uzņēmumam. | Should have |
+| 15. | Lietotājs vēlas, lai trūkstoša informācija par ieraksta CO2 izmešiem tiktu automātiski aizpildīta no līdzīgākā ieraksta no datu bāzes, lai nerastos aprēķinu kļūdas. | Would not have |
+| 16. | Lietotājs vēlas, lai sistēma dotu detalizētus aprēķina procesa rekvizītus, lai datus varētu auditēt. | Could have |
+| 17. | Lietotājs vēlas, lai informācija par izmešiem tiktu uzskatāmi izvadīta kontrolpanelī ar iespēju to filtrēt pēc dažādiem kritērijiem, jo tas ļautu ērti pārskatīt datus. | Should have |
+| 18. | Lietotājs vēlas, lai sistēma izveidotu PDF, Excel vai cita formāta atskaiti par ilgtspējību, lai to varētu nepieciešamības gadījumā uzrādīt. | Should have |
