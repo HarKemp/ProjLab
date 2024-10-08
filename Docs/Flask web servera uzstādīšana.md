@@ -4,7 +4,7 @@
 `python -m venv venv` 
 ## 3. Aktivizē jauno virtuālo vidi: 
 `\venv\Scripts\Activate` <br>
-Terminālim jāizskatās apmēram šādi - `(venv) PS D:\Desktop\ProjLab\ProjLab\Application> `
+Terminālim jāizskatās apmēram šādi - `(venv) PS C:\Users\Lietotajs\Desktop\ProjLab\ProjLab\Application> `
 ## 4. Instalē dependencies:
 `pip install -r requirements.txt` 
 ## 5. Konfigurē flask izstrādes vidi (šis ir caur powershell):
