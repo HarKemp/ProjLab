@@ -1,6 +1,3 @@
-# ProjLab
-Projektēšanas laboratorijas kursa darbs
-
 # Apraksts
 Rēķinu apstrāde ar OCR un datu analīze
 • Project Description: This project aims to develop a solution that enables small and
