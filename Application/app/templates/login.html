@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Login Page{% endblock %}
+{% block body %}
+    <div class = "center-element">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-danger">
+        {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class = "login-form">
+      <form action="{{ url_for('auth.login_post') }}" method="post">
+        <div class="mb-3">
+          <label for="usernameInput" class="form-label">Username</label>
+          <input name="username" autocomplete="off" autofocus type="text" class="form-control" id="usernameInput">
+        </div>
+        <div class="mb-3">
+          <label for="passwordInput" class="form-label">Password</label>
+          <input name="password" autocomplete="off" type="password" class="form-control" id="passwordInput">
+        </div>
+        <div>
+          <button type="submit" class="btn btn-primary">Log in</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block title %}Home Page{% endblock %}
+{% block body %}
+<div class="center-element">
+    <h1 style="font-size:80px;">Hello ( ͡° ͜ʖ ͡° )</h1>
+    <a href="{{ url_for('auth.logout') }}" style="font-size:20px">logout</a>
+</div>
+{% endblock %}
