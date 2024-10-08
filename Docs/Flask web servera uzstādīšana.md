@@ -3,16 +3,16 @@
 ## 2. Izveido jaunu virtuālo python vidi:
 `python -m venv venv` 
 ## 3. Aktivizē jauno virtuālo vidi: 
-`\venv\Scripts\Activate`
+`\venv\Scripts\Activate` <br><br>
 Terminālim jāizskatās apmēram šādi - `(venv) PS C:\Users\Lietotajs\Desktop\ProjLab\ProjLab\Application> `
 ## 4. Instalē dependencies:
 `pip install -r requirements.txt` 
 ## 5. Konfigurē flask izstrādes vidi:
 ### Ja caur powershell:
-`$env:FLASK_ENV="development"`
+`$env:FLASK_ENV="development"` <br><br>
 Pēc tam var pārbaudīt vai pareizi iestatījās ar komandu: `echo $env:FLASK_ENV` 
 ### Ja caur cmd:
-`set FLASK_ENV=development`
+`set FLASK_ENV=development` <br><br>
 Pārbauda vai pareizi echo `%FLASK_ENV%`
 ## 6. Iestata Flask aplikācijas direktoriju
 `set FLASK_APP=app` 
