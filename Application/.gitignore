@@ -235,3 +235,4 @@ fabric.properties
 instance/
 app/__pycache__/
 app/db/__pycache__/
+../instance/
