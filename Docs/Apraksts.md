@@ -111,8 +111,6 @@ Saite uz risinājumu: https://picturetotext.info/
 
 # Konceptu modelis
 
-![Alt text](Konceptu_modelis.png)
-
 ```mermaid
 graph TD;
     ProduktuPak[Produktu/Pakalpojums] -->|n..n| Rekini[Rēķini];
