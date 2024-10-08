@@ -1,6 +1,3 @@
-# ProjLab
-Projektēšanas laboratorijas kursa darbs
-
 # Apraksts
 Rēķinu apstrāde ar OCR un datu analīze
 • Project Description: This project aims to develop a solution that enables small and
@@ -111,4 +108,8 @@ Saite uz risinājumu: https://picturetotext.info/
 
 # Konceptu modelis
 
-![Alt text](Konceptu_modelis.png)
+```mermaid
+graph TD;
+    ProduktuPak[Produkts/Pakalpojums] -->|n..n| Rekini[Rēķini];
+    Lietotaji[Lietotāji] -->|1..n| Rekini[Rēķini];
+    Rekini[Rēķini] -->|1..n| Atskaites[Atskaites];
