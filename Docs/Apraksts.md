@@ -113,6 +113,6 @@ Saite uz risinājumu: https://picturetotext.info/
 
 ```mermaid
 graph TD;
-    ProduktuPak[Produktu/Pakalpojums] -->|n..n| Rekini[Rēķini];
+    ProduktuPak[Produkts/Pakalpojums] -->|n..n| Rekini[Rēķini];
     Lietotaji[Lietotāji] -->|1..n| Rekini[Rēķini];
     Rekini[Rēķini] -->|1..n| Atskaites[Atskaites];
