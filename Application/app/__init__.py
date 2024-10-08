@@ -1,37 +1,31 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
 
 db = SQLAlchemy()
 
 def create_app():
 
-    testing = True
-
     app = Flask(__name__)
 
     ### Set up database
-    if not testing:
-        # PRODUCTION: MySQL Database
-        username = "develop"
-        password = "cilveksviens$3"
-        hostname = "localhost" ## "labdarbs.westeurope.cloudapp.azure.com"
-        dbname = "appusers"
-        dbpath = f'mysql+pymysql://{username}:{password}@{hostname}/{dbname}'
+    env = os.environ.get('FLASK_ENV')
+    if env == 'production':
+        # # PRODUCTION: MySQL Database
+        from Application.config import ConfigProd
+        app.config.from_object(ConfigProd)
     else:
         # TESTING: SQLite Database
-        dbpath = 'sqlite:///test.db'
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+        from Application.config import ConfigDevelop
+        app.config.from_object(ConfigDevelop)
 
     ### Connect to database 
-    app.config['SECRET_KEY'] = 'af28j093jf9wjfp9@J@*sajfaioj'
-    app.config['SQLALCHEMY_DATABASE_URI'] = dbpath
     db.init_app(app)
 
     ### Create Test User On SQLite Database
-    from app.db.models import User
-    if testing:
+    from Application.app.db.models import User
+    if env == 'development':
         # Create SQLite database tables
         with app.app_context():
             db.create_all()
