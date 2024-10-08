@@ -19,14 +19,14 @@ def create_app():
     #     # TESTING: SQLite Database
     #     from Application.config import ConfigDevelop
     #     app.config.from_object(ConfigDevelop)
-    from Application.config import Config
+    from app.config import Config
     app.config.from_object(Config)
 
     ### Connect to database 
     db.init_app(app)
 
     ### Create Test User On SQLite Database
-    from Application.app.db.models import User
+    from app.db.models import User
     if env == 'development':
         # Create SQLite database tables
         with app.app_context():
