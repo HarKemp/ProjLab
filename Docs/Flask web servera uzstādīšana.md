@@ -1,5 +1,5 @@
 # Šim setup vajadzētu strādāt uz visual studio code (Pycharm drošvien līdzīgi)
-## 1. Kad noklonē ProjLab github repozitoriju, jānomaina pašreizējo direktoriju uz `Application`.
+## 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.
 ## 2. Izveido jaunu virtuālo python vidi:
 `python -m venv venv` 
 ## 3. Aktivizē jauno virtuālo vidi: 
