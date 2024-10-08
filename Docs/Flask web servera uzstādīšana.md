@@ -13,7 +13,7 @@ Terminālim jāizskatās apmēram šādi - `(venv) PS C:\Users\Lietotajs\Desktop
 Pēc tam var pārbaudīt vai pareizi iestatījās ar komandu: `echo $env:FLASK_ENV` 
 ### Ja caur cmd:
 `set FLASK_ENV=development` <br><br>
-Pārbauda vai pareizi echo `%FLASK_ENV%`
+Pārbauda vai pareizi `echo %FLASK_ENV%`
 ## 6. Iestata Flask aplikācijas direktoriju
 `set FLASK_APP=app` 
 ## 7. Palaiž web serveri uz localhost: 
