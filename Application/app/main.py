@@ -12,3 +12,8 @@ def index():
 @login_required
 def homepage():
     return render_template("homepage.html")
+
+@main.route("/chart", methods=['GET', 'POST'])
+@login_required
+def chart():
+    return render_template("chart.html")
