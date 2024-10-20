@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}File Download{% endblock %}
+{% block body %}
+    <div class="center-element">
+        <div class="mb-3">
+            <h3>Download Report</h3>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div class="alert alert-danger">
+                {{ messages[0] }}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div>
+                <a href="{{ url_for('main.download_file') }}">
+                    <button type="button" class="btn btn-outline-primary">Download Report</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

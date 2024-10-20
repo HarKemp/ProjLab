@@ -11,16 +11,8 @@ def create_app():
 
     ### Set up database
     env = os.environ.get('FLASK_ENV')
-    # if env == 'production':
-    #     # # PRODUCTION: MySQL Database
-    #     from Application.config import ConfigProd
-    #     app.config.from_object(ConfigProd)
-    # else:
-    #     # TESTING: SQLite Database
-    #     from Application.config import ConfigDevelop
-    #     app.config.from_object(ConfigDevelop)
-    from app.config import Config
-    app.config.from_object(Config)
+    from app.config import DevConfig
+    app.config.from_object(DevConfig)
 
     ### Connect to database 
     db.init_app(app)

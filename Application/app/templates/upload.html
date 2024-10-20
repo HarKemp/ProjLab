@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}File Upload{% endblock %}
+{% block body %}
+    <div class="center-element">
+        <div class="mb-3">
+            <h3>Upload Invoice</h3>
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    <div>
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.upload_page') }}">
+            <input class="form-control" type="file" id="formFile" name="file" multiple>
+            <br>
+            <input type="submit" value="Upload" class="btn btn-outline-primary">
+        </form>
+    </div>
+{% endblock %}
