@@ -1,9 +1,8 @@
-from flask_login import UserMixin
+# This file is bridge for separate models where each model is defined in its own file
+
 from app.__init__ import db
 
-class User(UserMixin, db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100))
-    password = db.Column(db.String(300))
-    
+# models
+from .users import User
+from .files import File
+from .invoices import Invoices
