@@ -20,8 +20,8 @@ class Config(object):
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     REPORT_FOLDER = os.path.join(BASE_DIR, REPORT_FILE_DIRECTORY)
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
+    if not os.path.exists(REPORT_FOLDER):
+        os.makedirs(REPORT_FOLDER)
 
 # Development only (Sqlite config)
 class DevConfig(Config):
