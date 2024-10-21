@@ -6,3 +6,5 @@ from app.__init__ import db
 from .users import User
 from .files import File
 from .invoices import Invoices
+from .emissions import Emissions
+from .services_emissions import services_emissions
