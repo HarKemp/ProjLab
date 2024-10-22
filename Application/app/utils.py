@@ -1,6 +1,7 @@
 from flask import flash, request, current_app, send_from_directory
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+import pandas as pd
 import os
 
 def file_upload():
@@ -33,14 +34,44 @@ def file_upload():
         flash(f"An unexpected error occurred: {str(e)}", 'alert-danger')
         return False
 
-def file_download():
+def create_csv(report_folder, filename):
+
+    file_path = os.path.join(report_folder, filename)
+    # TODO Read data from the database
+    data = {
+        'Company': ['LMT', 'CircleK', 'KKas'],
+        'Reg. Number': ['AF123', 'AF234', 'AF345'],
+        'Product': ['Mobilais internets', 'Bendzīns', 'Cepumi']
+    }
+    df = pd.DataFrame(data)
+    df.to_csv(file_path, index=False)
+
+def file_download(file_type):
+
     report_folder = current_app.config['REPORT_FOLDER']
-    try:
-        filename = 'report.txt'  # Name of the specific file to be downloaded
-        file_path = os.path.join(report_folder, filename)
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write('Paldies, ka lejupielādēji vīrusu. Datu šifrēšana ir progresā.\n')
-        return send_from_directory(report_folder, filename, as_attachment=True)
-    except Exception as e:
-        flash(f'Download failed: {str(e)}', 'alert-danger')
+    # TODO dynamically change the name of the report file based on user/company/time/date
+    # Name the specific file to be downloaded
+    filename = 'report.csv'
+    # Create a summary of the invoices in .csv format
+    if file_type == 'summary':
+        try:
+            create_csv(report_folder, filename)
+            return send_from_directory(report_folder, filename, as_attachment=True)
+        except Exception as e:
+            flash(f'Download failed: {str(e)}', 'alert-danger')
+            return False
+
+    # TODO Create a summary of the emissions in pdf format
+    elif file_type == 'report':
+        # try:
+        #     filename = 'report.txt'  # Name of the specific file to be downloaded
+        #     file_path = os.path.join(report_folder, filename)
+        #     with open(file_path, 'w', encoding='utf-8') as file:
+        #         file.write('Paldies, ka lejupielādēji vīrusu. Datu šifrēšana ir progresā.\n')
+        #     return send_from_directory(report_folder, filename, as_attachment=True)
+        # except Exception as e:
+        #     flash(f'Download failed: {str(e)}', 'alert-danger')
+            return False
+    else:
+        flash(f'Download failed: Incorrect redirect', 'alert-danger')
         return False

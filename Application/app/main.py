@@ -33,11 +33,11 @@ def upload_page():
 def download_page():
     return render_template('download.html')
 
-@main.route('/download-file', methods=['GET'])
+@main.route('/download-file-<file_type>', methods=['GET'])
 @login_required
-def download_file():
-    result = file_download()
+def download_file(file_type):
+    result = file_download(file_type)
     if not result:
-        return redirect(url_for('main.download_file'))
+        return redirect(url_for('main.download_page'))
     return result
 

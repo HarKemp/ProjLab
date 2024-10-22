@@ -12,7 +12,7 @@
             {% endif %}
             {% endwith %}
             <div>
-                <a href="{{ url_for('main.download_file') }}">
+                <a href="{{ url_for('main.download_file', file_type='summary') }}">
                     <button type="button" class="btn px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Download Report</button>
                 </a>
             </div>
