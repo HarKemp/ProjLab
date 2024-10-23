@@ -2,109 +2,33 @@
 Projektēšanas laboratorijas kursa darbs
 
 # Apraksts
-Rēķinu apstrāde ar OCR un datu analīze
-• Project Description: This project aims to develop a solution that enables small and
-medium-sized enterprises (SMEs) to accurately report their carbon emissions as part of
-their sustainability efforts. The solution will allow companies to upload their invoices as
-PDFs, from which data will be extracted about the items purchased and their quantities.
-This data will then be used to calculate the total carbon emissions based on predefined
-emission factors for each item. The results will be summarized in a comprehensive
-report.
-• General Scope: The product to be developed is a web-based application designed to
-automate the process of carbon emission reporting for SMEs. Users will upload their
-invoices in PDF format, and the application will use optical character recognition (OCR)
-technology to extract relevant data, such as the items purchased and their quantities.
-This data will be stored in a secure database. The application will then apply predefined
-emission factors to each item to calculate the total carbon emissions. For example, if an
-invoice shows the purchase of 1 liter of gas, the application will use the known emission
-factor for gas to calculate the corresponding CO2 emissions. The final output will be a
-detailed report summarizing the company’s carbon emissions over a specified period.
-The application will feature a user-friendly interface for uploading invoices and viewing
-reports, as well as a backend system for data extraction, processing, and report
-generation.
-• Target Customers and Users: The primary users of this solution are SMEs that need to
-comply with new regulations requiring transparent carbon emission reporting. The
-target customers include business owners, sustainability officers, and financial
-managers who are responsible for environmental reporting and compliance.
+Kursa darba apraksts pieejams /Docs/
 
-# Līdzīgo risinājumu saraksts
+# Uzstādīšana
+## Nepieciešams
+* Python 3.12.4 vai jaunāks
 
-* TensorFlow
-Apraksts: Rīku kopums, kas iekļauj mašīnmācīšanos (ML) un teksta atpazīšanas funkcionalitāti.</br>
-Saite uz risinājumu: https://github.com/tensorflow/examples/tree/master/lite/examples/optical_character_recognition
-
-* ocr-table
-Apraksts: GitHub projekts, kurš Spēj nolasīt tabulas un rakstzīmes no pdf formāta un pārvērst tās tekstā</br>
-Licence: MIT Lincense</br>
-Saite uz risinājumu: https://github.com/cseas/ocr-table
-
-* Carbonfox
-Apraksts: Rīks, kas reāllaikā apstrādā uzņēmumu pavadzīmes ar MI palīdzību, lai uzņēmumi varētu sekot līdzi savām GHG(greenhouse gases) emisijām.</br>
-Saite uz risinājumu: https://www.snowfox.ai/carbonfox-realtime-insights-for-co2-emissions
-
-* Manga OCR
-Apraksts: GitHub projekts, kurš pārveido tekstu no Japāņu manga komiksiem par nolasāmu tekstu.
-2024\. gada septembrī šim projektam ir visvairāk zvaigznītes GitHub projektiem Python programmēšanas valodā,
-meklējot "Optical character recognition" </br>
-Saite uz risinājumu: https://github.com/kha-white/manga-ocr
-Licence: Apache-2.0 license</br>
-
-* android-ocr
-Apraksts: Eksperimentāla Anroid lietotne, kura veic teksta nolasīšanu no attēla. 2024\. gada Septembrī GitHub repozitorijs ir "Tikai lasīt" režīmā.</br>
-Programmēšanas valodas/tehnoloģija: Java, HTML, CSS </br>
-Licence: Apache-2.0 license</br>
-Saite uz risinājumu: https://github.com/rmtheis/android-ocr
-
-* deep-text-recognition-benchmark
-Apraksts: GitHub projekts, kurš veic ziļo mācīšanos no attēliem, lai nolasītu tekstu.
-Programmēšanas valodas: Python, Jupyter Notebook</br>
-Licence: Apache-2.0 license</br>
-Saite uz risinājumu: https://github.com/clovaai/deep-text-recognition-benchmark
-
-* Adobe Acrobat JPG to PDF converter
-Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
-Pieejamie formāti no JPG, PNG, BMP u.c. uz PDF</br>
-Saite uz risinājumu: https://www.adobe.com/acrobat/online/jpg-to-pdf.html
-
-* IMAGE TO TEXT CONVERTER - OCR ONLINE
-Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
-Pieejamie formāti no PNG, BMP, PDF u.c. uz docx, txt, xlsx</br>
-Saite uz risinājumu https://www.onlineocr.net/
-
-* Image to Text Converter
-Pieejamie formāti no JPG, PDF, text uz doc, text, PDF, JPG 
-Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
-Saite uz risinājumu https://www.imagetotext.info/</br>
-
-* Image to Text
-Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
-Pieejamie formāti no PNG JPG, BMP, GIF, JPEG, TIFF uz GNUMERIC</br>
-Saite uz risinājumu: https://www.prepostseo.com/image-to-text
-
-* Picture to Text Converter
-Apraksts: Nolasa tekstu no attēliem un ieraksta to teksta failā.</br>
-Pieejamie formāti no JPG, PNG, JPEG, GIF, JFIF uz text </br>
-Saite uz risinājumu: https://picturetotext.info/
-
-# Lietotājstāsti
-
-| Nr. | Lietotājstāsts | MoSCoW prioritāte |
-|-----|----------------|-------------------|
-| 1. | Lietotājs vēlas augšupielādēt rēķinu, lai sistēma aprēķinātu CO2 nospiedumu. | Must have |
-| 2. | Lietotājs vēlas ērti augšupielādēt vairākus rēķinus, lai ietaupītu laiku. | Should have |
-| 3. | Lietotājs vēlas, lai sistēma pārbauda, ka fails ir PDF formātā, lai nepieļautu nepareiza formāta augšupielādi | Must have |
-| 4. | Lietotājs vēlas, lai viņam ir iespēja rediģēt sava augšupielādētā rēķina apstrādātos datus. | Should have |
-| 5. | Lietotājs vēlas, lai programma ar OCR iegūtu nepieciešamo informāciju no augšupielādētā rēķina (nr., datums, pasūtītāja informācija, produkti, apjoms, cenas, un to kopējās summas, jo tas var tikt izmantots CO2 aprēķinam | Must have |
-| 6. | Lietotājs vēlas, lai augšupielādētie rēķini tiktu saglabāti datu bāzē, jo tad nav nepieciešams tos atkārtoti augšupielādēt | Could have |
-| 7. | Lietotājs vēlas, lai informācija par apstrādātiem rēķiniem datu bāzē tiktu uzglabāta atsevišķi kā CSV fails, lai to varētu vēlāk lejupielādēt vai izmantot apstrādei. | Should have |
-| 8. | Lietotājs vēlas pievienot rēķinu manuāli, lai papildinātu esošo informāciju par CO2 izmešu aprēķinam | Should have |
-| 9. | Lietotājs vēlas izveidot savu unikālu lietotāja kontu, jo tad citiem nav piekļuves viņa augšupielādēto rēķinu datiem. | Must have |
-| 10. | Lietotājs vēlas  piesaistīt kontu  e-pasta adresei, jo tad var nodrošināt sava konta atkopšanu | Would not have |
-| 11. | Lietotājs vēlas grafisko saskarni, ar filtru, lai atrastu ierakstus pēc dažādiem kritērijiem. | Should have |
-| 12. | Lietotājs vēlas savu rēķinu atskaites saglabāt dažādos formātos/ izkārtojumos, atskaites atbilstu dažādu organizāciju prasībām. | Could have |
-| 13. | Lietotājs vēlas, lai datu bāze uzglabātu informāciju par izmešiem no dažādiem produktiem/pakalpojumiem, lai tos varētu ērti pārskatīt un izmantot aprēķinam. | Should have |
-| 14. | Lietotāji vēlas pievienot datu bāzē papildus produktus/pakalpojumus vai izmainīt to izmešu vērtības, lai precīzāk atspoguļotu kopējos izmešus konkrētajam uzņēmumam. | Should have |
-| 15. | Lietotājs vēlas, lai trūkstoša informācija par ieraksta CO2 izmešiem tiktu automātiski aizpildīta no līdzīgākā ieraksta no datu bāzes, lai nerastos aprēķinu kļūdas. | Would not have |
-| 16. | Lietotājs vēlas, lai sistēma dotu detalizētus aprēķina procesa rekvizītus, lai datus varētu auditēt. | Could have |
-| 17. | Lietotājs vēlas, lai informācija par izmešiem tiktu uzskatāmi izvadīta kontrolpanelī ar iespēju to filtrēt pēc dažādiem kritērijiem, jo tas ļautu ērti pārskatīt datus. | Should have |
-| 18. | Lietotājs vēlas, lai sistēma izveidotu PDF, Excel vai cita formāta atskaiti par ilgtspējību, lai to varētu nepieciešamības gadījumā uzrādīt. | Should have |
+# Šim setup vajadzētu strādāt uz visual studio code (Pycharm drošvien līdzīgi)
+## 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.
+## 2. Izveido jaunu virtuālo python vidi:
+`python -m venv venv` 
+## 3. Aktivizē jauno virtuālo vidi: 
+`\venv\Scripts\Activate` <br><br>
+Terminālim jāizskatās apmēram šādi - `(venv) PS C:\Users\Lietotajs\Desktop\ProjLab\ProjLab\Application> `
+## 4. Instalē dependencies:
+`pip install -r requirements.txt` 
+## 5. Konfigurē flask izstrādes vidi:
+### Ja caur powershell:
+`$env:FLASK_ENV="development"` <br><br>
+Pēc tam var pārbaudīt vai pareizi iestatījās ar komandu: `echo $env:FLASK_ENV` 
+### Ja caur cmd:
+`set FLASK_ENV=development` <br><br>
+Pārbauda vai pareizi `echo %FLASK_ENV%`
+## 6. Iestata Flask aplikācijas direktoriju
+`set FLASK_APP=app` 
+## 7. Palaiž web serveri uz localhost: 
+`flask run` 
+## 8. Pārlūkprogrammā var atvērt:
+`http://127.0.0.1:5000` 
+## 9. Kad nepieciešams, virtuālo vidi var deaktivizēt (virtuālai videi tehniski jābūt aktivizētai tikai tad, kad veic izmaiņas flask web servera konfigurācijā vai kad to palaiž ar `flask run`):
+`deactivate`
