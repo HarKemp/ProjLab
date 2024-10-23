@@ -41,3 +41,7 @@ def download_file(file_type):
         return redirect(url_for('main.download_page'))
     return result
 
+@main.route("/chart", methods=['GET', 'POST'])
+@login_required
+def chart():
+    return render_template("chart.html")
