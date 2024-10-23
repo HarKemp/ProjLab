@@ -106,6 +106,12 @@ Saite uz risinājumu: https://picturetotext.info/
 | 17. | Lietotājs vēlas, lai informācija par izmešiem tiktu uzskatāmi izvadīta kontrolpanelī ar iespēju to filtrēt pēc dažādiem kritērijiem, jo tas ļautu ērti pārskatīt datus. | Should have |
 | 18. | Lietotājs vēlas, lai sistēma izveidotu PDF, Excel vai cita formāta atskaiti par ilgtspējību, lai to varētu nepieciešamības gadījumā uzrādīt. | Should have |
 
+# Tehnoloģiju steks
+## Backend
+![Alt text](stack.png)
+## Frontend
+HTML, CSS - Tailwind, JavaScript
+
 # Konceptu modelis
 
 ```mermaid
