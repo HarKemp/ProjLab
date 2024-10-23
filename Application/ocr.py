@@ -4,11 +4,25 @@ from pdf2image import convert_from_path
 from PIL import Image
 import io
 import os
-# import google.generativeai as genai
+import cv2
+import numpy as np
+import google.generativeai as genai
 # #pip install -U google-generativeai 
 # #apt-get install poppler-utils
-# # genai.configure(api_key='')
-# # model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+genai.configure(api_key='')
+import typing_extensions as typing
+
+class Order(typing.TypedDict):
+    OrderNumber: str
+    Customer: str
+    Supplier: str
+    Goods: list[str]
+    OrderedAmount: list[str]
+    OrderDate: str
+    Cost: str
+    SeparateCosts: list[str]
+
+model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
 # def ocr_pdf_to_text(pdf_path, tess_path=None):
 #     """
@@ -43,13 +57,13 @@ import os
 #         else:
 #             # Perform OCR if no text is found
 #             print(f"Performing OCR on page {page_num + 1}...")
-#             page_images = convert_from_path(pdf_path, first_page=page_num + 1, last_page=page_num + 1, dpi=1200)
+#             page_images = convert_from_path(pdf_path, first_page=page_num + 1, last_page=page_num + 1, dpi=200)
             
 #             for img in page_images:
 #                 img_byte_array = io.BytesIO()
 #                 img.save(img_byte_array, format='PNG')  
 #                 img = Image.open(io.BytesIO(img_byte_array.getvalue()))  
-#                 ocr_text = pytesseract.image_to_string(img, lang='lva')
+#                 ocr_text = pytesseract.image_to_string(img, lang='lav')
 #                 text += ocr_text
                 
 #     pdf_document.close()
@@ -87,15 +101,32 @@ def merge_rectangles(rect1, rect2):
     x0_1, y0_1, x1_1, y1_1 = rect1
     x0_2, y0_2, x1_2, y1_2 = rect2
     return (min(x0_1, x0_2), min(y0_1, y0_2), max(x1_1, x1_2), max(y1_1, y1_2))
+def image_smoothen(img):
+    # Step 1: Convert the image to grayscale if not already
+    if len(img.shape) == 3:  # If the image has 3 channels (RGB), convert to grayscale
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    smoothed = cv2.bilateralFilter(img, d=5, sigmaColor=75, sigmaSpace=75)
+
+    # Step 3: Apply non-local means denoising for better noise reduction
+    denoised = cv2.fastNlMeansDenoising(smoothed, h=30)
+
+    # Step 4: Apply adaptive thresholding to binarize the image
+    th = cv2.adaptiveThreshold(denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+
+    cv2.imwrite('img.png', th)
+
+    return th
 
 # Function to extract text and blocks from PDF
-def extract_text_from_pdf(pdf_path):
+def extract_text_from_pdf(pdf_path,lang='lav'):
     doc = fitz.open(pdf_path)
     ocr_results = []  # To store OCR results for each page
-    images = convert_from_path(pdf_path)
+    images = convert_from_path(pdf_path,dpi=300)
 
     for page_num, image in enumerate(images, start=1):
-        ocr_data = pytesseract.image_to_data(image, output_type=pytesseract.Output.DATAFRAME)
+        imagenp =np.asarray(image)
+        image_smh = image_smoothen(np.asarray(imagenp))
+        ocr_data = pytesseract.image_to_data(image_smh,lang=lang,config='--psm 6',output_type=pytesseract.Output.DATAFRAME)
         ocr_data = ocr_data.dropna(subset=['text']).reset_index(drop=True)
         pdf_page = doc.load_page(page_num - 1)
         text_blocks = pdf_page.get_text("blocks")
@@ -114,7 +145,7 @@ def extract_text_from_pdf(pdf_path):
 
     return ocr_results
 
-def combine_text_by_word_clustering(ocr_results, proximity_threshold=30):
+def combine_text_by_word_clustering(ocr_results, proximity_threshold=10):
     combined_blocks = []
 
     for page_result in ocr_results:
@@ -165,7 +196,7 @@ def combine_text_by_word_clustering(ocr_results, proximity_threshold=30):
     return combined_blocks
 
 # Example usage
-pdf_path = 'ocr_test_files/LMT.pdf'
+pdf_path = 'ocr_test_files/zarum-1-rek_compress.pdf'
 
 ocr_results = extract_text_from_pdf(pdf_path)
 
@@ -173,9 +204,19 @@ ocr_results = extract_text_from_pdf(pdf_path)
 combined_blocks = combine_text_by_word_clustering(ocr_results, proximity_threshold=20)
 
 # Output: combined_blocks will contain combined text for clustered words
+total_text = ""
 for block in combined_blocks:
     print(f"{block['combined_text']}")
     print()
+    total_text += block['combined_text']
+# total_text = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
+prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN."
+
+response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
+        response_mime_type="application/json", response_schema=list[Order]
+    ))
+
+print(response.text)
 
 
 

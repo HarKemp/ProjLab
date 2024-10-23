@@ -1,0 +1,77 @@
+LMT.pdf
+OCR:
+Processing Page 1:
+Rēķins Nr. 1
+
+Datums: 10.08.2023 Apmaksāt līdz: 28.08.2023
+
+PIRCĒJS Raivo Krāklis Pēterbaznīcas iela 9, Rīga, LV-1050 Reģ. Nr.: 40003000050 PVN Nr.: LV40003000050
+
+LMT Kungu iela 10, Rīga, LV-1050 Reģ. Nr.: 40003000066 PVN Nr. LV40003000066 Tālrunis: +371 27957444
+
+NOSAUKUMS telefona abonements "Nebtātetonaabonemems
+
+DAUDZUMS |1
+
+CENA
+
+KOPĀ 25,00 ae
+
+PVN
+
+Mobilā
+
+0 28 (21%)
+
+€ 25.00
+
+KOPĀ PVN Kopumā
+
+19,75 € 5,25€ 25,00€
+
+Rietumu Banka SWIFT/BIC: RTMBLV2X Bankas konta numurs: LVRIET4821816144401924
+
+GenAI:
+[{"Cost": "25,00€", "Customer": "Raivo Krāklis",
+"Goods": ["telefona abonements \"Nebtātetonaabonemems"],
+"OrderDate": "10.08.2023", "OrderNumber": "1", "OrderedAmount": ["1"],
+"SeparateCosts": ["25.00€"], "Supplier": "LMT"}]
+
+zarum-1-rek_compress.pdf
+OCR:
+Processing Page 1:
+Rēķins Nr. 04/0720 saskaņā ar līgums Nr. 05/2020
+
+Rīgā,
+
+2020.gada 10.julijā
+
+Saņēmējs: Adrese: Norēķinu rekvizīti:
+
+JK STUDIO SIA Lokomotīves iela 90 — 113, LV-1057, Rīga A/S LUMINOR
+
+Reģ. Nr.|41203070891 N/konts |LV74RIKO0001080131991
+
+Maksātājs: Adrese: Norēķinu rekvizīti:
+
+ZARUM SIA Rīga, Anniņmuižas bulvāris 38 k-4 - 83D, LV-1067 AIS PAYSERA N/konts |LT113500010008393245
+
+Reģ.Nr./ Pers. Kods |40203244891
+
+Pārvadātāja nosaukums, reģ. Nr., transportlīdzekļa nosaukums un valsts Nr., vadītāja vārds, uzv.: Bez piegādes. A k dat :2020. g. 13. julijā pmaksas datums g julijā Pamatojums: Samaksas veids: Pārskaitījums Speciālas atzīmes: Darījumu vieta: Latvija Pakalpojum sniegšanas laiks: julijs
+
+Projektešanas pakalpojumi
+
+T ļ 920.00
+
+Kopā izsniegts: Pievienotās vērtības nodoklis 0% no summas Pavisam apmaksai: devini simti, divdesmit eiro, 00 centi
+
+920.00 || 920.00
+
+EUR:
+
+Maksātājs veicot šī rēķina apmaksu apliecina,kā pakalpojums ir saņemts atbilstošā laikā un kvalitātē Maksātājam nav nekādu pretenziju par saņemto pakalpojumu. Rēķins sastādīts elektroniski un saskaņā ar likumu par grāmatvedību 7.1. pantu ir derīgs bez paraksta. Valdes loceklis Viktors Motrohins
+GenAI:
+[{"Cost": "920.00 EUR", "Customer": "ZARUM SIA", "Goods": ["Projektešanas pakalpojumi"], "OrderDate": "2020.gada 10.julijā",
+ "OrderNumber": "04/0720",
+  "OrderedAmount": ["1"], "SeparateCosts": ["920.00 EUR"], "Supplier": "JK STUDIO SIA"}]
