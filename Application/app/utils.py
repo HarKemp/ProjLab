@@ -1,8 +1,11 @@
-from flask import flash, request, current_app, send_from_directory
+from flask import flash, request, current_app, send_from_directory, session
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+from .db.files import File
+from app.__init__ import db
 import pandas as pd
 import os
+
 
 def file_upload():
     allowed_extensions = current_app.config['ALLOWED_EXTENSIONS']
@@ -16,12 +19,13 @@ def file_upload():
             return False
         # If incorrect file extension
         for file in files:
-            if file.filename.rsplit('.',1)[1].lower() not in allowed_extensions:
+            if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
                 flash(f'Invalid file format for {file.filename}', 'alert-danger')
                 continue  # Skip the invalid file
             # If file is allowed
             # Secure the filename and save it to the upload folder
             filename = secure_filename(file.filename)
+            insert_file_in_db(filename, file.read())
             file.save(os.path.join(upload_folder, filename))
             flash(f"File uploaded successfully: {filename}", 'alert-success')
         return True
@@ -34,8 +38,8 @@ def file_upload():
         flash(f"An unexpected error occurred: {str(e)}", 'alert-danger')
         return False
 
-def create_csv(report_folder, filename):
 
+def create_csv(report_folder, filename):
     file_path = os.path.join(report_folder, filename)
     # TODO Read data from the database
     data = {
@@ -46,8 +50,8 @@ def create_csv(report_folder, filename):
     df = pd.DataFrame(data)
     df.to_csv(file_path, index=False)
 
-def file_download(file_type):
 
+def file_download(file_type):
     report_folder = current_app.config['REPORT_FOLDER']
     # TODO dynamically change the name of the report file based on user/company/time/date
     # Name the specific file to be downloaded
@@ -71,7 +75,16 @@ def file_download(file_type):
         #     return send_from_directory(report_folder, filename, as_attachment=True)
         # except Exception as e:
         #     flash(f'Download failed: {str(e)}', 'alert-danger')
-            return False
+        return False
     else:
         flash(f'Download failed: Incorrect redirect', 'alert-danger')
         return False
+
+
+def insert_file_in_db(filename, file_data):
+    # TODO check if the correct user
+    user_id = session['user_id']
+    new_file = File(user_id=user_id, title=filename, file_data=file_data)
+    db.session.add(new_file)
+    db.session.commit()
+

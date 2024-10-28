@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user
 from app.db.models import User
@@ -20,11 +20,13 @@ def login_post():
             return redirect(url_for('auth.login_post'))
         # If credentials correct - log in user and redirect to home page
         login_user(user)
+        session['user_id'] = user.id
         return redirect(url_for('main.homepage'))
     return render_template('login.html')
 
 @auth.route('/logout')
 @login_required
 def logout():
+    session.pop('user_id', None)
     logout_user()
     return redirect(url_for('auth.login_post'))

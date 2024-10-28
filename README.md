@@ -14,6 +14,10 @@ Kursa darba apraksts pieejams /Docs/
 `python -m venv venv` 
 ## 3. Aktivizē jauno virtuālo vidi: 
 `\venv\Scripts\Activate` <br><br>
+Ja komanda nestrādā tad jāizpilda </br>
+`Set-ExecutionPolicy RemoteSigned -Scope Process`
+vai arī jāizpilda bez sķērsvītras
+`venv\Scripts\Activate`</br>
 Terminālim jāizskatās apmēram šādi - `(venv) PS C:\Users\Lietotajs\Desktop\ProjLab\ProjLab\Application> `
 ## 4. Instalē dependencies:
 `pip install -r requirements.txt` 
