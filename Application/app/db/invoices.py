@@ -18,4 +18,3 @@ class Invoices(db.Model):
     sum_total = db.Column(db.Float, nullable=False)
     pvn = db.Column(db.Integer, nullable=False)
     services = db.relationship('Emissions', secondary=services_emissions, backref=db.backref('invoices', lazy='dynamic'))
-
