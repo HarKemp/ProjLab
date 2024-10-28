@@ -7,6 +7,7 @@ Kursa darba apraksts pieejams /Docs/
 # Uzstādīšana
 ## Nepieciešams
 * Python 3.12.4 vai jaunāks
+* Microsoft C++ Build Tools - priekš Greenlet
 
 # Šim setup vajadzētu strādāt uz visual studio code (Pycharm drošvien līdzīgi)
 ## 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.
@@ -29,7 +30,7 @@ Pēc tam var pārbaudīt vai pareizi iestatījās ar komandu: `echo $env:FLASK_E
 `set FLASK_ENV=development` <br><br>
 Pārbauda vai pareizi `echo %FLASK_ENV%`
 ## 6. Iestata Flask aplikācijas direktoriju
-`set FLASK_APP=app` 
+`set FLASK_APP=app`
 ## 7. Palaiž web serveri uz localhost: 
 `flask run` 
 ## 8. Pārlūkprogrammā var atvērt:
