@@ -15,6 +15,7 @@ class Invoices(db.Model):
     receiver_address = db.Column(db.String(128), nullable=False)
     issue_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     issue_number = db.Column(db.String(80), nullable=False)
-    services = db.relationship('Emissions', secondary=services_emissions, backref=db.backref('invoices', lazy='dynamic'))
     sum_total = db.Column(db.Float, nullable=False)
     pvn = db.Column(db.Integer, nullable=False)
+    services = db.relationship('Emissions', secondary=services_emissions, backref=db.backref('invoices', lazy='dynamic'))
+
