@@ -27,6 +27,7 @@ class Config(object):
 class DevConfig(Config):
     ### Database settings
     DB_INSTANCE_DIRECTORY = 'instance'
+    DB_INSTANCE_NAME = 'test.db'
     SECRET_KEY = 'af28j093jf9wjfp9@J@*sajfaioj'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -34,5 +35,10 @@ class DevConfig(Config):
     DATABASE_FOLDER = os.path.join(Config.BASE_DIR, DB_INSTANCE_DIRECTORY)
     if not os.path.exists(DATABASE_FOLDER):
         os.makedirs(DATABASE_FOLDER)
+
+    DB_PATH = os.path.join(DATABASE_FOLDER, DB_INSTANCE_NAME)
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+
     ### Defines path to sqlite database instance
-    SQLALCHEMY_DATABASE_URI = f"sqlite:///{os.path.join(DATABASE_FOLDER, 'test.db')}"
+    SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
