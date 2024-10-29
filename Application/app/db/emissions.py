@@ -1,11 +1,8 @@
 from app.__init__ import db
 
 
-class Emissions(db.Model):
+class Emission(db.Model):
     __tablename__ = 'emissions'
     id = db.Column(db.Integer, primary_key=True)
-    service = db.Column(db.String(80), nullable=False)
-    service_price = db.Column(db.Float, nullable=False)
-    units_per_service = db.Column(db.Float)
+    service_id = db.Column(db.Integer, db.ForeignKey('services.id'), nullable=False)
     value = db.Column(db.Float, nullable=False)
-    

@@ -1,9 +1,9 @@
 from app.__init__ import db
 from datetime import datetime
-from .services_emissions import services_emissions
+from .invoices_services import invoices_services
 
 
-class Invoices(db.Model):
+class Invoice(db.Model):
     __tablename__ = 'invoices'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -17,4 +17,4 @@ class Invoices(db.Model):
     issue_number = db.Column(db.String(80), nullable=False)
     sum_total = db.Column(db.Float, nullable=False)
     pvn = db.Column(db.Integer, nullable=False)
-    services = db.relationship('Emissions', secondary=services_emissions, backref=db.backref('invoices', lazy='dynamic'))
+    services = db.relationship('Service', secondary=invoices_services, backref=db.backref('invoice', lazy='dynamic'))
