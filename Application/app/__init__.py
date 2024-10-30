@@ -10,7 +10,7 @@ def create_app():
     app = Flask(__name__)
 
     ### Set up database
-    env = os.environ.get('FLASK_ENV')
+    env = os.environ.get('FLASK_ENV', 'development')
     from app.config import DevConfig
     app.config.from_object(DevConfig)
 
