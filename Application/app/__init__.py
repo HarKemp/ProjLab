@@ -28,15 +28,19 @@ def create_app():
         with app.app_context():
             db.create_all()
 
-            # Create a test user
-            from werkzeug.security import generate_password_hash
-            test_username = "students"
+            # Test user credentials
+            test_username = "test"
             test_password = "cilveks"
-            new_user = User(username=test_username, password=generate_password_hash(test_password))
-            
-            # Add test user to database
-            db.session.add(new_user)
-            db.session.commit()
+
+            # Check if the test user already exists and if not, create him
+            if not User.query.filter_by(username=test_username).first():
+                from werkzeug.security import generate_password_hash
+
+                new_user = User(username=test_username, password=generate_password_hash(test_password))
+                
+                # Add test user to database
+                db.session.add(new_user)
+                db.session.commit()
 
 
     ### User login management 

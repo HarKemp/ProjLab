@@ -37,8 +37,10 @@ class DevConfig(Config):
         os.makedirs(DATABASE_FOLDER)
 
     DB_PATH = os.path.join(DATABASE_FOLDER, DB_INSTANCE_NAME)
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
+
+    # Commented out to avoid WinError32 when running flask with the --debug flag
+    #if os.path.exists(DB_PATH):
+        #os.remove(DB_PATH)
 
     ### Defines path to sqlite database instance
     SQLALCHEMY_DATABASE_URI = f"sqlite:///{DB_PATH}"
