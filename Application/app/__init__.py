@@ -11,8 +11,12 @@ def create_app():
 
     ### Set up database
     env = os.environ.get('FLASK_ENV', 'development')
-    from app.config import DevConfig
-    app.config.from_object(DevConfig)
+    if env == 'production':
+        from app.prodConfig import ProdConfig
+        app.config.from_object(ProdConfig)
+    else:
+        from app.config import DevConfig
+        app.config.from_object(DevConfig)
 
     ### Connect to database 
     db.init_app(app)
