@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .bg-main {
+        background-color: #0f172a;
+    }
+
+    .bg-main-20 {
+        background-color: #262c3e;
+    }
+
+    .bg-accent {
+        background-color: #2e9e8a;
+    }
+
+    .bg-accent-40 {
+        background-color: #67b4a3;
+    }
+
+    .bg-accent-100 {
+        background-color: #aad4c9;
+    }
+}
