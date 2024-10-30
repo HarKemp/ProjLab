@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, url_for, flash, request, redirect, current_app, send_from_directory
-from flask_login import login_required
+from flask import Blueprint, render_template, url_for, request, redirect, session
+from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 import os
@@ -15,14 +15,20 @@ def index():
 @main.route("/homepage", methods=['GET', 'POST'])
 @login_required
 def homepage():
-    return render_template("homepage.html")
+    if current_user.is_authenticated:
+        return render_template("homepage.html")
+    else:
+        return redirect(main.index)
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload_page():
     if request.method == 'POST':
         if file_upload():
-            return redirect(url_for('main.upload_page'))
+            # Check if a file has been uploaded by checking session
+            file_uploaded = 'file_id' in session
+            return render_template('upload.html', file_uploaded=file_uploaded)
+            # return redirect(url_for('main.upload_page'))
         else:
             return redirect(request.url)
 

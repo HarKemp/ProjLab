@@ -85,6 +85,7 @@ def insert_file_in_db(filename, file_data):
     # TODO check if the correct user
     user_id = session['user_id']
     new_file = File(user_id=user_id, title=filename, file_data=file_data)
+    session['file_id'] = new_file.id
     db.session.add(new_file)
     db.session.commit()
 
