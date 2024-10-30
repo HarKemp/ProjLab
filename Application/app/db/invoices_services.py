@@ -1,6 +1,6 @@
 from app.__init__ import db
 
-services_emissions = db.Table('services_emissions',
+invoices_services = db.Table('invoices_services',
                              db.Column('invoice_id', db.Integer, db.ForeignKey('invoices.id'), primary_key=True),
-                             db.Column('emission_id', db.Integer, db.ForeignKey('emissions.id'), primary_key=True)
+                             db.Column('service_id', db.Integer, db.ForeignKey('services.id'), primary_key=True)
                              )

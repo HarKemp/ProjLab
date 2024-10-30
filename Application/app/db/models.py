@@ -5,6 +5,7 @@ from app.__init__ import db
 # models
 from .users import User
 from .files import File
-from .invoices import Invoices
-from .emissions import Emissions
-from .services_emissions import services_emissions
+from .invoices import Invoice
+from .services import Service
+from .emissions import Emission
+from .invoices_services import invoices_services
