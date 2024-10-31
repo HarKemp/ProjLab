@@ -12,7 +12,7 @@ def file_upload():
     max_upload_size = current_app.config['MAX_UPLOAD_SIZE']
     upload_folder = current_app.config['UPLOAD_FOLDER']
     try:
-        files = request.files.getlist('file')
+        files = request.files.getlist('files')
         # If no file is selected
         if not files or files[0].filename == '':
             flash('No file selected', 'alert-danger')
@@ -20,8 +20,8 @@ def file_upload():
         # If incorrect file extension
         for file in files:
             if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
-                flash(f'Invalid file format for {file.filename}', 'alert-danger')
-                continue  # Skip the invalid file
+                # flash(f'Invalid file format for {file.filename}', 'alert-danger')
+                return False  # Stop processing and return False
             # If file is allowed
             # Secure the filename and save it to the upload folder
             filename = secure_filename(file.filename)

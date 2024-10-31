@@ -1,8 +1,121 @@
 {% extends "layout.html" %}
-{% block title %}Home Page{% endblock %}
+{% block title %}Homepage Page{% endblock %}
 {% block body %}
-<div class="center-element">
-    <h1 style="font-size:80px;">Hello ( ͡° ͜ʖ ͡° )</h1>
-    <a href="{{ url_for('auth.logout') }}" style="font-size:20px">logout</a>
+
+{% include 'navbar.html' %}
+
+<div class="flex flex-col items-center justify-start min-h-screen pt-10 relative" >
+
+    
+    <h1 class="text-4xl dark:text-slate-400 font-bold mb-6 text-black">Upload invoice</h1>
+    
+    <div class="text-center flex flex-col items-center mb-4">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}" class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
+        <div 
+            id="dropArea" 
+            class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
+            onclick="document.getElementById('fileInput').click()"
+        >
+            <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
+            <input type="file" name="files" id="fileInput" multiple required class="hidden" onchange="showFileNames()">
+        </div>
+
+        <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul> 
+        
+        <button type="submit" class="w-full bg-blue-500  text-white py-2 rounded hover:bg-blue-600 transition duration-200">Upload</button>
+    </form>
 </div>
+
+<script>
+    let selectedFiles = []; 
+
+    function showFileNames() {
+        const fileInput = document.getElementById('fileInput');
+        const fileNamesDisplay = document.getElementById('fileNames');
+        const files = fileInput.files;
+
+        fileNamesDisplay.innerHTML = '';
+
+        selectedFiles = Array.from(files); 
+        const validFiles = selectedFiles.every(file => file.type === 'application/pdf');
+
+        if (selectedFiles.length > 0) {
+            selectedFiles.forEach((file, index) => {
+                const li = document.createElement('li');
+                li.classList.add('flex', 'justify-between', 'items-center');
+
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                li.appendChild(fileName);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'text-red-500 ml-4 hover:underline';
+                deleteButton.onclick = () => {
+                    deleteFile(index);
+                };
+                
+                li.appendChild(deleteButton);
+                fileNamesDisplay.appendChild(li);
+            });
+
+            if (!validFiles) {
+            const errorMessage = document.createElement('li');
+            errorMessage.classList.add('mt-7'); 
+            errorMessage.innerHTML = `<span class="text-red-500">Only PDF files are allowed</span>`;
+            fileNamesDisplay.appendChild(errorMessage);
+        }
+
+        }
+    }
+
+    function deleteFile(index) {
+        selectedFiles.splice(index, 1);
+
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        document.getElementById('fileInput').files = dataTransfer.files;
+
+        showFileNames();
+    }
+
+    const dropArea = document.getElementById('dropArea');
+
+    dropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropArea.classList.add('bg-gray-300');
+    });
+
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('bg-gray-300');
+    });
+
+    dropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropArea.classList.remove('bg-gray-300');
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            const dataTransfer = new DataTransfer();
+            for (let i = 0; i < files.length; i++) {
+                dataTransfer.items.add(files[i]);
+            }
+            document.getElementById('fileInput').files = dataTransfer.files;
+            showFileNames();  
+        }
+    });
+</script>
 {% endblock %}
