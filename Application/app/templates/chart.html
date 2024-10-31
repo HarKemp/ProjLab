@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block title %}Home Page{% endblock %}
 {% block body %}
+{% include 'navbar.html' %}
 <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
-<div class="center-element">
+<div class="center-element py-10" >
     <!-- Chart.js test -->
     <div>work pls</div>
     <canvas id="myChart" width="400" height="400"></canvas>
