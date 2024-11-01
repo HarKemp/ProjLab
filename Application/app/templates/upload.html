@@ -15,14 +15,14 @@
                     </div>
                 {% endif %}
             {% endwith %}
-        </div>
         <div>
             <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.upload_page') }}" class="flex flex-col items-center space-y-4">
             <input class="lock w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" id="formFile" name="file" multiple>
             <input type="submit" value="Upload" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer">
-        </form>
-        <button id="ocrButton" method="POST" action="{{ url_for('ocr.convert_text') }}" class="flex flex-col px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer">Convert invoice</button>
+            </form>
 
-        </div>
+            <form  method="POST" action="{{ url_for('ocr.convert_text') }}" class="flex flex-col items-center space-y-4">
+            <button id="ocrButton"  class="flex flex-col px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer">Convert invoice</button>
+            </form>
     </div>
 {% endblock %}
