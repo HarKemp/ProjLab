@@ -12,6 +12,7 @@ class Config(object):
     # Allowed file extensions for upload
     ALLOWED_EXTENSIONS = {'pdf'}
 
+    # Max allowed single upload size ->
     MAX_CONTENT_LENGTH = MAX_UPLOAD_SIZE * 1024 * 1024  # MiB
 
     ### Creates the directories for file storage in the TEMP_FILE_DIRECTORY

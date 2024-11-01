@@ -4,7 +4,9 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from .db.files import File
 from app.__init__ import db
 import pandas as pd
+from datetime import datetime
 import os
+from .db.models import User
 
 
 def file_upload():
@@ -12,6 +14,7 @@ def file_upload():
     max_upload_size = current_app.config['MAX_UPLOAD_SIZE']
     upload_folder = current_app.config['UPLOAD_FOLDER']
     try:
+        # Get list of all files selected
         files = request.files.getlist('files')
         # If no file is selected
         if not files or files[0].filename == '':
@@ -21,12 +24,13 @@ def file_upload():
         for file in files:
             if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
                 # flash(f'Invalid file format for {file.filename}', 'alert-danger')
-                return False  # Stop processing and return False
+                return False  # Stop processing
             # If file is allowed
             # Secure the filename and save it to the upload folder
             filename = secure_filename(file.filename)
-            insert_file_in_db(filename, file.read())
             file.save(os.path.join(upload_folder, filename))
+            # Place copy of file in database
+            insert_file_in_db(filename, file.read())
             flash(f"File uploaded successfully: {filename}", 'alert-success')
         return True
 
@@ -53,19 +57,37 @@ def create_csv(report_folder, filename):
 
 def file_download(file_type):
     report_folder = current_app.config['REPORT_FOLDER']
-    # TODO dynamically change the name of the report file based on user/company/time/date
-    # Name the specific file to be downloaded
-    filename = 'report.csv'
-    # Create a summary of the invoices in .csv format
+
+    # get current date and time -> date,month,year  hour,minute,second
+    current_datetime = datetime.now().strftime("%d%m%Y_%H%M%S")
+
+    # Get current users id
+    user_id = session.get('user_id')
+    # Find user in database
+    user = User.query.get(user_id) if user_id else None
+    # Get username for current user
+    username = user.username if user and user.username else ""
+    # Get group and replace spaces in group name with an underscore
+    group = user.group.replace(" ", "_") if user and user.group else ""
+
+    filename = f'report-{username}-{group}-{current_datetime}'
+    os.path.join(report_folder, filename)
+
+    # Create a summary of the invoices in csv format
     if file_type == 'summary':
         try:
+            # Create csv file
             create_csv(report_folder, filename)
-            return send_from_directory(report_folder, filename, as_attachment=True)
+            # Send file to user
+            response = send_from_directory(report_folder, filename, as_attachment=True)
+            # Delete csv file
+            os.remove(file_path)
+            return response
         except Exception as e:
             flash(f'Download failed: {str(e)}', 'alert-danger')
             return False
 
-    # TODO Create a summary of the emissions in pdf format
+    # TODO Create a summary of the emissions in pdf or excel format
     elif file_type == 'report':
         # try:
         #     filename = 'report.txt'  # Name of the specific file to be downloaded
