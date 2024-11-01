@@ -1,9 +1,5 @@
 from flask import Blueprint, render_template, url_for, request, redirect, session
-from flask_login import login_required, current_user
-
-from werkzeug.utils import secure_filename
-from werkzeug.exceptions import RequestEntityTooLarge
-import os
+from flask_login import login_required
 
 from .utils import file_upload, file_download
 
@@ -16,16 +12,14 @@ def index():
 @main.route("/homepage", methods=['GET', 'POST'])
 @login_required
 def homepage():
-    file_uploaded = False
     if request.method == 'POST':
-        if current_user.is_authenticated:
             if file_upload():
                 file_uploaded = 'file_id' in session
-                return redirect(url_for('main.homepage' , file_uploaded=file_uploaded))
+                session['file_uploaded'] = file_uploaded
+                return redirect(url_for('main.homepage'))
             else:
                 return redirect(request.url)
-    else:
-        return url_for("main.index")
+    file_uploaded = session.pop('file_uploaded', False)
     return render_template("homepage.html", file_uploaded=file_uploaded)
 
 @main.route('/upload', methods=['GET', 'POST'])
