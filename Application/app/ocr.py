@@ -7,6 +7,7 @@ ocr = Blueprint('ocr', __name__)
 @ocr.route('/convert-text/<int:file_id>', methods=['POST'])
 @login_required
 def convert_text(file_id):
+    # TODO make sure only owner can upload the file
     if file_id is None or not isinstance(file_id, int) or file_id < 1:
         print("NOK")
         return redirect(url_for('main.homepage'))
