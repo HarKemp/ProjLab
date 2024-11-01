@@ -53,13 +53,16 @@
                 </button>
 
             </form>
-            <button type="submit" id="ocrButton"
+
+            <form id="ocrForm" action="{{ url_for('ocr.convert_text', file_id=file_id) }}" method="post">
+                <button type="submit" id="ocrButton"
+
                     class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
                 Convert invoice
-            </button>
+                </button>
+            </form>
+
         </div>
-
-
     </div>
 
     <script>

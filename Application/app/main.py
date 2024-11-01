@@ -15,12 +15,15 @@ def homepage():
     if request.method == 'POST':
             if file_upload():
                 file_uploaded = 'file_id' in session
+                file_id = session.get('file_id')
+                print(file_id)
                 session['file_uploaded'] = file_uploaded
                 return redirect(url_for('main.homepage'))
             else:
                 return redirect(request.url)
     file_uploaded = session.pop('file_uploaded', False)
-    return render_template("homepage.html", file_uploaded=file_uploaded)
+    file_id = session.pop('file_id')
+    return render_template("homepage.html", file_uploaded=file_uploaded, file_id=file_id)
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
