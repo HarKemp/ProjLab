@@ -14,12 +14,11 @@
     
         <p class="text-center font-semibold text-gray-200 md:text-3xl lg:text-4xl">LOGIN</p>
     </div>
-
     <div class="bg-gray-100  lg:w-4/12 md:w-5/12 w-6/12 shadow-lg rounded-2xl" style="background-color: #262c3e;">
-        {% with messages = get_flashed_messages() %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
-        <div class="bg-red-600 text-center text-white p-4 rounded  ">
-            {{ messages[0] }}
+        <div class="{% if messages[0][0] == 'alert-success' %} bg-green-500 {% else %} bg-red-600 {% endif %} text-white text-center p-4 rounded">
+            {{ messages[0][1] }}
         </div>
         {% endif %}
         {% endwith %}
@@ -38,7 +37,7 @@
                 <input type="password" name="password" id="password" class="bg-gray-200 dark:bg-zinc-300 text-black dark:placeholder-gray-400 rounded pl-12 py-2 md:py-4 focus:outline-none w-full" placeholder="Password" autocomplete="off" />
             </div>
             <button type="submit" class="  font-bold p-2 md:p-4 text-white uppercase w-full rounded bg-accent-40 hover:bg-accent" style=" color: #080a0a;">Login</button>
-            <a href="" class="block mx-auto text-center mt-4 dark:text-teal-50 ">Create account</a>
+            <a href="{{ url_for('auth.register') }}" class="block mx-auto text-center mt-4 dark:text-teal-50 ">Create account</a>
 
         </form>
     </div>

@@ -71,86 +71,97 @@
         const errorMessage = document.getElementById('fileMessage');
         let selectedFiles = [];
 
-        function showFileNames() {
-            const fileNamesDisplay = document.getElementById('fileNames');
-            const files = fileInput.files;
+    function showFileNames() {
+        const fileNamesDisplay = document.getElementById('fileNames');
 
-            fileNamesDisplay.innerHTML = '';
+        fileNamesDisplay.innerHTML = '';
 
-            // Hide the error message
-            errorMessage.style.display = 'none';
+        // Hide the error message
+        errorMessage.style.display = 'none';
 
-            // Get the selected files as an array
-            selectedFiles = Array.from(files);
+        // Display loop for selected files
+        if (selectedFiles.length > 0) {
+            selectedFiles.forEach((file, index) => {
+                // If the file is not a PDF, display an error message and remove it from the selectedFiles array
+                if (file.type !== 'application/pdf') {
+                    errorMessage.style.display = 'block';
+                    // Remove the invalid file from the selectedFiles array
+                    selectedFiles.splice(index, 1);
+                }
+                else
+                {
+                    const li = document.createElement('li');
+                    li.classList.add('flex', 'justify-between', 'items-center');
 
-            // Display loop for selected files
-            if (selectedFiles.length > 0) {
-                selectedFiles.forEach((file, index) => {
-                    // If the file is not a PDF, display an error message and remove it from the selectedFiles array
-                    if (file.type !== 'application/pdf') {
-                        errorMessage.style.display = 'block';
-                        // Remove the invalid file from the selectedFiles array
-                        selectedFiles.splice(index, 1);
-                    } else {
-                        const li = document.createElement('li');
-                        li.classList.add('flex', 'justify-between', 'items-center');
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    li.appendChild(fileName);
 
-                        const fileName = document.createElement('span');
-                        fileName.textContent = file.name;
-                        li.appendChild(fileName);
-
-                        const deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Delete';
-                        deleteButton.className = 'text-red-500 ml-4 hover:underline';
-                        deleteButton.onclick = () => {
-                            deleteFile(index);
-                        };
-
-                        li.appendChild(deleteButton);
-                        fileNamesDisplay.appendChild(li);
-                    }
-                });
-            }
-        }
-
-        function deleteFile(index) {
-            selectedFiles.splice(index, 1);
-            updateFileInput();
-            showFileNames();
-        }
-
-        function updateFileInput() {
-            const dataTransfer = new DataTransfer();
-            selectedFiles.forEach(file => {
-                dataTransfer.items.add(file);
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.className = 'text-red-500 ml-4 hover:underline';
+                    deleteButton.onclick = () => {
+                        deleteFile(index);
+                    };
+                    
+                    li.appendChild(deleteButton);
+                    fileNamesDisplay.appendChild(li);
+                }
             });
-            fileInput.files = dataTransfer.files;
         }
+    }
 
-        dropArea.addEventListener('dragover', (event) => {
-            event.preventDefault();
-            dropArea.classList.add('bg-gray-300');
+    function deleteFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileInput();
+        showFileNames();
+    }
+
+    function updateFileInput() {
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
         });
+        fileInput.files = dataTransfer.files;
+    }
 
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.classList.remove('bg-gray-300');
-        });
+    function isDuplicate(file) {
+        return selectedFiles.some(existingFile =>
+            existingFile.name === file.name && existingFile.size === file.size
+        );
+    }
 
-        dropArea.addEventListener('drop', (event) => {
-            event.preventDefault();
-            dropArea.classList.remove('bg-gray-300');
+    dropArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropArea.classList.add('bg-gray-300');
+    });
 
-            const files = Array.from(event.dataTransfer.files);
-            selectedFiles = selectedFiles.concat(files);
+    dropArea.addEventListener('dragleave', () => {
+        dropArea.classList.remove('bg-gray-300');
+    });
 
-            if (files.length > 0) {
-                updateFileInput();
-                showFileNames();
-            }
-        });
+    dropArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropArea.classList.remove('bg-gray-300');
 
-        fileInput.addEventListener('change', (event) => {
+        const files = Array.from(event.dataTransfer.files);
+        const newFiles = files.filter(file => !isDuplicate(file));
+        selectedFiles = selectedFiles.concat(newFiles);
+
+        if (files.length > 0) {
             updateFileInput();
-        });
-    </script>
+            showFileNames();  
+        }
+    });
+
+    fileInput.addEventListener('change', () => {
+        const files = Array.from(fileInput.files);
+
+        const newFiles = files.filter(file => !isDuplicate(file));
+        selectedFiles = selectedFiles.concat(newFiles);
+
+        updateFileInput();
+        showFileNames();
+    });
+</script>
 {% endblock %}
