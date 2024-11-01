@@ -46,15 +46,11 @@
 
     function showFileNames() {
         const fileNamesDisplay = document.getElementById('fileNames');
-        const files = fileInput.files;
 
         fileNamesDisplay.innerHTML = '';
 
         // Hide the error message
         errorMessage.style.display = 'none';
-
-        // Get the selected files as an array
-        selectedFiles = Array.from(files);
 
         // Display loop for selected files
         if (selectedFiles.length > 0) {
@@ -102,6 +98,12 @@
         fileInput.files = dataTransfer.files;
     }
 
+    function isDuplicate(file) {
+        return selectedFiles.some(existingFile =>
+            existingFile.name === file.name && existingFile.size === file.size
+        );
+    }
+
     dropArea.addEventListener('dragover', (event) => {
         event.preventDefault();
         dropArea.classList.add('bg-gray-300');
@@ -116,7 +118,8 @@
         dropArea.classList.remove('bg-gray-300');
 
         const files = Array.from(event.dataTransfer.files);
-        selectedFiles = selectedFiles.concat(files);
+        const newFiles = files.filter(file => !isDuplicate(file));
+        selectedFiles = selectedFiles.concat(newFiles);
 
         if (files.length > 0) {
             updateFileInput();
@@ -124,8 +127,14 @@
         }
     });
 
-    fileInput.addEventListener('change', (event) => {
+    fileInput.addEventListener('change', () => {
+        const files = Array.from(fileInput.files);
+
+        const newFiles = files.filter(file => !isDuplicate(file));
+        selectedFiles = selectedFiles.concat(newFiles);
+
         updateFileInput();
+        showFileNames();
     });
 </script>
 {% endblock %}
