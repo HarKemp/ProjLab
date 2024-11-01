@@ -2,47 +2,74 @@
 {% block title %}Homepage Page{% endblock %}
 {% block body %}
 
-{% include 'navbar.html' %}
+    {% include 'navbar.html' %}
+    {% block style %}
+        <style>
+            #ocrButton {
+                display: {% if file_uploaded %} block {% else %} none {% endif %};
+                padding: 10px 20px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+        </style>
+    {% endblock %}
 
-<div class="flex flex-col items-center justify-start min-h-screen pt-10 relative" >
+    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
 
-    
-    <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
-    
-    <div class="text-center flex flex-col items-center mx-4 min-h-6">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold'}}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
-    </div>
-    
-    <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}" class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
-        <div 
-            id="dropArea" 
-            class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
-            onclick="document.getElementById('fileInput').click()"
-        >
-            <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
-            <input type="file" name="files" id="fileInput" multiple required class="hidden" onchange="showFileNames()" accept="application/pdf">
+
+        <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
+
+        <div class="text-center flex flex-col items-center mx-4 min-h-6">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
         </div>
 
-        <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul> 
-        
-        <button type="submit" class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">Upload</button>
-    </form>
-</div>
 
-<script>
-    const fileInput = document.getElementById('fileInput');
-    const dropArea = document.getElementById('dropArea');
-    const errorMessage = document.getElementById('fileMessage');
-    let selectedFiles = []; 
+        <div class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
+            <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
+                <div
+                        id="dropArea"
+                        class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
+                        onclick="document.getElementById('fileInput').click()"
+                >
+                    <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
+                    <input type="file" name="files" id="fileInput" multiple required class="hidden"
+                           onchange="showFileNames()" accept="application/pdf">
+                </div>
+
+                <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
+
+                <button type="submit"
+                        class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
+                    Upload
+                </button>
+
+            </form>
+
+            <form id="ocrForm" action="{{ url_for('ocr.convert_text', file_id=file_id) }}" method="post">
+                <button type="submit" id="ocrButton"
+
+                    class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
+                Convert invoice
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const dropArea = document.getElementById('dropArea');
+        const errorMessage = document.getElementById('fileMessage');
+        let selectedFiles = [];
 
     function showFileNames() {
         const fileNamesDisplay = document.getElementById('fileNames');

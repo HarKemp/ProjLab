@@ -15,10 +15,10 @@
                     </div>
                 {% endif %}
             {% endwith %}
-        </div>
-        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.upload_page') }}" class="flex flex-col items-center space-y-4">
+        <div>
+            <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.upload_page') }}" class="flex flex-col items-center space-y-4">
             <input class="lock w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" type="file" id="formFile" name="file" multiple>
             <input type="submit" value="Upload" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 cursor-pointer">
-        </form>
-    </div>
+            </form>
+        </div>
 {% endblock %}
