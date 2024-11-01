@@ -7,18 +7,19 @@
 <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative" >
 
     
-    <h1 class="text-4xl dark:text-slate-400 font-bold mb-6 text-black">Upload invoice</h1>
+    <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
     
-    <div class="text-center flex flex-col items-center mb-4">
+    <div class="text-center flex flex-col items-center mx-4 min-h-6">
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
+                    <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold'}}">
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
+        <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
     </div>
     
     <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}" class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
@@ -28,55 +29,62 @@
             onclick="document.getElementById('fileInput').click()"
         >
             <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
-            <input type="file" name="files" id="fileInput" multiple required class="hidden" onchange="showFileNames()">
+            <input type="file" name="files" id="fileInput" multiple required class="hidden" onchange="showFileNames()" accept="application/pdf">
         </div>
 
         <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul> 
         
-        <button type="submit" class="w-full bg-blue-500  text-white py-2 rounded hover:bg-blue-600 transition duration-200">Upload</button>
+        <button type="submit" class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">Upload</button>
     </form>
 </div>
 
 <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropArea = document.getElementById('dropArea');
+    const errorMessage = document.getElementById('fileMessage');
     let selectedFiles = []; 
 
     function showFileNames() {
-        const fileInput = document.getElementById('fileInput');
         const fileNamesDisplay = document.getElementById('fileNames');
         const files = fileInput.files;
 
         fileNamesDisplay.innerHTML = '';
 
-        selectedFiles = Array.from(files); 
-        const validFiles = selectedFiles.every(file => file.type === 'application/pdf');
+        // Hide the error message
+        errorMessage.style.display = 'none';
 
+        // Get the selected files as an array
+        selectedFiles = Array.from(files);
+
+        // Display loop for selected files
         if (selectedFiles.length > 0) {
             selectedFiles.forEach((file, index) => {
-                const li = document.createElement('li');
-                li.classList.add('flex', 'justify-between', 'items-center');
+                // If the file is not a PDF, display an error message and remove it from the selectedFiles array
+                if (file.type !== 'application/pdf') {
+                    errorMessage.style.display = 'block';
+                    // Remove the invalid file from the selectedFiles array
+                    selectedFiles.splice(index, 1);
+                }
+                else
+                {
+                    const li = document.createElement('li');
+                    li.classList.add('flex', 'justify-between', 'items-center');
 
-                const fileName = document.createElement('span');
-                fileName.textContent = file.name;
-                li.appendChild(fileName);
+                    const fileName = document.createElement('span');
+                    fileName.textContent = file.name;
+                    li.appendChild(fileName);
 
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.className = 'text-red-500 ml-4 hover:underline';
-                deleteButton.onclick = () => {
-                    deleteFile(index);
-                };
-                
-                li.appendChild(deleteButton);
-                fileNamesDisplay.appendChild(li);
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.className = 'text-red-500 ml-4 hover:underline';
+                    deleteButton.onclick = () => {
+                        deleteFile(index);
+                    };
+                    
+                    li.appendChild(deleteButton);
+                    fileNamesDisplay.appendChild(li);
+                }
             });
-
-            if (!validFiles) {
-            const errorMessage = document.createElement('li');
-            errorMessage.classList.add('mt-7'); 
-            errorMessage.innerHTML = `<span class="text-red-500">Only PDF files are allowed</span>`;
-            fileNamesDisplay.appendChild(errorMessage);
-        }
-
         }
     }
 
@@ -91,10 +99,8 @@
         selectedFiles.forEach(file => {
             dataTransfer.items.add(file);
         });
-        document.getElementById('fileInput').files = dataTransfer.files;
+        fileInput.files = dataTransfer.files;
     }
-
-    const dropArea = document.getElementById('dropArea');
 
     dropArea.addEventListener('dragover', (event) => {
         event.preventDefault();
@@ -118,12 +124,8 @@
         }
     });
 
-    document.getElementById('fileInput').addEventListener('change', (event) => {
-        const newFiles = Array.from(event.target.files);
-        selectedFiles = selectedFiles.concat(newFiles);
-
+    fileInput.addEventListener('change', (event) => {
         updateFileInput();
-        showFileNames();
     });
 </script>
 {% endblock %}
