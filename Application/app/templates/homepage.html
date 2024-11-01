@@ -82,14 +82,16 @@
 
     function deleteFile(index) {
         selectedFiles.splice(index, 1);
+        updateFileInput();
+        showFileNames();
+    }
 
+    function updateFileInput() {
         const dataTransfer = new DataTransfer();
         selectedFiles.forEach(file => {
             dataTransfer.items.add(file);
         });
         document.getElementById('fileInput').files = dataTransfer.files;
-
-        showFileNames();
     }
 
     const dropArea = document.getElementById('dropArea');
@@ -107,15 +109,21 @@
         event.preventDefault();
         dropArea.classList.remove('bg-gray-300');
 
-        const files = event.dataTransfer.files;
+        const files = Array.from(event.dataTransfer.files);
+        selectedFiles = selectedFiles.concat(files);
+
         if (files.length > 0) {
-            const dataTransfer = new DataTransfer();
-            for (let i = 0; i < files.length; i++) {
-                dataTransfer.items.add(files[i]);
-            }
-            document.getElementById('fileInput').files = dataTransfer.files;
+            updateFileInput();
             showFileNames();  
         }
+    });
+
+    document.getElementById('fileInput').addEventListener('change', (event) => {
+        const newFiles = Array.from(event.target.files);
+        selectedFiles = selectedFiles.concat(newFiles);
+
+        updateFileInput();
+        showFileNames();
     });
 </script>
 {% endblock %}

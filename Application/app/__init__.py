@@ -21,13 +21,14 @@ def create_app():
     ### Connect to database 
     db.init_app(app)
 
-    ### Create Test User On SQLite Database
-    from app.db.models import User
-    if env == 'development':
-        # Create SQLite database tables
-        with app.app_context():
-            db.create_all()
+    # Create database tables
+    from app.db.models import User, File, Invoice, Service, Emission, invoices_services
+    with app.app_context():
+        db.create_all()
 
+    ### Create Test User On SQLite Database
+    if env == 'development':
+        with app.app_context():
             # Test user credentials
             test_username = "test"
             test_password = "cilveks"

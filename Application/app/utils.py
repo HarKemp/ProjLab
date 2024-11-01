@@ -32,7 +32,7 @@ def file_upload():
 
     except RequestEntityTooLarge:
         # Handle the specific error for large files
-        flash(f"File is too large. Maximum size allowed is {max_upload_size} MB.", 'alert-danger')
+        flash(f"Files are too large. Maximum upload size is {max_upload_size} MB.", 'alert-danger')
         return False
     except Exception as e:
         flash(f"An unexpected error occurred: {str(e)}", 'alert-danger')
