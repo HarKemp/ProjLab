@@ -15,10 +15,15 @@ def index():
 @main.route("/homepage", methods=['GET', 'POST'])
 @login_required
 def homepage():
-    if current_user.is_authenticated:
-        return render_template("homepage.html")
+    if request.method == 'POST':
+        if current_user.is_authenticated:
+            if file_upload():
+                return redirect(url_for('main.homepage'))
+            else:
+                return redirect(request.url)
     else:
-        return redirect(main.index)
+        return (url_for("main.index"))
+    return render_template("homepage.html")
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required

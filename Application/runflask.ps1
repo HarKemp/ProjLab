@@ -17,5 +17,15 @@ if ($runTailwind -eq 'Y' -or $runTailwind -eq 'y') {
     Start-Process powershell -ArgumentList "npx tailwindcss -i ./app/static/styles/input.css -o ./app/static/styles/tailwind.css --watch"
 }
 
+# Prompt if the flask server should be hosted locally
+$hostLocally = Read-Host "Do you want to host the application locally? (Y/N)"
+if ($hostLocally -eq 'Y' -or $hostLocally -eq 'y') {
+    # Run flask with --host parameter
+    flask --debug run --host=0.0.0.0
+}
+else {
+    flask --debug run
+}
+
 # Run Flask in debug mode
 flask --debug run

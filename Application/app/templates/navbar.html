@@ -1,0 +1,30 @@
+<div class="relative bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-200 border-b-2 border-gray-300 dark:border-gray-500 " style="background-color:#262c3e;">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-center  space-x-10 py-3 md:py-4 xl:py-6 md:justify-start">
+            <div class="flex justify-start lg:w-0 lg:flex-1">
+                <a href="{{ url_for('main.homepage') }}" class="text-1xl md:text-2xl hover:text-gray-900 dark:hover:text-gray-400 font-semibold leading-tight">
+                    Homepage
+                </a>
+            </div>
+            <nav class="flex space-x-10 text-sm md:text-base font-medium">
+                <a href="{{ url_for('main.chart') }}" class="hover:text-gray-900 dark:hover:text-gray-400">
+                    Chart
+                </a>
+                
+                <a href="{{ url_for('main.download_page') }}" class="hover:text-gray-900 dark:hover:text-gray-400">
+                    Download
+                </a>
+
+                <a href="{{ url_for('main.upload_page') }}" class="hover:text-gray-900 dark:hover:text-gray-400">
+                    Upload
+                </a>
+            </nav>
+            <div class="flex items-center justify-end flex-1 lg:w-0">
+                <div class="flex justify-center items-center">
+                    <a href="{{ url_for('auth.logout') }}" class=" absolute right-8 bg-accent-40 text-black py-1.5 px-4 rounded hover:bg-accent transition duration-200" >Logout</a>
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</div>
