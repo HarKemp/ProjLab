@@ -109,4 +109,5 @@ def insert_file_in_db(filename, file_data):
     new_file = File(user_id=user_id, title=filename, file_data=file_data)
     db.session.add(new_file)
     db.session.commit()
+    session['file_id'] = new_file.id
 

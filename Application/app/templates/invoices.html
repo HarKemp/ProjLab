@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Homepage Page{% endblock %}
+{% block body %}
+
+    {% include 'navbar.html' %}
+    {% block style %}
+        <style>
+            #ocrButton {
+                display: {% if file_uploaded %} block {% else %} none {% endif %};
+                padding: 10px 20px;
+                justify-content: center;
+                margin-top: 20px;
+            }
+        </style>
+    {% endblock %}
+
+    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
+
+
+        <h1 class="text-4xl font-bold mb-6 text-white">My invoices</h1>
+
+        <div class="text-center flex flex-col items-center mx-4 min-h-6">
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
+        </div>
+
+    </div>
+
+{% endblock %}
