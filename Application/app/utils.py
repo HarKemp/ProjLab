@@ -1,12 +1,11 @@
 from flask import flash, request, current_app, send_from_directory, session
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
-from .db.files import File
+from .db.models import File, User
 from app.__init__ import db
 import pandas as pd
 from datetime import datetime
 import os
-from .db.models import User
 
 
 def file_upload():
@@ -43,8 +42,7 @@ def file_upload():
         return False
 
 
-def create_csv(report_folder, filename):
-    file_path = os.path.join(report_folder, filename)
+def create_csv(file_path):
     # TODO Read data from the database
     data = {
         'Company': ['LMT', 'CircleK', 'KKas'],
@@ -70,19 +68,17 @@ def file_download(file_type):
     # Get group and replace spaces in group name with an underscore
     group = user.group.replace(" ", "_") if user and user.group else ""
 
-    filename = f'report-{username}-{group}-{current_datetime}'
-    os.path.join(report_folder, filename)
+    filename = f'report-{username}-{group}-{current_datetime}.csv'
+    file_path = os.path.join(report_folder, filename)
 
+    # TODO Delete the csv file when no longer needed
     # Create a summary of the invoices in csv format
     if file_type == 'summary':
         try:
             # Create csv file
-            create_csv(report_folder, filename)
+            create_csv(file_path)
             # Send file to user
-            response = send_from_directory(report_folder, filename, as_attachment=True)
-            # Delete csv file
-            os.remove(file_path)
-            return response
+            return send_from_directory(report_folder, filename, as_attachment=True)
         except Exception as e:
             flash(f'Download failed: {str(e)}', 'alert-danger')
             return False
