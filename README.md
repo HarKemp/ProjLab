@@ -8,6 +8,8 @@ Kursa darba apraksts pieejams /Docs/
 ## Nepieciešams
 * Python 3.12.4 vai jaunāks
 * Microsoft C++ Build Tools - priekš Greenlet
+* poppler-utils - PDF apstrādei
+* pytesseract lang packages for Latvian, Estonian, Lithuanian
 
 # Šim setup vajadzētu strādāt uz visual studio code (Pycharm drošvien līdzīgi)
 ## 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.
