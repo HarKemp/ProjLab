@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
-{% block title %}Homepage Page{% endblock %}
-{% block body %}
+{% block title %}My Invoices{% endblock %}
 
+{% block body %}
     {% include 'navbar.html' %}
+
     {% block style %}
         <style>
             #ocrButton {
@@ -11,13 +12,35 @@
                 justify-content: center;
                 margin-top: 20px;
             }
+            .invoice-table, .services-table {
+                width: 100%; /* Ensure full width */
+            }
+            .invoice-table td, .services-table td {
+                text-align: center; /* Center text in table cells */
+                color: black; /* Set text color to black */
+            }
+            .invoice-table th, .services-table th {
+                color: black; /* Set heading text color to black */
+            }
+            .services-table {
+                margin-top: 10px; /* Add some space between tables */
+            }
+            /* Optional: Improve readability */
+            .invoice-table th, .services-table th {
+                background-color: #f3f4f6; /* Light grey background for headers */
+            }
+            /* Ensure the rows do not span over 2 rows */
+            .invoice-table, .services-table {
+                border-collapse: collapse; /* Ensure there are no gaps between cells */
+            }
+            .invoice-table td, .services-table td {
+                padding: 10px; /* Add padding for better spacing */
+            }
         </style>
     {% endblock %}
 
     <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
-
-
-        <h1 class="text-4xl font-bold mb-6 text-white">My invoices</h1>
+        <h1 class="text-4xl font-bold mb-6 text-white">My Invoices</h1>
 
         <div class="text-center flex flex-col items-center mx-4 min-h-6">
             {% with messages = get_flashed_messages(with_categories=True) %}
@@ -32,6 +55,65 @@
             <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
         </div>
 
+        <!-- Invoice Table -->
+        <div class="w-full max-w-4xl bg-white rounded-lg shadow-md mt-6">
+            <table class="invoice-table min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issue Date</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Number</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Address</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Address</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Registration Number</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Registration Number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for invoice in invoices %}
+                    <tr>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.sum_total }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_address }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
+                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="9">
+                            <table class="services-table min-w-full leading-normal mt-2">
+                                <thead>
+                                    <tr>
+                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Description</th>
+                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th> <!-- Added price header -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for service in invoice.services %}
+                                    <tr>
+                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.name }}</td>
+                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.amount }}</td>
+                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.price }}</td> <!-- Added service price -->
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="border-b border-gray-200 bg-white text-sm text-center text-gray-500">No services found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 {% endblock %}

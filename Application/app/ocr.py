@@ -1,5 +1,5 @@
 from flask import Blueprint, session, url_for, request, redirect, render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.db.models import File, Invoice, Service
 from .ocr_utils import extract_text_from_pdf, get_ai_result, send_invoice
 
@@ -16,16 +16,12 @@ def convert_text(file_id):
         print("OK")
         file = File.query.get(file_id)
         
-        #     # Call ORC
+        #Call OCR
         ocr_results = extract_text_from_pdf(file.file_data)
         ai_result = get_ai_result(ocr_results)
-        # invoice = Invoice()
-        # print(ai_result)
-        print(ai_result['Goods'])
-        print(ai_result['SeparateCosts'])
-        print(ai_result['OrderedAmount'])
-        send_invoice(ai_result)
-        #     # Save invoice into DB
+        #Save invoice into DB
+        user_id = current_user.id
+        send_invoice(ai_result,user_id)
 
         #     # Redirect to MyInvoices
         # TODO show message about convert status
@@ -37,4 +33,8 @@ def my_invoices():
     print("Implement me")
     # Get all invoices by current user
     # pass the invoices invoices html
-    return render_template("invoices.html")
+    user_id = current_user.id
+    user_invoices = Invoice.query.filter_by(user_id=user_id).all()
+    print(user_invoices)
+    return render_template('invoices.html', invoices=user_invoices)
+

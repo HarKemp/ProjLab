@@ -9,6 +9,7 @@ import numpy as np
 import google.generativeai as genai
 from app.db.models import File, Invoice, Service
 import json
+from datetime import datetime
 # #apt-get install poppler-utils
 genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
 import typing_extensions as typing
@@ -17,12 +18,16 @@ from flask_login import current_user
 class Order(typing.TypedDict):
     OrderNumber: str
     Customer: str
+    CustomerAdress: str
     Supplier: str
     Goods: list[str]
     OrderedAmount: list[str]
     OrderDate: str
     Cost: str
     SeparateCosts: list[str]
+    SupplierAdress: str
+    SupplierRegNumber: str
+    CustomerRegNumber: str
 
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
@@ -148,11 +153,9 @@ def get_ai_result(ocr_results):
     # Output: combined_blocks will contain combined text for clustered words
     total_text = ""
     for block in combined_blocks:
-        print(f"{block['combined_text']}")
-        print()
         total_text += block['combined_text']
     # total_text = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
-    prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN."
+    prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN. Ja tekstā neatrodi vērtību kādam parametram, ievieto tekstu 'not found' Amount ir pasūtītās rēķina pozīcijas daudzums."
 
     response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
             response_mime_type="application/json", response_schema=list[Order]
@@ -166,7 +169,8 @@ def get_ai_result(ocr_results):
 
 # ocr_results = extract_text_from_pdf(pdf_path)
 # print(get_ai_result(ocr_results))
-def send_invoice(response):
+def send_invoice(response, user_id):
+    print(response)
     goods = response['Goods']
     services = []
     for j in range(len(goods)):
@@ -182,15 +186,29 @@ def send_invoice(response):
         except Exception as e:
             # Print any other unexpected error
             print("An error occurred:", e)
-    issuer = response['Supplier'][0]
-    issuer_registration_number = 1
-    issuer_address = ""
-    receiver = response['Customer'][0]
-    receiver_registration_number
-    receiver_address
+    try:
+        issuer = response['Supplier']
+        issuer_registration_number = response['SupplierRegNumber']
+        issuer_address = response['SupplierAdress']
+        receiver = response['Customer']
+        receiver_registration_number = response['CustomerRegNumber']
+        receiver_address = response['CustomerAdress']
 
-    # TODO: str to date
-    issue_date = response['OrderDate'][0]
-    issue_number = response['OrderNumber'][0]
-    sum_total = response['Cost'][0]
-    service = Service(name=name, user_id=current_user.id, issuer= )
+        # TODO: str to date, add checks for different dates
+        issue_date = response['OrderDate']
+        print(issue_date)
+        issue_date = datetime.strptime(issue_date, "%d.%m.%Y")
+        issue_number = response['OrderNumber']
+        sum_total = response['Cost']
+
+        invoice = Invoice(user_id=user_id,issuer=issuer,issuer_registration_number=issuer_registration_number,
+        issuer_address=issuer_address,receiver=receiver,receiver_registration_number=receiver_registration_number,
+        receiver_address=receiver_address,issue_date=issue_date,issue_number=issue_number,
+        sum_total=sum_total,services=services)
+        db.session.add(invoice)
+        db.session.commit()
+        print(invoice)
+
+    except Exception as e:
+            # Print any other unexpected error
+            print("An error occurred:", e)
