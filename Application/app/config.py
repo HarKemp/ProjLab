@@ -7,8 +7,8 @@ class Config(object):
     # Directories below are created under TEMP_FILE_DIRECTORY
     UPLOAD_FILE_DIRECTORY = 'uploads'
     REPORT_FILE_DIRECTORY = 'reports'
-    # Max allowed file upload size in MiB (total size in one upload)
-    MAX_UPLOAD_SIZE = 5
+    # Max allowed upload size in MiB (TOTAL size in one upload) // SINGLE file size is limited by 'files' table in db, which can store up to 16MB
+    MAX_UPLOAD_SIZE = 5 # Accepts values up to 50 <- limited by current nginx config on production web server
     # Allowed file extensions for upload
     ALLOWED_EXTENSIONS = {'pdf'}
 
