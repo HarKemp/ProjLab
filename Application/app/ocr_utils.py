@@ -1,22 +1,19 @@
 import fitz  # PyMuPDF
 import pytesseract
-from pdf2image import convert_from_path
+from pdf2image import convert_from_bytes
 from PIL import Image
 import io
 import os
 import cv2
 import numpy as np
 import google.generativeai as genai
-# #pip install -U google-generativeai 
+from app.db.models import File, Invoice, Service
+import json
 # #apt-get install poppler-utils
-# sudo apt install tesseract-ocr
-# sudo apt install tesseract-ocr-lav
-
-# pip install pytesseract
-
-genai.configure(api_key='')
+genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
 import typing_extensions as typing
-
+from app.__init__ import db
+from flask_login import current_user
 class Order(typing.TypedDict):
     OrderNumber: str
     Customer: str
@@ -29,64 +26,6 @@ class Order(typing.TypedDict):
 
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
-# def ocr_pdf_to_text(pdf_path, tess_path=None):
-#     """
-#     Extracts text from a PDF using both direct text extraction and OCR (for scanned PDFs).
-    
-#     Args:
-#     - pdf_path (str): Path to the PDF file.
-#     - tess_path (str): Path to Tesseract OCR executable (if it's not in the system's PATH).
-    
-#     Returns:
-#     - text (str): The extracted text from the PDF.
-#     """
-#     if tess_path:
-#         pytesseract.pytesseract.tesseract_cmd = tess_path
-    
-#     text = ""
-    
-#     # Open the PDF with PyMuPDF
-#     pdf_document = fitz.open(pdf_path)
-    
-#     # Loop through each page
-#     for page_num in range(len(pdf_document)):
-#         page = pdf_document.load_page(page_num)
-        
-#         # Extract text directly (useful for PDFs that are not scanned)
-#         extracted_text = page.get_text("text")
-        
-#         if extracted_text.strip():
-#             # If text is found, append it
-#             text += extracted_text
-#             #print(extracted_text)
-#         else:
-#             # Perform OCR if no text is found
-#             print(f"Performing OCR on page {page_num + 1}...")
-#             page_images = convert_from_path(pdf_path, first_page=page_num + 1, last_page=page_num + 1, dpi=200)
-            
-#             for img in page_images:
-#                 img_byte_array = io.BytesIO()
-#                 img.save(img_byte_array, format='PNG')  
-#                 img = Image.open(io.BytesIO(img_byte_array.getvalue()))  
-#                 ocr_text = pytesseract.image_to_string(img, lang='lav')
-#                 text += ocr_text
-                
-#     pdf_document.close()
-    
-#     return text
-
-# # Example usage
-# pdf_path = "example.pdf"
-# text_output = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
-
-# print(text_output)
-
-# # prompt = "Iegūsti informāciju no rēķina teksta: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN? - kāds ir rēķina numurs? -kāds ir rēķina datums?"
-
-# # response = model.generate_content([prompt, text_output])
-
-# # print(response.text)
-# Example usage
 # Function to extract text and blocks from PDF
 # Helper function to check if two rectangles overlap or are close
 def are_rectangles_close(rect1, rect2, threshold=100):
@@ -123,10 +62,12 @@ def image_smoothen(img):
     return th
 
 # Function to extract text and blocks from PDF
-def extract_text_from_pdf(pdf_path,lang='lav'):
-    doc = fitz.open(pdf_path)
+def extract_text_from_pdf(pdf_file,lang='lav'):
+    pdf_bytes = pdf_file.read() if hasattr(pdf_file, 'read') else pdf_file
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
     ocr_results = []  # To store OCR results for each page
-    images = convert_from_path(pdf_path,dpi=300)
+    images = convert_from_bytes(pdf_bytes,dpi=300)
 
     for page_num, image in enumerate(images, start=1):
         imagenp =np.asarray(image)
@@ -200,29 +141,56 @@ def combine_text_by_word_clustering(ocr_results, proximity_threshold=10):
 
     return combined_blocks
 
-# Example usage
-pdf_path = 'ocr_test_files/zarum-1-rek_compress.pdf'
+def get_ai_result(ocr_results):
+    # Combine text by clustering nearby words
+    combined_blocks = combine_text_by_word_clustering(ocr_results, proximity_threshold=20)
 
-ocr_results = extract_text_from_pdf(pdf_path)
+    # Output: combined_blocks will contain combined text for clustered words
+    total_text = ""
+    for block in combined_blocks:
+        print(f"{block['combined_text']}")
+        print()
+        total_text += block['combined_text']
+    # total_text = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
+    prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN."
 
-# Combine text by clustering nearby words
-combined_blocks = combine_text_by_word_clustering(ocr_results, proximity_threshold=20)
+    response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
+            response_mime_type="application/json", response_schema=list[Order]
+        ))
+    json_data = json.loads(response.text)
 
-# Output: combined_blocks will contain combined text for clustered words
-total_text = ""
-for block in combined_blocks:
-    print(f"{block['combined_text']}")
-    print()
-    total_text += block['combined_text']
-# total_text = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
-prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN."
-
-response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
-        response_mime_type="application/json", response_schema=list[Order]
-    ))
-
-print(response.text)
-
-
+    return json_data[0]
 
 # Example usage
+# pdf_path = 'ocr_test_files/zarum-1-rek_compress.pdf'
+
+# ocr_results = extract_text_from_pdf(pdf_path)
+# print(get_ai_result(ocr_results))
+def send_invoice(response):
+    goods = response['Goods']
+    services = []
+    for j in range(len(goods)):
+        try:
+            name = goods[j]
+            price = response['SeparateCosts'][j]
+            amount = response['OrderedAmount'][j]
+            service = Service(name=name, price=price, amount=amount)
+            db.session.add(service)
+            db.session.commit()
+            print(service)
+            services.append(service)
+        except Exception as e:
+            # Print any other unexpected error
+            print("An error occurred:", e)
+    issuer = response['Supplier'][0]
+    issuer_registration_number = 1
+    issuer_address = ""
+    receiver = response['Customer'][0]
+    receiver_registration_number
+    receiver_address
+
+    # TODO: str to date
+    issue_date = response['OrderDate'][0]
+    issue_number = response['OrderNumber'][0]
+    sum_total = response['Cost'][0]
+    service = Service(name=name, user_id=current_user.id, issuer= )
