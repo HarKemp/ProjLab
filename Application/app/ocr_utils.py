@@ -8,9 +8,12 @@ import json
 from datetime import datetime
 import typing_extensions as typing
 from app.__init__ import db
+import os
+from dotenv import load_dotenv
 
-#TODO move api key to new .env file, add that env file to .gitignore
-genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
+load_dotenv()
+api_key = os.getenv("API_KEY")
+genai.configure(api_key=api_key)
 class Order(typing.TypedDict):
     OrderNumber: str
     Customer: str
