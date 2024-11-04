@@ -1,20 +1,15 @@
 import fitz  # PyMuPDF
 import pytesseract
 from pdf2image import convert_from_bytes
-from PIL import Image
-import io
-import os
 import cv2
 import numpy as np
 import google.generativeai as genai
-from app.db.models import File, Invoice, Service
+from .db.models import Invoice, Service
 import json
 from datetime import datetime
-# #apt-get install poppler-utils
 genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
 import typing_extensions as typing
 from app.__init__ import db
-from flask_login import current_user
 class Order(typing.TypedDict):
     OrderNumber: str
     Customer: str
