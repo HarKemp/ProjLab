@@ -37,3 +37,11 @@ def my_invoices():
     print(user_invoices)
     return render_template('invoices.html', invoices=user_invoices)
 
+
+@ocr.route('/my-invoices/invoice/<int:invoice_id>', methods=['GET'])
+@login_required
+def invoice(invoice_id):
+    print("Implement me")
+    # Get specific invoice
+    # Render invoice
+
