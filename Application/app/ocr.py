@@ -1,6 +1,6 @@
-from flask import Blueprint, session, url_for, request, redirect, render_template
+from flask import Blueprint, url_for, redirect, render_template
 from flask_login import login_required, current_user
-from app.db.models import File, Invoice, Service
+from app.db.models import File, Invoice
 from .ocr_utils import extract_text_from_pdf, get_ai_result, send_invoice
 
 ocr = Blueprint('ocr', __name__)
@@ -15,9 +15,6 @@ def convert_text(file_id):
     else:
         print("OK")
         file = File.query.get(file_id)
-
-        print(file.title)
-        print(file.file_data)
         #Call OCR
         ocr_results = extract_text_from_pdf(file.file_data)
         ai_result = get_ai_result(ocr_results)
@@ -29,7 +26,7 @@ def convert_text(file_id):
         # TODO show message about convert status
         return redirect(url_for('ocr.my_invoices'))
 
-@ocr.route('/my_invoices', methods=['GET'])
+@ocr.route('/my-invoices', methods=['GET'])
 @login_required
 def my_invoices():
     print("Implement me")

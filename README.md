@@ -10,6 +10,13 @@ Kursa darba apraksts pieejams /Docs/
 * Microsoft C++ Build Tools - priekš Greenlet
 * poppler-utils - PDF apstrādei
 * pytesseract lang packages for Latvian, Estonian, Lithuanian
+### Tesseract instalācija
+* UNIX sistēmām ```sudo apt get install tesseract```
+* Windows </br>
+sekot instrukcijām no https://stackoverflow.com/questions/50951955/pytesseract-tesseractnotfound-error-tesseract-is-not-installed-or-its-not-i
+* Instalēt tesseract no https://github.com/UB-Mannheim/tesseract/wiki
+* Pievienot tesseract pie path C:\Users\<lietotājvārds>\AppData\Local\Tesseract-OCR
+* pip install pytesseract
 
 # Šim setup vajadzētu strādāt uz visual studio code (Pycharm drošvien līdzīgi)
 ## 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.

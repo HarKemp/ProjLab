@@ -1,15 +1,16 @@
 import fitz  # PyMuPDF
-import pytesseract
+import pytesseract # For unix systems make sure tesseract is installed sudo apt get install tesseract
 from pdf2image import convert_from_bytes
 import cv2
 import numpy as np
 import google.generativeai as genai
-from .db.models import Invoice, Service
 import json
 from datetime import datetime
-genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
 import typing_extensions as typing
 from app.__init__ import db
+
+#TODO move api key to new .env file, add that env file to .gitignore
+genai.configure(api_key='AIzaSyBiUpB8iPNskEqeSvj8f50svUCu4c50rdk')
 class Order(typing.TypedDict):
     OrderNumber: str
     Customer: str
