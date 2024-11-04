@@ -27,9 +27,10 @@ def file_upload():
             # If file is allowed
             # Secure the filename and save it to the upload folder
             filename = secure_filename(file.filename)
-            file.save(os.path.join(upload_folder, filename))
+            file_data = file.read()
             # Place copy of file in database
-            insert_file_in_db(filename, file.read())
+            insert_file_in_db(filename, file_data)
+            file.save(os.path.join(upload_folder, filename))
             flash(f"File uploaded successfully: {filename}", 'alert-success')
         return True
 

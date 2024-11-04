@@ -15,7 +15,9 @@ def convert_text(file_id):
     else:
         print("OK")
         file = File.query.get(file_id)
-        
+
+        print(file.title)
+        print(file.file_data)
         #Call OCR
         ocr_results = extract_text_from_pdf(file.file_data)
         ai_result = get_ai_result(ocr_results)
