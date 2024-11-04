@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 import typing_extensions as typing
 from app.__init__ import db
+from app.db.models import Service, Invoice
 import os
 from dotenv import load_dotenv
 
