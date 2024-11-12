@@ -1,37 +1,92 @@
+{#{% extends "layout.html" %}#}
+{#{% block title %}Homepage Page{% endblock %}#}
+{#{% block body %}#}
+{##}
+{#    {% include 'navbar.html' %}#}
+{#    {% block style %}#}
+{#        <style>#}
+{#            #ocrButton {#}
+{#                display: {% if file_uploaded %} block {% else %} none {% endif %};#}
+{#                padding: 10px 20px;#}
+{#                justify-content: center;#}
+{#                margin-top: 20px;#}
+{#            }#}
+{#        </style>#}
+{#    {% endblock %}#}
+{##}
+{#    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">#}
+{##}
+{##}
+{#        <h1 class="text-4xl font-bold mb-6 text-white">My invoices</h1>#}
+{##}
+{#        <div class="text-center flex flex-col items-center mx-4 min-h-6">#}
+{#            {% with messages = get_flashed_messages(with_categories=True) %}#}
+{#                {% if messages %}#}
+{#                    {% for category, message in messages %}#}
+{#                        <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">#}
+{#                            {{ message }}#}
+{#                        </div>#}
+{#                    {% endfor %}#}
+{#                {% endif %}#}
+{#            {% endwith %}#}
+{#            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>#}
+{#        </div>#}
+{##}
+{#    </div>#}
+{##}
+{#{% endblock %}#}
+
 {% extends "layout.html" %}
-{% block title %}Homepage Page{% endblock %}
+
 {% block body %}
+<h1 class="text-2xl font-semibold mb-4">Your Invoices</h1>
 
-    {% include 'navbar.html' %}
-    {% block style %}
-        <style>
-            #ocrButton {
-                display: {% if file_uploaded %} block {% else %} none {% endif %};
-                padding: 10px 20px;
-                justify-content: center;
-                margin-top: 20px;
-            }
-        </style>
-    {% endblock %}
-
-    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
-
-
-        <h1 class="text-4xl font-bold mb-6 text-white">My invoices</h1>
-
-        <div class="text-center flex flex-col items-center mx-4 min-h-6">
-            {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+<table class="w-full border-collapse">
+    <thead>
+        <tr>
+            <th class="border-b-2 p-2 text-left">Title</th>
+            <th class="border-b-2 p-2 text-left">Status</th>
+            <th class="border-b-2 p-2 text-left">Text Content</th>
+            <th class="border-b-2 p-2 text-left">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr class="hover:bg-gray-100">
+            <td class="border-b p-2">{{ invoice.title }}</td>
+            <td class="border-b p-2">
+                {% if invoice.ocr_status == "Pending" %}
+                    <span class="text-yellow-500 font-semibold">Pending</span>
+                {% elif invoice.ocr_status == "Processing" %}
+                    <span class="text-blue-500 font-semibold">Processing</span>
+                {% elif invoice.ocr_status == "Complete" %}
+                    <span class="text-green-500 font-semibold">Complete</span>
+                {% else %}
+                    <span class="text-red-500 font-semibold">Unknown</span>
                 {% endif %}
-            {% endwith %}
-            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
-        </div>
-
-    </div>
-
+            </td>
+            <td class="border-b p-2">
+                {% if invoice.ocr_status == "Complete" %}
+                    <p>{{ invoice.text_content }}</p>
+                {% else %}
+                    <em>Not yet processed</em>
+                {% endif %}
+            </td>
+            <td class="border-b p-2">
+                {% if invoice.ocr_status == "Pending" %}
+                    <form action="{{ url_for('ocr.convert_text', file_id=invoice.id) }}" method="POST">
+                        <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
+                            Start OCR
+                        </button>
+                    </form>
+                {% elif invoice.ocr_status == "Processing" %}
+                    <span class="text-gray-500 italic">OCR in progress...</span>
+                {% elif invoice.ocr_status == "Complete" %}
+                    <span class="text-green-500 font-semibold">OCR Complete</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

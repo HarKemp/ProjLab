@@ -1,28 +1,47 @@
-from flask import Blueprint, session, url_for, request, redirect, render_template
-from flask_login import login_required
+from flask import Blueprint, session, flash, url_for, request, redirect, render_template
+from flask_login import login_required, current_user
 from app.db.models import File
+from .tasks import ocr_task
+from app.__init__ import db
 
 ocr = Blueprint('ocr', __name__)
+
+# @ocr.route('/convert-text/<int:file_id>', methods=['POST'])
+# @login_required
+# def convert_text(file_id):
+#     if file_id is None or not isinstance(file_id, int) or file_id < 1:
+#         print("NOK")
+#         return redirect(url_for('main.homepage'))
+#     else:
+#         print("OK")
+#         file = File.query.get(file_id)
+#         #     # Call ORC
+#         #     # Save invoice into DB
+#         #     # Redirect to MyInvoices
+#         return redirect(url_for('ocr.my_invoices'))
 
 @ocr.route('/convert-text/<int:file_id>', methods=['POST'])
 @login_required
 def convert_text(file_id):
-    # TODO make sure only owner can upload the file
-    if file_id is None or not isinstance(file_id, int) or file_id < 1:
-        print("NOK")
+    file = File.query.get(file_id)
+    if file is None or file.user_id != current_user.id:
+        flash("You do not have permission to access this file.", "alert-danger")
         return redirect(url_for('main.homepage'))
-    else:
-        print("OK")
-        file = File.query.get(file_id)
-        #     # Call ORC
-        #     # Save invoice into DB
-        #     # Redirect to MyInvoices
-        return redirect(url_for('ocr.my_invoices'))
+
+    # Set initial OCR status to "Pending" and save to the database
+    file.ocr_status = "Pending"
+    db.session.commit()
+
+    # Queue the OCR task
+    ocr_task.delay(file_id)
+    flash("OCR processing has started.", "alert-success")
+
+    return redirect(url_for('ocr.my_invoices'))
 
 @ocr.route('/my_invoices', methods=['GET'])
 @login_required
 def my_invoices():
-    print("Implement me")
     # Get all invoices by current user
     # pass the invoices invoices html
-    return render_template("invoices.html")
+    invoices = File.query.filter_by(user_id=current_user.id).all()
+    return render_template("invoices.html", invoices=invoices)
