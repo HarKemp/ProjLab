@@ -1,11 +1,8 @@
 import time
 from .db.models import File, db
-from .celery_worker import celery
+from celery import shared_task
 
-# Access the Celery app instance from Flask's app context
-# celery = app.extensions['celery']
-
-@celery.task
+@shared_task
 def ocr_task(file_id):
         file = File.query.get(file_id)
         if file is None:

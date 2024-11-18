@@ -1,10 +1,9 @@
-from app.__init__ import create_app
-# from app.celery_worker import make_celery
+from app.__init__ import create_app, ext_celery
 
 app = create_app()
+celery = ext_celery.celery
 
-# # celery.conf.update(app.config)
-# make_celery(app)
+print("wsgi celery broker url: ", celery.conf.broker_url)
 
 if __name__ == "__main__":
     app.run()

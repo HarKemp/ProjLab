@@ -23,6 +23,10 @@ class Config(object):
     if not os.path.exists(REPORT_FOLDER):
         os.makedirs(REPORT_FOLDER)
 
+    ### Config redis broker for celery
+    broker_url = "redis://localhost:6379/0"
+    result_backend = "redis://localhost:6379/0"
+
 # Development only (Sqlite config)
 class DevConfig(Config):
     ### Database settings

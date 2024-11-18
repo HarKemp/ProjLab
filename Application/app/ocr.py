@@ -1,10 +1,11 @@
 from flask import Blueprint, session, flash, url_for, request, redirect, render_template
 from flask_login import login_required, current_user
 from app.db.models import File
-from .tasks import ocr_task
 from app.__init__ import db
 
 ocr = Blueprint('ocr', __name__)
+
+from app.tasks import ocr_task
 
 # @ocr.route('/convert-text/<int:file_id>', methods=['POST'])
 # @login_required
