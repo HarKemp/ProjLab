@@ -1,13 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_celeryext import FlaskCeleryExt
 import os
 
-from .celery_utils import make_celery
-
 db = SQLAlchemy()
-ext_celery = FlaskCeleryExt(create_celery_app=make_celery)
 
 def create_app():
 
@@ -24,7 +20,6 @@ def create_app():
 
     ### Connect to database 
     db.init_app(app)
-    ext_celery.init_app(app)
 
     # Create database tables
     from app.db.models import User, File, Invoice, Service, Emission, invoices_services
