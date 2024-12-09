@@ -1,9 +1,14 @@
+from . import create_app
 import time
 from .db.models import File, db
-from celery import shared_task
+# from celery import shared_task
+from .celery_utils import celery
 
-@shared_task
+app = create_app()
+# @shared_task
+@celery.task
 def ocr_task(file_id):
+    with app.app_context():
         file = File.query.get(file_id)
         if file is None:
             return "File not found."
