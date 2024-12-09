@@ -4,7 +4,6 @@ from .invoices_services import invoices_services
 
 
 class Invoice(db.Model):
-    #TODO rework this based on excel "Invoices" in docs
     __tablename__ = 'invoices'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -19,3 +18,12 @@ class Invoice(db.Model):
     # TODO: sum_total with currency separator as str, or sum_total as float with currency elsewhere
     sum_total = db.Column(db.String(15), nullable=False)
     services = db.relationship('Service', secondary=invoices_services, backref=db.backref('invoice', lazy='dynamic'))
+
+    # @property
+    # def total_emissions(self):
+    #     """Calculate the total emission value of all services related to this invoice."""
+    #     total_emission = 0.0
+    #     for service in self.services:
+    #         for emission in service.emissions:
+    #             total_emission += emission.value
+    #     return total_emission

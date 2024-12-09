@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 import typing_extensions as typing
 from app.__init__ import db
-from app.db.models import Service, Invoice
+from app.db.models import Service, Invoice, Emission, get_emission_value
 import os
 from dotenv import load_dotenv
 
@@ -181,7 +181,13 @@ def send_invoice(response, user_id):
             service = Service(name=name, price=price, amount=amount)
             db.session.add(service)
             db.session.commit()
-            print(service)
+
+            print("emission_value = " + str(get_emission_value(name)))
+            emission = Emission(service_id=service.id, value=get_emission_value(name))
+            db.session.add(emission)
+            db.session.commit()
+
+            print("service " + str(service.name) + " has emmision " + str(service.emission.value) + " amount = " + str(service.amount) + " totaling " + str(service.total_emissions))
             services.append(service)
         except Exception as e:
             # Print any other unexpected error
@@ -207,6 +213,7 @@ def send_invoice(response, user_id):
         sum_total=sum_total,services=services)
         db.session.add(invoice)
         db.session.commit()
+        print("invoice:")
         print(invoice)
 
     except Exception as e:
