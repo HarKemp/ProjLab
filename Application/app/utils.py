@@ -24,7 +24,6 @@ def file_upload():
 
         file_ids = []
 
-        # If incorrect file extension
         for file in files:
             if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
                 # flash(f'Invalid file format for {file.filename}', 'alert-danger')
@@ -39,7 +38,7 @@ def file_upload():
 
             flash(f"File uploaded successfully: {filename}", 'alert-success')
 
-            # After all files are inserted, initiate OCR tasks for each
+        # Start OCR task for each file
         for file_id in file_ids:
             file = File.query.get(file_id)
             if file:
@@ -49,7 +48,6 @@ def file_upload():
         return True
 
     except RequestEntityTooLarge:
-        # Handle the specific error for large files
         flash(f"Files are too large. Maximum upload size is {max_upload_size} MB.", 'alert-danger')
         return False
     except Exception as e:
@@ -62,7 +60,7 @@ def create_csv(file_path):
     data = {
         'Company': ['LMT', 'CircleK', 'KKas'],
         'Reg. Number': ['AF123', 'AF234', 'AF345'],
-        'Product': ['Mobilais internets', 'Bendzīns', 'Cepumi']
+        'Product': ['Mobilais internets', 'Benzīns', 'Cepumi']
     }
     df = pd.DataFrame(data)
     df.to_csv(file_path, index=False)

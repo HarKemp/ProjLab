@@ -146,7 +146,7 @@
   }
 
   function fetchStatusUpdates() {
-    fetch("{{ url_for('ocr.invoice_status') }}")
+    fetch("{{ url_for('main.invoice_status') }}")
       .then(response => response.json())
       .then(data => {
         data.forEach(invoice => {

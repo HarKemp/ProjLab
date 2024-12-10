@@ -3,26 +3,11 @@ from app.extensions import db
 from flask import Flask
 import os
 
-# celery = Celery()
-# def make_celery(app):
-#
-#     celery = Celery(
-#         app.import_name,
-#         broker=app.config.get("broker_url", "redis://localhost:6379/0"),
-#         # backend=app.config.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
-#         backend=app.config.get("result_backend", "redis://localhost:6379/0"),
-#     )
-#
-#     celery.conf.update(app.config)
-#     celery.conf.update(broker_connection_retry_on_startup=True)
-#     celery.autodiscover_tasks(['app.tasks'], force=True)
-#
-#     return celery
-
+# the celery app must use the same database and config as the web flask app
+### Create flask instance for celery app
 def create_celery_app():
     app = Flask(__name__)
 
-    # Set up config just like in create_app
     env = os.environ.get('FLASK_ENV', 'development')
     if env == 'production':
         from app.prodConfig import ProdConfig
@@ -31,7 +16,6 @@ def create_celery_app():
         from app.config import DevConfig
         app.config.from_object(DevConfig)
 
-    # Initialize the database with the app
     db.init_app(app)
 
     return app
@@ -39,26 +23,11 @@ def create_celery_app():
 celery_app = create_celery_app()
 
 celery = Celery(
-    'celerypr',
-    broker="redis://127.0.0.1:6379/0",
-    # backend=app.config.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
-    backend="redis://127.0.0.1:6379/0",
+    'celeryWorker',
+    broker=celery_app.config['broker_url'],
+    backend=celery_app.config['result_backend'],
 )
 
 celery.conf.update(broker_connection_retry_on_startup=True)
 celery.autodiscover_tasks(['app.tasks'], force=True)
 
-# if __name__ == '__main__':
-#     celery.start()
-
-
-# celery = Celery(
-#     app.import_name,
-#     broker="redis://localhost:6379/0",
-#     # backend=app.config.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/0"),
-#     backend="redis://localhost:6379/0",
-# )
-#
-# celery.conf.update(app.config)
-# celery.conf.update(broker_connection_retry_on_startup=True)
-# celery.autodiscover_tasks(['app.tasks'], force=True)

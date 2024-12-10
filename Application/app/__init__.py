@@ -58,9 +58,7 @@ def create_app():
 
     # blueprint for main
     from .main import main as main_blueprint
-    from .ocr import ocr as ocr_blueprint
     app.register_blueprint(main_blueprint)
-    app.register_blueprint(ocr_blueprint)
 
     return app
 

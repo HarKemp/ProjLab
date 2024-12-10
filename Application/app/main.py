@@ -1,7 +1,10 @@
-from flask import Blueprint, render_template, url_for, request, redirect, session
-from flask_login import login_required
+from flask import Blueprint, render_template, url_for, request, redirect, jsonify
+from flask_login import login_required, current_user
+from app.db.models import File
+from app.__init__ import db
 
 from .utils import file_upload, file_download
+from app.tasks import ocr_task
 
 main = Blueprint('main',__name__)
 
@@ -43,6 +46,28 @@ def download_file(file_type):
     if not result:
         return redirect(url_for('main.download_page'))
     return result
+
+@main.route('/my_invoices', methods=['GET'])
+@login_required
+def my_invoices():
+    # Obtain all invoices for current user
+    invoices = File.query.filter_by(user_id=current_user.id).all()
+    return render_template("invoices.html", invoices=invoices)
+
+@main.route('/invoice-status', methods=['GET'])
+@login_required
+def invoice_status():
+    # Obtain all invoices for current user
+    invoices = File.query.filter_by(user_id=current_user.id).all()
+    data = []
+    # Send data about invoices in json format
+    for inv in invoices:
+        data.append({
+            'id': inv.id,
+            'title': inv.title,
+            'ocr_status': inv.ocr_status,
+        })
+    return jsonify(data)
 
 @main.route("/chart", methods=['GET', 'POST'])
 @login_required
