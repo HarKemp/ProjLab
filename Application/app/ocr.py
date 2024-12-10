@@ -1,4 +1,4 @@
-from flask import Blueprint, session, flash, url_for, request, redirect, render_template
+from flask import Blueprint, session, flash, url_for, request, redirect, render_template, jsonify
 from flask_login import login_required, current_user
 from app.db.models import File
 from app.__init__ import db
@@ -35,7 +35,7 @@ def convert_text(file_id):
 
     # Queue the OCR task
     ocr_task.delay(file_id)
-    flash("OCR processing has started.", "alert-success")
+    # flash("OCR processing has started.", "alert-success")
 
     return redirect(url_for('ocr.my_invoices'))
 
@@ -46,3 +46,16 @@ def my_invoices():
     # pass the invoices invoices html
     invoices = File.query.filter_by(user_id=current_user.id).all()
     return render_template("invoices.html", invoices=invoices)
+
+@ocr.route('/invoice-status', methods=['GET'])
+@login_required
+def invoice_status():
+    invoices = File.query.filter_by(user_id=current_user.id).all()
+    data = []
+    for inv in invoices:
+        data.append({
+            'id': inv.id,
+            'title': inv.title,
+            'ocr_status': inv.ocr_status,
+        })
+    return jsonify(data)

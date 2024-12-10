@@ -7,6 +7,8 @@ import pandas as pd
 from datetime import datetime
 import os
 
+from app.tasks import ocr_task
+
 
 def file_upload():
     allowed_extensions = current_app.config['ALLOWED_EXTENSIONS']
@@ -19,6 +21,9 @@ def file_upload():
         if not files or files[0].filename == '':
             flash('No file selected', 'alert-danger')
             return False
+
+        file_ids = []
+
         # If incorrect file extension
         for file in files:
             if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
@@ -29,8 +34,18 @@ def file_upload():
             filename = secure_filename(file.filename)
             file.save(os.path.join(upload_folder, filename))
             # Place copy of file in database
-            insert_file_in_db(filename, file.read())
+            file_id = insert_file_in_db(filename, file.read())
+            file_ids.append(file_id)
+
             flash(f"File uploaded successfully: {filename}", 'alert-success')
+
+            # After all files are inserted, initiate OCR tasks for each
+        for file_id in file_ids:
+            file = File.query.get(file_id)
+            if file:
+                file.ocr_status = "Pending"
+                db.session.commit()
+                ocr_task.delay(file_id)
         return True
 
     except RequestEntityTooLarge:
@@ -105,5 +120,6 @@ def insert_file_in_db(filename, file_data):
     new_file = File(user_id=user_id, title=filename, file_data=file_data)
     db.session.add(new_file)
     db.session.commit()
-    session['file_id'] = new_file.id
+    # session['file_id'] = new_file.id
+    return new_file.id
 

@@ -19,9 +19,6 @@ def ocr_task(file_id):
         # Mock OCR processing time
         time.sleep(10)  # Simulates a 5-second processing delay
 
-        # Simulate OCR text content
-        file.text_content = "This is a test OCR result."
-
         # Set status to "Complete"
         file.ocr_status = "Complete"
         db.session.commit()
