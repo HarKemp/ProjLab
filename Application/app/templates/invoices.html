@@ -49,6 +49,8 @@
             <table class="invoice-table">
                 <thead>
                     <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Carbon Footprint (CO2eq)</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Services</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issue Date</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Number</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer</th>
@@ -64,6 +66,8 @@
                     {% for invoice in invoices %}
                     <tr class="border-b border-gray-200 text-sm"
                     onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
+                        <td>{{ invoice.total_emissions }}</td>
+                        <td>{{ invoice.services | length  }}</td>
                         <td>{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
                         <td>{{ invoice.issue_number }}</td>
                         <td>{{ invoice.issuer }}</td>
