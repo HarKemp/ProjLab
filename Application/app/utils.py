@@ -7,7 +7,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-from app.tasks import ocr_task
+from app.celery_tasks import ocr_task
 
 
 def file_upload():

@@ -4,7 +4,7 @@ from app.db.models import File
 from app.__init__ import db
 
 from .utils import file_upload, file_download
-from app.tasks import ocr_task
+from app.celery_tasks import ocr_task
 
 main = Blueprint('main',__name__)
 
