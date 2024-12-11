@@ -16,6 +16,7 @@ FLASK_APP=app
 FLASK_ENV=development
 pytesseract.pytesseract.tesseract_cmd = C:\Program Files\Tesseract-OCR\tesseract.exe
 API_KEY=asddasjl1lekj123j21lj3l
+PATH_TO_DEFAULT_SERVICE_VALUES_CSV=C:\Program Files\mydata.csv
 ```
 ### Tesseract instalācija
 * UNIX sistēmām ```sudo apt get install tesseract```
