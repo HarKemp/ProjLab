@@ -27,7 +27,6 @@ def homepage():
 def upload_page():
     if request.method == 'POST':
         if file_upload():
-            # Check if a file has been uploaded by checking session
             return redirect(url_for('main.upload_page'))
         else:
             return redirect(request.url)
@@ -54,6 +53,7 @@ def my_invoices():
     invoices = File.query.filter_by(user_id=current_user.id).all()
     return render_template("invoices.html", invoices=invoices)
 
+# Runs when requested by the client side (usually every 10 seconds when the specific webpage is open)
 @main.route('/invoice-status', methods=['GET'])
 @login_required
 def invoice_status():

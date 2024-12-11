@@ -1,7 +1,9 @@
 from flask import Flask
-from app.extensions import db
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
+
+db = SQLAlchemy()
 
 def create_app():
 

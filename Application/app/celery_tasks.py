@@ -1,8 +1,7 @@
 from app.celery_init import celery, celery_app
-import time
 from app.db.models import File
-from app.extensions import db
-###### app.__init__ import db ????
+from app.__init__ import db
+import time
 
 @celery.task
 def ocr_task(file_id):

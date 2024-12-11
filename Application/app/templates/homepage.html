@@ -5,7 +5,6 @@
     {% include 'navbar.html' %}
     {% block style %}
         <style>
-        /* Initially hide the Go To Invoices button */
         #ocrButton {
             display: none;
             padding: 10px 20px;
@@ -20,15 +19,13 @@
 
         <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
 
+        {#  Looks like a nice place for a nest  #}
         <div class="text-center flex flex-col items-center mx-4 min-h-6">
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
                     {% for category, message in messages %}
-{#                        <div id="flashMessage" class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">#}
-{#                            {{ message }}#}
-{#                        </div>#}
                         {% if category == 'alert-success' %}
-                            <div id="flashMessage" class="text-green-500 font-semibold">
+                            <div id="success-msg" class="text-green-500 font-semibold">
                                 {{ message }}
                             </div>
                         {% else %}
@@ -174,12 +171,12 @@
         showFileNames();
     });
 
-    // Show the "Go To Invoices" button if there's a success message
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const flashMessage = document.getElementById('flashMessage');
-            if (flashMessage && flashMessage.classList.contains('text-green-500')) {
-                document.getElementById('ocrButton').style.display = 'block';
-            }
-        });
+    // Show the "Go To My Invoices" button if there's a success message
+    window.addEventListener('DOMContentLoaded', () => {
+        const successMsg = document.getElementById('success-msg');
+        if (successMsg && successMsg.classList.contains('text-green-500')) {
+            document.getElementById('ocrButton').style.display = 'block';
+        }
+    });
 </script>
 {% endblock %}

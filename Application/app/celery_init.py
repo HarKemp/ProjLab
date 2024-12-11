@@ -1,5 +1,5 @@
 from celery import Celery
-from app.extensions import db
+from app.__init__ import db
 from flask import Flask
 import os
 
