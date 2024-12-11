@@ -1,69 +1,144 @@
 {% extends "layout.html" %}
+{% block title %}My Invoices{% endblock %}
+
 {% block body %}
-{% include 'navbar.html' %}
-<h1 class="text-2xl font-semibold mb-4 text-center">Your Invoices</h1>
+    {% include 'navbar.html' %}
 
-<div class="mx-auto">
-    <table id="invoices-table" class="border-collapse mx-auto">
-        <thead>
-            <tr>
-                <th class="border-b-2 p-2 text-center">Title</th>
-                <th class="border-b-2 p-2 text-center">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for invoice in invoices %}
-            <tr id="invoice-{{ invoice.id }}" class="hover:bg-gray-100">
-                <td class="border-b p-2 text-center invoice-title">{{ invoice.title }}</td>
-                <td class="border-b p-2 text-center invoice-status">
-                    {% if invoice.ocr_status == "Pending" %}
-                        <span class="text-white font-semibold">Pending</span>
-                    {% elif invoice.ocr_status == "Processing" %}
-                        <span class="text-white font-semibold">Processing</span>
-                    {% elif invoice.ocr_status == "Complete" %}
-                        <span class="text-green-500 font-semibold">Complete</span>
-                    {% else %}
-                        <span class="text-red-500 font-semibold">Error</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    {% block style %}
+    <style>
+        .invoice-table, .services-table {
+            width: 100%;
+        }
+        .invoice-table td, .services-table td {
+            text-align: center;
+            color: black;
+        }
+        .invoice-table th, .services-table th {
+            color: black;
+        }
+        .services-table {
+            margin-top: 10px;
+        }
+        .invoice-table th, .services-table th {
+            background-color: #f3f4f6;
+        }
+        .invoice-table, .services-table {
+            border-collapse: collapse;
+        }
+        .invoice-table td, .services-table td {
+            padding: 10px;
+        }
+    </style>
+    {% endblock %}
 
-<script>
-  function updateInvoiceRow(invoice) {
-    const row = document.getElementById(`invoice-${invoice.id}`);
-    if (!row) return;
+    <h1 class="text-4xl font-bold mb-6 text-white text-center">Your Invoices</h1>
 
-    const statusCell = row.querySelector('.invoice-status');
-    let statusHtml = '';
+    <!-- Invoice Table -->
+    <div class="w-full max-w-4xl bg-white rounded-lg shadow-md mt-6 mx-auto">
+        <table class="invoice-table min-w-full leading-normal">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Issue Date</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Invoice Number</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Title</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Status</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Issuer</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Receiver</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Total</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Issuer Address</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Receiver Address</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Issuer Reg. Number</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Receiver Reg. Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr id="invoice-{{ invoice.id }}">
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.title }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm invoice-status">
+                        {% if invoice.ocr_status == "Pending" %}
+                            <span class="text-white font-semibold">Pending</span>
+                        {% elif invoice.ocr_status == "Processing" %}
+                            <span class="text-white font-semibold">Processing</span>
+                        {% elif invoice.ocr_status == "Complete" %}
+                            <span class="text-green-500 font-semibold">Complete</span>
+                        {% else %}
+                            <span class="text-red-500 font-semibold">Error</span>
+                        {% endif %}
+                    </td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.sum_total }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_address }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
+                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
+                </tr>
+                <tr>
+                    <td colspan="11">
+                        <table class="services-table min-w-full leading-normal mt-2">
+                            <thead>
+                                <tr>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Service Description</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Amount</th>
+                                    <th class="px-5 py-3 border-b-2 border-gray-200 text-xs font-semibold uppercase tracking-wider text-left">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in invoice.services %}
+                                <tr>
+                                    <td class="border-b border-gray-200 bg-white text-sm">{{ service.name }}</td>
+                                    <td class="border-b border-gray-200 bg-white text-sm">{{ service.amount }}</td>
+                                    <td class="border-b border-gray-200 bg-white text-sm">{{ service.price }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="border-b border-gray-200 bg-white text-sm text-center text-gray-500">No services found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
-    if (invoice.ocr_status === 'Pending') {
-      statusHtml = '<span class="text-white font-semibold">Pending</span>';
-    } else if (invoice.ocr_status === 'Processing') {
-      statusHtml = '<span class="text-white font-semibold">Processing</span>';
-    } else if (invoice.ocr_status === 'Complete') {
-      statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
-    } else {
-      statusHtml = '<span class="text-red-500 font-semibold">Error</span>';
-    }
-    statusCell.innerHTML = statusHtml;
-  }
+    <script>
+      function updateInvoiceRow(invoice) {
+        const row = document.getElementById(`invoice-${invoice.id}`);
+        if (!row) return;
 
-  function fetchStatusUpdates() {
-    fetch("{{ url_for('main.invoice_status') }}")
-      .then(response => response.json())
-      .then(data => {
-        data.forEach(invoice => {
-          updateInvoiceRow(invoice);
-        });
-      })
-      .catch(err => console.error('Error fetching invoice status:', err));
-  }
+        const statusCell = row.querySelector('.invoice-status');
+        let statusHtml = '';
 
-  // Send GET request to server every 10 seconds
-  setInterval(fetchStatusUpdates, 10000);
-</script>
+        if (invoice.ocr_status === 'Pending') {
+          statusHtml = '<span class="text-white font-semibold">Pending</span>';
+        } else if (invoice.ocr_status === 'Processing') {
+          statusHtml = '<span class="text-white font-semibold">Processing</span>';
+        } else if (invoice.ocr_status === 'Complete') {
+          statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
+        } else {
+          statusHtml = '<span class="text-red-500 font-semibold">Error</span>';
+        }
+        statusCell.innerHTML = statusHtml;
+      }
+
+      function fetchStatusUpdates() {
+        fetch("{{ url_for('main.invoice_status') }}")
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(invoice => {
+              updateInvoiceRow(invoice);
+            });
+          })
+          .catch(err => console.error('Error fetching invoice status:', err));
+      }
+
+      // Send GET request to server every 10 seconds
+      setInterval(fetchStatusUpdates, 10000);
+    </script>
 {% endblock %}

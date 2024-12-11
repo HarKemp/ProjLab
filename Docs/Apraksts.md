@@ -117,6 +117,6 @@ HTML, CSS - Tailwind, JavaScript
 ```mermaid
 graph TD;
     ProduktuPak[Produkts/Pakalpojums] -->|n..n| Rekini[Rēķini];
+    ProduktuPak[Produkts/Pakalpojums] -->|1..1| Izmesi[Izmeši]
     Uznemumi[Uzņēmumi] -->|1..n| Rekini[Rēķini];
     Uznemumi[Uzņēmumi] -->|1..n| Lietotaji[Lietotāji];
-    Uznemumi[Uzņēmumi] -->|1..n| Izmesi[Izmeši];
