@@ -73,7 +73,7 @@
                 </thead>
                 <tbody>
                     {% for invoice in invoices %}
-                    <tr>
+                    <tr onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}';">
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
@@ -83,32 +83,6 @@
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
                         <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="9">
-                            <table class="services-table min-w-full leading-normal mt-2">
-                                <thead>
-                                    <tr>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Description</th>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th> <!-- Added price header -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for service in invoice.services %}
-                                    <tr>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.name }}</td>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.amount }}</td>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.price }}</td> <!-- Added service price -->
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="3" class="border-b border-gray-200 bg-white text-sm text-center text-gray-500">No services found.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
