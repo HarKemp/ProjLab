@@ -24,10 +24,10 @@ celery_app = create_celery_app()
 
 celery = Celery(
     'celeryWorker',
-    broker=celery_app.config['broker_url'],
-    backend=celery_app.config['result_backend'],
+    broker=celery_app.config['BROKER_URL'],
+    backend=celery_app.config['RESULT_BACKEND'],
 )
 
 celery.conf.update(broker_connection_retry_on_startup=True)
-celery.autodiscover_tasks(['app.tasks'], force=True)
+celery.autodiscover_tasks(['app.celery_tasks'], force=True)
 
