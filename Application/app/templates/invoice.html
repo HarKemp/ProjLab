@@ -2,64 +2,156 @@
 {% extends "layout.html" %}
 {% block title %}Invoice{% endblock %}
 {% block body %}
-<div class="overflow-hidden shadow rounded-lg border box">
-    <div class="px-4 py-5 sm:px-6">
-        <div class="flex justify-between items-center">
-            <h3 class="text-lg leading-6 font-medium">
-                Detailed invoice {{ invoice.issue_number }} information
-            </h3>
+    <div class="overflow-hidden shadow rounded-lg border box">
+        <div class="px-4 py-5 sm:px-6">
+            <div class="flex justify-between items-center">
+                <h3 class="text-lg leading-6 font-medium">
+                    Detailed invoice {{ invoice.issue_number }} information
+                </h3>
+            </div>
+        </div>
+
+        {% set fields = [
+        {'label': 'Total Carbon Footprint', 'key': 'total_emissions', 'value': invoice.total_emissions ~ ' CO2eq'},
+        {'label': 'Issue Date', 'key': 'issue_date', 'value': invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A'},
+        {'label': 'Invoice Number', 'key': 'issue_number', 'value': invoice.issue_number},
+        {'label': 'Issuer', 'key': 'issuer', 'value': invoice.issuer},
+        {'label': 'Issuer Registration Number', 'key': 'issuer_registration_number', 'value': invoice.issuer_registration_number},
+        {'label': 'Issuer Address', 'key': 'issuer_address', 'value': invoice.issuer_address},
+        {'label': 'Receiver', 'key': 'receiver', 'value': invoice.receiver},
+        {'label': 'Receiver Registration Number', 'key': 'receiver_registration_number', 'value': invoice.receiver_registration_number},
+        {'label': 'Receiver Address', 'key': 'receiver_address', 'value': invoice.receiver_address},
+        {'label': 'Sum Total', 'key': 'sum_total', 'value': invoice.sum_total}
+    ] %}
+
+        <div id="fields">
+            {% for field in fields %}
+                <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
+                    <dl class="flex items-center gap-4 px-6">
+                        <dt class="text-sm flex-1">{{ field.label }}</dt>
+                        <dd class="text-sm flex-1">
+                            <span class="field-display">{{ field.value }}</span>
+                            <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ field.value }}" data-key="{{ field.key }}">
+                        </dd>
+                        <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
+                    </dl>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
+            <h4 class="text-base font-semibold">Services</h4>
+            <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
+                <thead>
+                <tr>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        Service Name
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        Price
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        Amount
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        Emission per Unit
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        Total Emissions (CO2eq)
+                    </th>
+                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                </tr>
+                </thead>
+                <tbody id="services">
+                {% for service in invoice.services %}
+                    <tr>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <span class="row-display">{{ service.name }}</span>
+                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ service.name }}" data-key="name">
+                        </td>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <span class="row-display">{{ service.price }}</span>
+                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ service.price }}" data-key="price">
+                        </td>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <span class="row-display">{{ service.amount }}</span>
+                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ service.amount }}" data-key="amount">
+                        </td>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <span class="row-display">{{ service.emission }}</span>
+                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ service.emission.value }}" data-key="emission">
+                        </td>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <span class="row-display">{{ service.total_emissions }}</span>
+                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                   value="{{ service.total_emissions }}" data-key="total_emissions">
+                        </td>
+                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
+                            <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-end gap-4 p-6">
+            <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50" disabled>Cancel
+            </button>
+            <button id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" disabled>
+                Submit
+            </button>
         </div>
     </div>
 
-    {% set fields = [
-        {'label': 'Total Carbon Footprint', 'value': invoice.total_emissions ~ ' CO2eq'},
-        {'label': 'Issue Date', 'value': invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A'},
-        {'label': 'Invoice Number', 'value': invoice.issue_number},
-        {'label': 'Issuer', 'value': invoice.issuer},
-        {'label': 'Issuer Registration Number', 'value': invoice.issuer_registration_number},
-        {'label': 'Issuer Address', 'value': invoice.issuer_address},
-        {'label': 'Receiver', 'value': invoice.receiver},
-        {'label': 'Receiver Registration Number', 'value': invoice.receiver_registration_number},
-        {'label': 'Receiver Address', 'value': invoice.receiver_address},
-        {'label': 'Sum Total', 'value': invoice.sum_total}
-    ] %}
+    <script>
+        const fieldsContainer = document.querySelector("#fields");
+        const servicesContainer = document.querySelector("#services");
+        const submitBtn = document.querySelector("#submit-btn");
+        const cancelBtn = document.querySelector("#cancel-btn");
 
-    {% for field in fields %}
-    <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
-        <dl class="flex items-center gap-4 px-6">
-            <dt class="text-sm flex-1">{{ field.label }}</dt>
-            <dd class="text-sm flex-1">{{ field.value }}</dd>
-            <button class="text-sm font-medium text-gray-500">Edit</button>
-        </dl>
-    </div>
-    {% endfor %}
+        let edited = false;
 
-    <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
-        <h4 class="text-base font-semibold">Services</h4>
-        <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
-            <thead>
-                <tr>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Name</th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Emission per Unit</th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total Emissions (CO2eq)</th>
-                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for service in invoice.services %}
-                <tr>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.name }}</td>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.price }}</td>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.amount }}</td>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.emission }}</td>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.total_emissions }}</td>
-                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-right"><button class="text-sm font-medium text-gray-500 text-right">Edit</button></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+        function toggleEditMode(container, btnSelector, displaySelector, inputSelector) {
+            container.addEventListener("click", (event) => {
+                if (event.target.matches(btnSelector)) {
+                    const parent = event.target.closest("dl, tr");
+                    const displays = parent.querySelectorAll(displaySelector);
+                    const inputs = parent.querySelectorAll(inputSelector);
+                    displays.forEach(d => d.classList.toggle("hidden"));
+                    inputs.forEach(i => i.classList.toggle("hidden"));
+                    edited = true;
+                    submitBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                }
+            });
+        }
+
+        toggleEditMode(fieldsContainer, ".edit-btn", ".field-display", ".field-input");
+        toggleEditMode(servicesContainer, ".edit-row-btn", ".row-display", ".row-input");
+
+        cancelBtn.addEventListener("click", () => {
+            location.reload();
+        });
+
+        submitBtn.addEventListener("click", () => {
+            const fieldInputs = [...document.querySelectorAll(".field-input")].map(input => ({
+                key: input.dataset.key,
+                value: input.value
+            }));
+            const rowInputs = [...document.querySelectorAll("#services tr")].map(row => {
+                return [...row.querySelectorAll(".row-input")].reduce((acc, input) => {
+                    acc[input.dataset.key] = input.value;
+                    return acc;
+                }, {});
+            });
+            console.log({fields: fieldInputs, services: rowInputs});
+            // TODO edit info in db and redirect ot this page
+        });
+    </script>
 {% endblock %}
