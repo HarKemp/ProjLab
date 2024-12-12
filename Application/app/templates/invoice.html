@@ -1,84 +1,65 @@
-{#https://tailwindui.com/components/ecommerce/page-examples/order-detail-pages#}
+{#https://tailwindflex.com/@boxdemo/show-user-details-2#}
 {% extends "layout.html" %}
 {% block title %}Invoice{% endblock %}
 {% block body %}
-    <div>
-        <div class="px-4 sm:px-0">
-            <h3 class="text-base/7 font-semibold">Detailed invoice {{invoice.issue_number}} information</h3>
-      </div>
-    </div>
-    <div class="mt-6 border-t border-gray-100">
-    <dl class="hm aec aeh ayp dkf dls">
-        <div class="la aaz abe awu flex items-center mb-4">
-            <dt class="bat w-1/3">Total Carbon Footprint</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.total_emissions}} CO2eq</dd>
+<div class="overflow-hidden shadow rounded-lg border box">
+    <div class="px-4 py-5 sm:px-6">
+        <div class="flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium">
+                Detailed invoice {{ invoice.issue_number }} information
+            </h3>
         </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Issue Date</dt>
-            <dd class="azp baw w-2/3 text-right">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Invoice Number</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.issue_number}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Issuer</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.issuer}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Issuer Registration Number</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.issuer_registration_number}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Issuer Issuer Address</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.issuer_address}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Receiver</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.receiver}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Receiver Registration Number</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.receiver_registration_number}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Receiver Address</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.receiver_address}}</dd>
-        </div>
-        <div class="la aaz abe aup flex items-center mb-4">
-            <dt class="bat w-1/3">Sum Total</dt>
-            <dd class="azp baw w-2/3 text-right">{{invoice.sum_total}}</dd>
-        </div>
-        <div class="la aaz abe avi flex items-center mb-4">
-        <h4 class="text-base/7 font-semibold">Services</h4>
-        <div class="mt-6 border-t border-gray-100">
-            <table class="min-w-full leading-normal">
-                <thead>
-                    <tr>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Name</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Emission per Unit</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total Emissions per Service (CO2eq)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for service in invoice.services %}
-                    <tr>
-                        <td class="border-b border-gray-200 px-5 py-3 text-sm">{{ service.name }}</td>
-                        <td class="border-b border-gray-200 px-5 py-3 text-sm">{{ service.price }}</td>
-                        <td class="border-b border-gray-200 px-5 py-3 text-sm">{{ service.amount }}</td>
-                        <td class="border-b border-gray-200 px-5 py-3 text-sm">{{ service.emission }}</td>
-                        <td class="border-b border-gray-200 px-5 py-3 text-sm">{{ service.total_emissions }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-
-        </div>
-    </dl>
     </div>
 
+    {% set fields = [
+        {'label': 'Total Carbon Footprint', 'value': invoice.total_emissions ~ ' CO2eq'},
+        {'label': 'Issue Date', 'value': invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A'},
+        {'label': 'Invoice Number', 'value': invoice.issue_number},
+        {'label': 'Issuer', 'value': invoice.issuer},
+        {'label': 'Issuer Registration Number', 'value': invoice.issuer_registration_number},
+        {'label': 'Issuer Address', 'value': invoice.issuer_address},
+        {'label': 'Receiver', 'value': invoice.receiver},
+        {'label': 'Receiver Registration Number', 'value': invoice.receiver_registration_number},
+        {'label': 'Receiver Address', 'value': invoice.receiver_address},
+        {'label': 'Sum Total', 'value': invoice.sum_total}
+    ] %}
+
+    {% for field in fields %}
+    <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
+        <dl class="flex items-center gap-4 px-6">
+            <dt class="text-sm flex-1">{{ field.label }}</dt>
+            <dd class="text-sm flex-1">{{ field.value }}</dd>
+            <button class="text-sm font-medium text-gray-500">Edit</button>
+        </dl>
+    </div>
+    {% endfor %}
+
+    <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
+        <h4 class="text-base font-semibold">Services</h4>
+        <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Name</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Emission per Unit</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total Emissions (CO2eq)</th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in invoice.services %}
+                <tr>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.name }}</td>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.price }}</td>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.amount }}</td>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.emission }}</td>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-left">{{ service.total_emissions }}</td>
+                    <td class="border-b border-gray-200 px-5 py-3 text-sm text-right"><button class="text-sm font-medium text-gray-500 text-right">Edit</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
