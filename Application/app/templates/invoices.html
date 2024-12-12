@@ -6,35 +6,24 @@
 
     {% block style %}
         <style>
-            #ocrButton {
-                display: {% if file_uploaded %} block {% else %} none {% endif %};
-                padding: 10px 20px;
-                justify-content: center;
-                margin-top: 20px;
+            .invoice-table td {
+                text-align: center;
+                color: black;
+                padding: 10px;
             }
-            .invoice-table, .services-table {
-                width: 100%; /* Ensure full width */
+
+            .invoice-table th {
+                color: black;
+                background-color: #f3f4f6;
             }
-            .invoice-table td, .services-table td {
-                text-align: center; /* Center text in table cells */
-                color: black; /* Set text color to black */
+
+            .invoice-table tr:nth-child(odd) {
+                background-color: #e5e4e2;
             }
-            .invoice-table th, .services-table th {
-                color: black; /* Set heading text color to black */
-            }
-            .services-table {
-                margin-top: 10px; /* Add some space between tables */
-            }
-            /* Optional: Improve readability */
-            .invoice-table th, .services-table th {
-                background-color: #f3f4f6; /* Light grey background for headers */
-            }
-            /* Ensure the rows do not span over 2 rows */
-            .invoice-table, .services-table {
-                border-collapse: collapse; /* Ensure there are no gaps between cells */
-            }
-            .invoice-table td, .services-table td {
-                padding: 10px; /* Add padding for better spacing */
+
+            .invoice-table tr:hover {
+                background-color: #e5e7eb; /* Lighter grey for hover to ensure it's distinct */
+                cursor: pointer;
             }
         </style>
     {% endblock %}
@@ -57,9 +46,11 @@
 
         <!-- Invoice Table -->
         <div class="w-full max-w-4xl bg-white rounded-lg shadow-md mt-6 overflow-x-auto">
-            <table class="invoice-table min-w-full leading-normal">
+            <table class="invoice-table">
                 <thead>
                     <tr>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Carbon Footprint (CO2eq)</th>
+                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Services</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issue Date</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Number</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer</th>
@@ -73,42 +64,19 @@
                 </thead>
                 <tbody>
                     {% for invoice in invoices %}
-                    <tr>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.sum_total }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_address }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
-                        <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="9">
-                            <table class="services-table min-w-full leading-normal mt-2">
-                                <thead>
-                                    <tr>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Service Description</th>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Amount</th>
-                                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Price</th> <!-- Added price header -->
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for service in invoice.services %}
-                                    <tr>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.name }}</td>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.amount }}</td>
-                                        <td class="border-b border-gray-200 bg-white text-sm">{{ service.price }}</td> <!-- Added service price -->
-                                    </tr>
-                                    {% else %}
-                                    <tr>
-                                        <td colspan="3" class="border-b border-gray-200 bg-white text-sm text-center text-gray-500">No services found.</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </td>
+                    <tr class="border-b border-gray-200 text-sm"
+                    onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
+                        <td>{{ invoice.total_emissions }}</td>
+                        <td>{{ invoice.services | length  }}</td>
+                        <td>{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
+                        <td>{{ invoice.issue_number }}</td>
+                        <td>{{ invoice.issuer }}</td>
+                        <td>{{ invoice.receiver }}</td>
+                        <td>{{ invoice.sum_total }}</td>
+                        <td>{{ invoice.issuer_address }}</td>
+                        <td>{{ invoice.receiver_address }}</td>
+                        <td>{{ invoice.issuer_registration_number }}</td>
+                        <td>{{ invoice.receiver_registration_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
