@@ -1,4 +1,5 @@
 from app.__init__ import db
+import re
 
 
 class Service(db.Model):
@@ -7,5 +8,12 @@ class Service(db.Model):
     name = db.Column(db.String(80), nullable=False)
     price = db.Column(db.String(10))
     amount = db.Column(db.String(100),nullable=False)
-    emissions = db.relationship('Emission', backref='service', lazy=True)
-    
+    emission = db.relationship('Emission', backref='service', uselist=False)
+
+    @property
+    def total_emissions(self):
+        match = re.search(r"[-+]?\d*\.\d+|\d+", self.amount)
+        if match:
+            return float(match.group()) * self.emission.value
+        else:
+            return 1.0

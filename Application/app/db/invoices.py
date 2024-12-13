@@ -21,3 +21,11 @@ class Invoice(db.Model):
     sum_total = db.Column(db.String(15), nullable=False)
     services = db.relationship('Service', secondary=invoices_services, backref=db.backref('invoice', lazy='dynamic'))
     file = db.relationship('File', backref='invoice', uselist=False)
+
+    @property
+    def total_emissions(self):
+        """Calculate the total emission value of all services related to this invoice."""
+        total_emissions = 0.0
+        for service in self.services:
+            total_emissions += service.total_emissions
+        return total_emissions

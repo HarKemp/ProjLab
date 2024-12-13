@@ -22,9 +22,12 @@ def create_app():
     db.init_app(app)
 
     # Create database tables
-    from app.db.models import User, File, Invoice, Service, Emission, invoices_services
+    from app.db.models import User, File, Invoice, Service, Emission, invoices_services, create_and_populate_table, get_emission_value
     with app.app_context():
         db.create_all()
+
+    ### Create service CO2 emission values
+    create_and_populate_table(app.app_context(), os.getenv('PATH_TO_DEFAULT_SERVICE_VALUES_CSV'))
 
     ### Create Test User On SQLite Database
     if env == 'development':
