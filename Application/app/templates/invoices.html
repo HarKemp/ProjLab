@@ -31,19 +31,6 @@
     <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
         <h1 class="text-4xl font-bold mb-6 text-white">My Invoices</h1>
 
-        <div class="text-center flex flex-col items-center mx-4 min-h-6">
-            {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="{{ 'text-green-500 font-semibold' if category == 'alert-success' else 'text-red-500 font-bold' }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
-        </div>
-
         <!-- Invoice Table -->
         <div class="w-full max-w-4xl bg-white rounded-lg shadow-md mt-6 overflow-x-auto">
             <table class="invoice-table">
@@ -65,30 +52,30 @@
                 </thead>
                 <tbody>
                     {% for invoice in invoices %}
-                    <tr class="border-b border-gray-200 text-sm"
+                    <tr id="invoice-{{ invoice.id }}" class="border-b border-gray-200 text-sm"
                     onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
                         <td class="border-b border-gray-200 bg-white text-sm invoice-status">
                         {% if invoice.file and invoice.file.ocr_status == "Pending" %}
-                            <span class="text-white font-semibold">Pending</span>
+                            <span class="text-black font-semibold">Pending</span>
                         {% elif invoice.file and invoice.file.ocr_status == "Processing" %}
-                            <span class="text-white font-semibold">Processing</span>
+                            <span class="text-black font-semibold">Processing</span>
                         {% elif invoice.file and invoice.file.ocr_status == "Complete" %}
                             <span class="text-green-500 font-semibold">Complete</span>
                         {% else %}
                             <span class="text-red-500 font-semibold">Error</span>
                         {% endif %}
                         </td>
-                        <td>{{ invoice.total_emissions }}</td>
-                        <td>{{ invoice.services | length  }}</td>
-                        <td>{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
-                        <td>{{ invoice.issue_number }}</td>
-                        <td>{{ invoice.issuer }}</td>
-                        <td>{{ invoice.receiver }}</td>
-                        <td>{{ invoice.sum_total }}</td>
-                        <td>{{ invoice.issuer_address }}</td>
-                        <td>{{ invoice.receiver_address }}</td>
-                        <td>{{ invoice.issuer_registration_number }}</td>
-                        <td>{{ invoice.receiver_registration_number }}</td>
+                        <td id="invoice-{{ invoice.id }}-total_emissions">{{ invoice.total_emissions }}</td>
+                        <td id="invoice-{{ invoice.id }}-services">{{ invoice.services | length }}</td>
+                        <td id="invoice-{{ invoice.id }}-issue_date">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
+                        <td id="invoice-{{ invoice.id }}-issue_number">{{ invoice.issue_number }}</td>
+                        <td id="invoice-{{ invoice.id }}-issuer">{{ invoice.issuer }}</td>
+                        <td id="invoice-{{ invoice.id }}-receiver">{{ invoice.receiver }}</td>
+                        <td id="invoice-{{ invoice.id }}-sum_total">{{ invoice.sum_total }}</td>
+                        <td id="invoice-{{ invoice.id }}-issuer_address">{{ invoice.issuer_address }}</td>
+                        <td id="invoice-{{ invoice.id }}-receiver_address">{{ invoice.receiver_address }}</td>
+                        <td id="invoice-{{ invoice.id }}-issuer_registration_number">{{ invoice.issuer_registration_number }}</td>
+                        <td id="invoice-{{ invoice.id }}-receiver_registration_number">{{ invoice.receiver_registration_number }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -104,16 +91,28 @@
         const statusCell = row.querySelector('.invoice-status');
         let statusHtml = '';
 
-        if (invoice.file.ocr_status === 'Pending') {
-          statusHtml = '<span class="text-white font-semibold">Pending</span>';
-        } else if (invoice.file.ocr_status === 'Processing') {
-          statusHtml = '<span class="text-white font-semibold">Processing</span>';
-        } else if (invoice.file.ocr_status === 'Complete') {
+        if (invoice.ocr_status === 'Pending') {
+          statusHtml = '<span class="text-black font-semibold">Pending</span>';
+        } else if (invoice.ocr_status === 'Processing') {
+          statusHtml = '<span class="text-black font-semibold">Processing</span>';
+        } else if (invoice.ocr_status === 'Complete') {
           statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
         } else {
           statusHtml = '<span class="text-red-500 font-semibold">Error</span>';
         }
         statusCell.innerHTML = statusHtml;
+
+        document.getElementById(`invoice-${invoice.id}-issue_date`).textContent = invoice.issue_date;
+        document.getElementById(`invoice-${invoice.id}-issue_number`).textContent = invoice.issue_number;
+        document.getElementById(`invoice-${invoice.id}-issuer`).textContent = invoice.issuer;
+        document.getElementById(`invoice-${invoice.id}-receiver`).textContent = invoice.receiver;
+        document.getElementById(`invoice-${invoice.id}-sum_total`).textContent = invoice.sum_total;
+        document.getElementById(`invoice-${invoice.id}-issuer_address`).textContent = invoice.issuer_address;
+        document.getElementById(`invoice-${invoice.id}-receiver_address`).textContent = invoice.receiver_address;
+        document.getElementById(`invoice-${invoice.id}-services`).textContent = invoice.services_count;
+        document.getElementById(`invoice-${invoice.id}-issuer_registration_number`).textContent = invoice.issuer_registration_number;
+        document.getElementById(`invoice-${invoice.id}-receiver_registration_number`).textContent = invoice.receiver_registration_number;
+        document.getElementById(`invoice-${invoice.id}-total_emissions`).textContent = invoice.total_emissions;
       }
 
       function fetchStatusUpdates() {

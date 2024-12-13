@@ -69,14 +69,24 @@ def invoice(invoice_id):
 @login_required
 def invoice_status():
     # Obtain all invoices for current user
-    invoices = File.query.filter_by(user_id=current_user.id).all()
+    invoices = Invoice.query.filter_by(user_id=current_user.id).all()
     data = []
     # Send data about invoices in json format
     for inv in invoices:
         data.append({
             'id': inv.id,
-            'title': inv.title,
-            'ocr_status': inv.ocr_status,
+            'ocr_status': inv.file.ocr_status if inv.file else 'Error',
+            'issuer': inv.issuer,
+            'issuer_address': inv.issuer_address,
+            'receiver': inv.receiver,
+            'receiver_address': inv.receiver_address,
+            'issue_number': inv.issue_number,
+            'issue_date': inv.issue_date.strftime('%Y-%m-%d') if inv.issue_date else 'N/A',
+            'sum_total': inv.sum_total,
+            'services_count': len(inv.services),
+            'total_emissions': inv.total_emissions,
+            'issuer_registration_number': inv.issuer_registration_number,
+            'receiver_registration_number': inv.receiver_registration_number,
         })
     return jsonify(data)
 

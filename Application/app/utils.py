@@ -2,7 +2,7 @@ from flask import flash, request, current_app, send_from_directory, session
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
-from .db.models import File, User
+from .db.models import File, User, Invoice
 from app.__init__ import db
 import pandas as pd
 from datetime import datetime
@@ -44,6 +44,20 @@ def file_upload():
             file = File.query.get(file_id)
             if file:
                 file.ocr_status = "Pending"
+                new_invoice = Invoice(
+                    user_id=session['user_id'],
+                    file_id=file_id,
+                    issuer="-",
+                    issuer_registration_number="-",
+                    issuer_address="-",
+                    receiver="-",
+                    receiver_registration_number="-",
+                    receiver_address="-",
+                    issue_date=None,
+                    issue_number="-",
+                    sum_total="-"
+                )
+                db.session.add(new_invoice)
                 db.session.commit()
                 ocr_task.delay(file_id)
         return True

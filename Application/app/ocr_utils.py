@@ -169,7 +169,7 @@ def get_ai_result(ocr_results):
 
 # ocr_results = extract_text_from_pdf(pdf_path)
 # print(get_ai_result(ocr_results))
-def send_invoice(response, user_id, file_id):
+def send_invoice(response, file_id):
     print(response)
     goods = response['Goods']
     services = []
@@ -193,26 +193,21 @@ def send_invoice(response, user_id, file_id):
             # Print any other unexpected error
             print("An error occurred:", e)
     try:
-        issuer = response['Supplier']
-        issuer_registration_number = response['SupplierRegNumber']
-        issuer_address = response['SupplierAdress']
-        receiver = response['Customer']
-        receiver_registration_number = response['CustomerRegNumber']
-        receiver_address = response['CustomerAdress']
-
-        # TODO: str to date, add checks for different dates
-        issue_date = response['OrderDate']
-        print(issue_date)
-        issue_date = datetime.strptime(issue_date, "%d.%m.%Y")
-        issue_number = response['OrderNumber']
-        sum_total = response['Cost']
-
-        invoice = Invoice(user_id=user_id,file_id=file_id,issuer=issuer,issuer_registration_number=issuer_registration_number,
-        issuer_address=issuer_address,receiver=receiver,receiver_registration_number=receiver_registration_number,
-        receiver_address=receiver_address,issue_date=issue_date,issue_number=issue_number,
-        sum_total=sum_total,services=services)
+        invoice = Invoice.query.filter_by(file_id=file_id).first()
+        if invoice:
+            invoice.issuer = response['Supplier']
+            invoice.issuer_registration_number = response['SupplierRegNumber']
+            invoice.issuer_address = response['SupplierAdress']
+            invoice.receiver = response['Customer']
+            invoice.receiver_registration_number = response['CustomerRegNumber']
+            invoice.receiver_address = response['CustomerAdress']
+            issue_date_str = response['OrderDate']
+            issue_date = datetime.strptime(issue_date_str, "%d.%m.%Y")
+            invoice.issue_date = issue_date
+            invoice.issue_number = response['OrderNumber']
+            invoice.sum_total = response['Cost']
+            invoice.services = services
         print("invoice from " + str(invoice.issuer) + " shows that carbon footprint for services is totaling " + str(invoice.total_emissions))
-        db.session.add(invoice)
         db.session.commit()
         print("invoice:")
         print(invoice)
@@ -225,4 +220,4 @@ def doc2data(file):
     ocr_results = extract_text_from_pdf(file.file_data)
     ai_result = get_ai_result(ocr_results)
     # Save invoice into DB
-    send_invoice(ai_result, file.user_id, file.id)
+    send_invoice(ai_result, file.id)
