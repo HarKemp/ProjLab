@@ -53,6 +53,17 @@ def my_invoices():
     invoices = Invoice.query.filter_by(user_id=current_user.id).all()
     return render_template("invoices.html", invoices=invoices)
 
+@main.route('/my-invoices/invoice/<int:invoice_id>', methods=['GET'])
+@login_required
+def invoice(invoice_id):
+    if invoice_id is None or not isinstance(invoice_id, int) or invoice_id < 1:
+        print("illegal invoice ID")
+        return redirect(url_for('main.homepage'))
+    else:
+        user_id = current_user.id
+        invoice = Invoice.query.filter_by(id=invoice_id, user_id=user_id).first()
+        return render_template('invoice.html', invoice=invoice)
+
 # Runs when requested by the client side (usually every 10 seconds when the specific webpage is open)
 @main.route('/invoice-status', methods=['GET'])
 @login_required
