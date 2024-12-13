@@ -169,7 +169,7 @@ def get_ai_result(ocr_results):
 
 # ocr_results = extract_text_from_pdf(pdf_path)
 # print(get_ai_result(ocr_results))
-def send_invoice(response, user_id):
+def send_invoice(response, user_id, file_id):
     print(response)
     goods = response['Goods']
     services = []
@@ -201,7 +201,7 @@ def send_invoice(response, user_id):
         issue_number = response['OrderNumber']
         sum_total = response['Cost']
 
-        invoice = Invoice(user_id=user_id,issuer=issuer,issuer_registration_number=issuer_registration_number,
+        invoice = Invoice(user_id=user_id,file_id=file_id,issuer=issuer,issuer_registration_number=issuer_registration_number,
         issuer_address=issuer_address,receiver=receiver,receiver_registration_number=receiver_registration_number,
         receiver_address=receiver_address,issue_date=issue_date,issue_number=issue_number,
         sum_total=sum_total,services=services)
@@ -212,3 +212,9 @@ def send_invoice(response, user_id):
     except Exception as e:
             # Print any other unexpected error
             print("An error occurred:", e)
+
+def doc2data(file):
+    ocr_results = extract_text_from_pdf(file.file_data)
+    ai_result = get_ai_result(ocr_results)
+    # Save invoice into DB
+    send_invoice(ai_result, file.user_id, file.id)

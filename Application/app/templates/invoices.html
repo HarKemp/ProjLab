@@ -53,29 +53,32 @@
             </thead>
             <tbody>
                 {% for invoice in invoices %}
-                <tr id="invoice-{{ invoice.id }}">
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.title }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm invoice-status">
-                        {% if invoice.ocr_status == "Pending" %}
-                            <span class="text-white font-semibold">Pending</span>
-                        {% elif invoice.ocr_status == "Processing" %}
-                            <span class="text-white font-semibold">Processing</span>
-                        {% elif invoice.ocr_status == "Complete" %}
-                            <span class="text-green-500 font-semibold">Complete</span>
-                        {% else %}
-                            <span class="text-red-500 font-semibold">Error</span>
-                        {% endif %}
-                    </td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.sum_total }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_address }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
-                    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
-                </tr>
+  <tr id="invoice-{{ invoice.id }}">
+    <td class="border-b border-gray-200 bg-white text-sm">
+      {{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}
+    </td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issue_number }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.title }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm invoice-status">
+      {% if invoice.file and invoice.file.ocr_status == "Pending" %}
+          <span class="text-white font-semibold">Pending</span>
+      {% elif invoice.file and invoice.file.ocr_status == "Processing" %}
+          <span class="text-white font-semibold">Processing</span>
+      {% elif invoice.file and invoice.file.ocr_status == "Complete" %}
+          <span class="text-green-500 font-semibold">Complete</span>
+      {% else %}
+          <span class="text-red-500 font-semibold">Error</span>
+      {% endif %}
+    </td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.sum_total }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_address }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_address }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.issuer_registration_number }}</td>
+    <td class="border-b border-gray-200 bg-white text-sm">{{ invoice.receiver_registration_number }}</td>
+  </tr>
+  <!-- Services table remains the same -->
                 <tr>
                     <td colspan="11">
                         <table class="services-table min-w-full leading-normal mt-2">
@@ -115,11 +118,11 @@
         const statusCell = row.querySelector('.invoice-status');
         let statusHtml = '';
 
-        if (invoice.ocr_status === 'Pending') {
+        if (invoice.file.ocr_status === 'Pending') {
           statusHtml = '<span class="text-white font-semibold">Pending</span>';
-        } else if (invoice.ocr_status === 'Processing') {
+        } else if (invoice.file.ocr_status === 'Processing') {
           statusHtml = '<span class="text-white font-semibold">Processing</span>';
-        } else if (invoice.ocr_status === 'Complete') {
+        } else if (invoice.file.ocr_status === 'Complete') {
           statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
         } else {
           statusHtml = '<span class="text-red-500 font-semibold">Error</span>';

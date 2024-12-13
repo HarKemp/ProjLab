@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for, request, redirect, jsonify
 from flask_login import login_required, current_user
-from app.db.models import File
+from app.db.models import File, Invoice
 from app.__init__ import db
 
 from .utils import file_upload, file_download
@@ -50,7 +50,7 @@ def download_file(file_type):
 @login_required
 def my_invoices():
     # Obtain all invoices for current user
-    invoices = File.query.filter_by(user_id=current_user.id).all()
+    invoices = Invoice.query.filter_by(user_id=current_user.id).all()
     return render_template("invoices.html", invoices=invoices)
 
 # Runs when requested by the client side (usually every 10 seconds when the specific webpage is open)

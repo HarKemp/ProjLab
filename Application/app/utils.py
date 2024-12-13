@@ -1,4 +1,5 @@
 from flask import flash, request, current_app, send_from_directory, session
+from flask_login import current_user
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from .db.models import File, User
@@ -38,7 +39,7 @@ def file_upload():
             file.save(os.path.join(upload_folder, filename))
             flash(f"File uploaded successfully: {filename}", 'alert-success')
 
-        # Start OCR task for each file
+        # Start OCR celery task for each file
         for file_id in file_ids:
             file = File.query.get(file_id)
             if file:
