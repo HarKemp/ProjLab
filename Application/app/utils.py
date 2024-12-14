@@ -2,7 +2,7 @@ from flask import flash, request, current_app, send_from_directory, session
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
-from .db.models import File, User, Invoice
+from .database.models import File, User, Invoice
 from app.__init__ import db
 import pandas as pd
 from datetime import datetime

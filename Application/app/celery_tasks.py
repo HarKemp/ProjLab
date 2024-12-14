@@ -1,5 +1,5 @@
 from app.celery_init import celery, celery_app
-from app.db.models import File
+from app.database.models import File
 from app.__init__ import db
 from app.ocr_utils import doc2data
 import time

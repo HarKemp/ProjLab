@@ -14,10 +14,10 @@ class EmissionValue(db.Model):
         return f"<EmissionValue name={self.name}, value={self.value}>"
 
 # inits table with starting values in for CO2 emissions
-def create_and_populate_table(app_context, csv_file_path):
-    with app_context:
+def create_and_populate_table(app, csv_file_path):
+    with app.app_context():
         # Create table if not exist
-        db.create_all()
+        # db.create_all()
 
         # Read the CSV and insert values
         with open(csv_file_path, encoding='utf-8-sig') as file:
@@ -25,7 +25,7 @@ def create_and_populate_table(app_context, csv_file_path):
             for row in reader:
                 # Strip any unwanted spaces from the header keys
                 name = row['name'].strip().lower()  # Ensure uniform casing and spacing
-                value = int(row['value'].strip().lower())
+                value = float(row['value'].strip())
                 # Check for duplicates before inserting
                 if not EmissionValue.query.filter_by(name=name).first():
                     emission_values = EmissionValue(name=name, value=value)

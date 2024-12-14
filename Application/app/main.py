@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, url_for, request, redirect, jsonify
 from flask_login import login_required, current_user
-from app.db.models import File, Invoice
-from app.__init__ import db
+from app.database.models import File, Invoice
 
 from .utils import file_upload, file_download
 from app.celery_tasks import ocr_task

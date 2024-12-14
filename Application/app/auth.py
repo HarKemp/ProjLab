@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user
-from app.db.models import User
+from app.database.models import User
 from app.__init__ import db
 
 auth = Blueprint('auth', __name__)
@@ -53,7 +53,7 @@ def register():
         if user_exists:
             if user_exists.username == username:
                 flash('Username already taken', 'alert-danger')
-            elif existing_user.email == email:
+            elif user_exists.email == email:
                 flash('Email already taken', 'alert-danger')
             return redirect(url_for('auth.register'))
 

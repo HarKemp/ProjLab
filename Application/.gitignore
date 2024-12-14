@@ -235,4 +235,4 @@ fabric.properties
 
 temp/
 app/__pycache__/
-app/db/__pycache__/
+app/database/__pycache__/

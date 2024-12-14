@@ -1,0 +1,25 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379" # Redis to localhost:6379
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 10s
+      retries: 1
+
+  celery:
+    build: .
+    command: celery -A app.celery_init worker --loglevel=INFO --pool=solo
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      SQLALCHEMY_DATABASE_URI: sqlite:////app/temp/instance/test.db
+      API_KEY: ${API_KEY}
+    volumes:
+      - ./app/temp/instance:/app/temp/instance
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped

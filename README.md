@@ -114,6 +114,7 @@ docker start redis
 ```
 
 ## 1.3 Redis ar Docker-Compose
+### Šobrīd strādā tikai tad, kad augšupielādē pa vienam failam un gaida kamēr tas tiek pilnībā apstrādāts - tā ir sqlite limitācija. Lai to apietu būtu jāpalaiž arī postgreSQL vai MySQL datubāze mūsu testa vidē
 ### Nepieciešams uzinstalēt docker desktop
 ### Atver Aplikācijas direktoriju (piemēram C:\Users\Lietotajs\PycharmProjects\ProjLab\Application>) un izpilda komandu:
 ```powershell

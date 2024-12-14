@@ -1,16 +1,20 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from dotenv import load_dotenv
 import os
 
 db = SQLAlchemy()
 
 def create_app():
 
+    load_dotenv()
+
     app = Flask(__name__)
 
     ### Set up database
-    env = os.environ.get('FLASK_ENV', 'development')
+    # env = os.environ.get('FLASK_ENV', 'development')
+    env = os.getenv('FLASK_ENV', 'development')
     if env == 'production':
         from app.prodConfig import ProdConfig
         app.config.from_object(ProdConfig)
@@ -22,12 +26,12 @@ def create_app():
     db.init_app(app)
 
     # Create database tables
-    from app.db.models import User, File, Invoice, Service, Emission, invoices_services, create_and_populate_table, get_emission_value
+    from app.database.models import User, File, Invoice, Service, Emission, invoices_services, create_and_populate_table, get_emission_value
     with app.app_context():
         db.create_all()
 
     ### Create service CO2 emission values
-    create_and_populate_table(app.app_context(), os.getenv('PATH_TO_DEFAULT_SERVICE_VALUES_CSV'))
+    create_and_populate_table(app, os.getenv('PATH_TO_DEFAULT_SERVICE_VALUES_CSV'))
 
     ### Create Test User On SQLite Database
     if env == 'development':
@@ -66,4 +70,5 @@ def create_app():
     app.register_blueprint(main_blueprint)
 
     return app
+
 

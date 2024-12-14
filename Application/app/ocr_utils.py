@@ -7,8 +7,8 @@ import google.generativeai as genai
 import json
 from datetime import datetime
 import typing_extensions as typing
+from app.database.models import Service, Invoice, Emission, get_emission_value
 from app.__init__ import db
-from app.db.models import Service, Invoice, Emission, get_emission_value
 import os
 from dotenv import load_dotenv
 
