@@ -101,7 +101,7 @@ sudo service redis-server stop
 ```
 
 ## 1.2 Redis ar Docker
-### Ja lieto docker, tad nepieciešams uzinstalēt docker desktop
+### Nepieciešams uzinstalēt docker desktop
 ### Powershell izpilda komandas:
 ```powershell
 docker pull redis
@@ -111,6 +111,14 @@ docker run -d -p 6379:6379 --name redis redis
 ### Kad restartēs datoru būs nepieciešams atkārtoti startēt konteineru
 ```powershell
 docker start redis
+```
+
+## 1.3 Redis ar Docker-Compose
+### Nepieciešams uzinstalēt docker desktop
+### Atver Aplikācijas direktoriju (piemēram C:\Users\Lietotajs\PycharmProjects\ProjLab\Application>) un izpilda komandu:
+```powershell
+docker-compose build
+docker-compose up
 ```
 
 ### 2. Tagad var palaist flask kā parasti
