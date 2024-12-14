@@ -142,14 +142,14 @@ docker start redis
 * Ja mēģina apstrādāt vairākus failus, tad no sqlite db tiek lasīts un rakstīts vienlaicīgi, kas korumpē datu bāzi
 * Es brīdināju
 * Ja izmanto šo variantu, tad nepieciešams uzinstalēt docker desktop
-* Pēc tam atver Aplikācijas direktoriju (piemēram C:\Users\Lietotajs\PycharmProjects\ProjLab\Application>) un izpilda komandu:
+* Pēc tam atver Aplikācijas direktoriju (piemēram C:\Users\Lietotajs\PycharmProjects\ProjLab\Application>) un izpilda komandas:
 ```powershell
 docker-compose build
 docker-compose up
 ```
 
 ## 2. Palaist Flask
-```
+```powershell
 flask run
 ```
 

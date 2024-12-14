@@ -217,6 +217,7 @@ def send_invoice(response, file_id):
             print("An error occurred:", e)
 
 def doc2data(file):
+    # TODO Pārbaudīt vai notika kļūda apstrādes procesā
     ocr_results = extract_text_from_pdf(file.file_data)
     ai_result = get_ai_result(ocr_results)
     # Save invoice into DB
