@@ -6,7 +6,13 @@ WORKDIR /app
 
 # Install system dependencies required for building and running the application
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends poppler-utils tesseract-ocr tesseract-ocr-lav libtesseract-dev build-essential pkg-config default-libmysqlclient-dev && rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    poppler-utils \
+    tesseract-ocr tesseract-ocr-lav libtesseract-dev \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
     apt-get install -y sqlite3 libsqlite3-dev && \
@@ -16,7 +22,7 @@ RUN apt-get update && \
 COPY requirements.txt /app/
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt # Šeit, iespējams, var izveidot requirements.txt failu tieši priekš docker, kas nesatur pakotnes, kas paredzētas flask web - tas ietaupītu build laiku
 
 # Copy the rest of the application code to the container
 COPY . /app/

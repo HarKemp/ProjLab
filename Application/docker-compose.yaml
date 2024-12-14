@@ -4,11 +4,6 @@ services:
     ports:
       - "6379:6379" # Redis to localhost:6379
     restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 10s
-      timeout: 10s
-      retries: 1
 
   celery:
     build: .
@@ -20,6 +15,5 @@ services:
     volumes:
       - ./app/temp/instance:/app/temp/instance
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     restart: unless-stopped
