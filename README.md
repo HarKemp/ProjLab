@@ -169,4 +169,6 @@ celery -A app.celery_init worker --loglevel=INFO --pool=solo
 * Šo komandu var izpildīt un atstāt, viņa NAV jārestartē katru reizi, kad restartē flask
 * Kad beidz darbu, to var apturēt ar Ctrl + C
 
-
+## Piezīmes
+* Flask web aplikācija darbojas, kā parasti, arī tad ja nav palaists redis un celery - nestrādās tikai rēķinu apstrādes funkcija
+* Nav nozīmes tam, kādā secībā tiek palaists flask un redis,celery
