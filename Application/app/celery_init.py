@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 # the celery app must use the same database and config as the web flask app
 ### Create flask instance for celery app
 def create_celery_app():
-
     load_dotenv()
 
     app = Flask(__name__)
@@ -31,18 +30,11 @@ def create_celery_app():
 celery_app = create_celery_app()
 
 redis_url = os.environ.get('REDIS_URL')
-if redis_url:
-    celery = Celery(
-        'celeryWorker',
-        broker=redis_url,
-        backend=redis_url,
-    )
-else:
-    celery = Celery(
-        'celeryWorker',
-        broker=celery_app.config['BROKER_URL'],
-        backend=celery_app.config['RESULT_BACKEND'],
-    )
+celery = Celery(
+    'celeryWorker',
+    broker = redis_url if redis_url else celery_app.config['BROKER_URL'],
+    backend = redis_url if redis_url else celery_app.config['RESULT_BACKEND'],
+)
 
 celery.conf.update(broker_connection_retry_on_startup=True)
 celery.autodiscover_tasks(['app.celery_tasks'], force=True)

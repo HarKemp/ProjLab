@@ -14,12 +14,12 @@ Kursa darba apraksts pieejams /Docs/
 ```
 FLASK_ENV=development
 pytesseract.pytesseract.tesseract_cmd = C:\Program Files\Tesseract-OCR\tesseract.exe <<-- iespējams, ka strādā arī bez šī
-API_KEY=TAVA_API_ATSLĒGA
+API_KEY=TAVA_GEMINI_API_ATSLĒGA
 PATH_TO_DEFAULT_SERVICE_VALUES_CSV=C:\User\Lietotajs\PyCharm\PycharmProjects\ProjLab\Application\app\static\assets\services.csv <<-- modificējiet lai atbilst jūsu faila atrašanās vietai
 ```
 ### Tesseract instalācija
 #### UNIX sistēmām (Piemērā instalēta tikai latviešu valodas rīki)
-```
+```powershell
 sudo apt-get install tesseract-ocr tesseract-ocr-lav libtesseract-dev
 ```
 #### Windows (Instrukcija no [Stackoverflow](https://stackoverflow.com/questions/50951955/pytesseract-tesseractnotfound-error-tesseract-is-not-installed-or-its-not-i))
@@ -38,40 +38,40 @@ pytesseract.pytesseract.tesseract_cmd = 'C:/OCR/Tesseract-OCR/tesseract.exe'
 # Flask Setup
 ### 1. Kad noklonē ProjLab github repozitoriju, jāatver terminālis (powershell vai cmd) un jānomaina pašreizējo direktoriju uz `Application`.
 ### 2. Izveido jaunu virtuālo python vidi:
-```
+```powershell
 python -m venv venv
 ```
 ### 3. Aktivizē jauno virtuālo vidi: 
-```
+```powershell
 \venv\Scripts\Activate
 ```
 Ja komanda nestrādā tad jāizpilda 
-```
+```powershell
 Set-ExecutionPolicy RemoteSigned -Scope Process
 ```
 vai arī jāizpilda bez sķērsvītras
-```
+```powershell
 venv\Scripts\Activate
 ```
 Terminālim jāizskatās apmēram šādi - 
-```
+```powershell
 (venv) PS C:\Users\Lietotajs\Desktop\ProjLab\ProjLab\Application>
 ```
 ### 4. Instalē dependencies:
-```
+```powershell
 pip install -r requirements.txt
 ```
 ### 5. Konfigurē flask izstrādes vidi:
 #### Ar Powershell:
-```
+```powershell
 $env:FLASK_ENV="development"
 ```
 Pēc tam var pārbaudīt vai pareizi iestatījās ar komandu: 
-```
+```powershell
 echo $env:FLASK_ENV
 ```
 ### 6. Palaiž web serveri uz localhost: 
-```
+```powershell
 flask run
 ```
 ### 7. Pārlūkprogrammā var atvērt:
@@ -79,15 +79,18 @@ flask run
 http://127.0.0.1:5000
 ```
 ### 8. Kad nepieciešams, virtuālo vidi var deaktivizēt (virtuālai videi tehniski jābūt aktivizētai tikai tad, kad veic izmaiņas flask web servera konfigurācijā vai kad to palaiž ar `flask run`):
-```
+```powershell
 deactivate
 ```
 
 # Konfigurācija background-ocr
+* Jāpalaiž pip install -r requirements.txt no python venv
 * Iesaku izveidot .env failu, tā saturs aprakstīts dokumenta sākumā
 * Vispirms izdzēsiet eksistējošo datubāzi no `temp` foldera
 * Lai varētu veikt rēķinu apstrādi fonā ir nepieciešams Redis brokeris, kas uzglabā pieprasījumus līdz Celery ir gatavs tos apstrādāt
-* Redis tiešā veidā strādā tikai uz linux, tāpēc ir nepieciešams izmantot wsl vai docker, lai to palaistu - zemāk ir aprakstīti abi varianti
+* Pēc Redis uzstādīšanas būs nepieciešams palaist arī Celery, kurš darbosies paralēli flask web aplikācijai 
+* Tehniski, Celery var izveidot vairākus strādniekus (worker) ar kuriem paralēli var apstrādāt vairākus pieprasījumus, taču uz windows operētājsistēmām Celery darbojas tikai ar vienu strādnieku
+* Redis tiešā veidā strādā tikai uz linux, tāpēc ir nepieciešams izmantot wsl vai docker, lai to palaistu - zemāk ir aprakstīti abi varianti (iesaku izmantot docker variantu, jo to vieglāk uzstādīt)
 
 ## 1.1 Redis ar WSL
 Tiks aprakstīts, kā uzinstalēt wsl2 (iespējams, ka var izmantot arī wsl1, bet to es nepārbaudīju) - Papildus info par wsl instalāciju: [Microsoft Docs](https://learn.microsoft.com/en-us/windows/wsl/install)
@@ -124,7 +127,7 @@ sudo service redis-server stop
 ```
 
 ## 1.2 Redis ar Docker
-* Vispirms uzinstalē docker desktop
+* Vispirms uzinstalē [Docker Desktop](https://www.docker.com/get-started/)
 * Powershell izpilda komandas:
 ```powershell
 docker pull redis
@@ -141,7 +144,7 @@ docker start redis
 * Var arī mēģināt palaist visus servisus - flask, sqlite, redis, celery iekšā konteineros, varbūt tas atrisinātu problēmu
 * Ja mēģina apstrādāt vairākus failus, tad no sqlite db tiek lasīts un rakstīts vienlaicīgi, kas korumpē datu bāzi
 * Es brīdināju
-* Ja izmanto šo variantu, tad nepieciešams uzinstalēt docker desktop
+* Ja izmanto šo variantu, tad nepieciešams uzinstalēt [Docker Desktop](https://www.docker.com/get-started/)
 * Pēc tam atver Aplikācijas direktoriju (piemēram C:\Users\Lietotajs\PycharmProjects\ProjLab\Application>) un izpilda komandas:
 ```powershell
 docker-compose build
@@ -154,12 +157,12 @@ flask run
 ```
 
 ## 3. Palaist Celery. 
-### 3.1 Iestatīt API_KEY vides mainīgo (pildīt tikai, ja nav .env fials)
+### 3.1 Iestatīt API_KEY vides mainīgo (pildīt tikai, ja nav .env fails)
 * Powershell manuāli iestata API atslēgas "environment variable":
 ```powershell
-$env:API_KEY=GEMINI_AI_API_ATSLEGA
+$env:API_KEY=TAVA_GEMINI_API_ATSLĒGA
 ```
-* Pārejos environment variables arī vajag iestatīt, bet ja tie nav iestatīti, tad flask visdrīzāk arī nepalaidās
+* Pārejos environment variables arī vajag iestatīt, bet ja tie nav iestatīti, tad flask visdrīzāk arī nepalaidīsies
 
 ### 3.2 Powershell logā atvērt python virtuālo vidi (venv) un izpildīt komandu (Ja izmantots docker-compose variants (1.3. punkts), tad šo soli nepildīt):
 ```powershell
@@ -171,4 +174,4 @@ celery -A app.celery_init worker --loglevel=INFO --pool=solo
 
 ## Piezīmes
 * Flask web aplikācija darbojas, kā parasti, arī tad ja nav palaists redis un celery - nestrādās tikai rēķinu apstrādes funkcija
-* Nav nozīmes tam, kādā secībā tiek palaists flask un redis,celery
+* Nav nozīmes, kādā secībā tiek palaists flask un redis,celery
