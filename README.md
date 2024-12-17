@@ -6,8 +6,8 @@ Kursa darba apraksts pieejams /Docs/
 
 # Uzstādīšana
 ## Nepieciešams
-* Python 3.12.4 vai jaunāks
-* Microsoft C++ Build Tools - priekš Greenlet
+* Python 3.12.4 vai jaunāks bet vecāks par 6.13
+* Microsoft Visual C++ 14.0 vai jaunāks - priekš Greenlet
 * poppler-utils - PDF apstrādei
 * pytesseract lang packages for Latvian, Estonian, Lithuanian
 * Izveidojiet `.env` failu `Application` folderī, kas satur informāciju par vides mainīgajiem:

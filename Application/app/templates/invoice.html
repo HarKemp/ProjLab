@@ -30,11 +30,17 @@
                     <dl class="flex items-center gap-4 px-6">
                         <dt class="text-sm flex-1">{{ field.label }}</dt>
                         <dd class="text-sm flex-1">
-                            <span class="field-display">{{ field.value }}</span>
-                            <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
+                            {% if field.key == 'total_emissions' %}
+                                <span class="field-display">{{ field.value }}</span>
+                            {% else %}
+                                <span class="field-display">{{ field.value }}</span>
+                                <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
                                    value="{{ field.value }}" data-key="{{ field.key }}">
+                            {% endif %}
                         </dd>
-                        <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
+                        {% if field.key != 'total_emissions' %}
+                            <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
+                        {% endif %}
                     </dl>
                 </div>
             {% endfor %}
@@ -44,76 +50,99 @@
             <h4 class="text-base font-semibold">Services</h4>
             <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
                 <thead>
-                <tr>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Service Name
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Price
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Amount
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Emission per Unit
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Total Emissions (CO2eq)
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
-                </tr>
+                    <tr>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Service Name
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Price
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Amount
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Emission per Unit
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Total Emissions (CO2eq)
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                    </tr>
                 </thead>
                 <tbody id="services">
-                {% for service in invoice.services %}
-                    <tr>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.name }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.name }}" data-key="name">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.price }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.price }}" data-key="price">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.amount }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.amount }}" data-key="amount">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.emission }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.emission.value }}" data-key="emission">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.total_emissions }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.total_emissions }}" data-key="total_emissions">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
-                            <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
-                        </td>
-                    </tr>
-                {% endfor %}
+                    {% for service in invoice.services %}
+                        <tr>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.name }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.name }}" data-key="name">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.price }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.price }}" data-key="price">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.amount }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.amount }}" data-key="amount">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.emission.value }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.emission.value }}" data-key="emission">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.total_emissions }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
+                                <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <div class="flex justify-end gap-4 p-6">
-            <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50" disabled>Cancel
+        <div class="flex justify-between gap-4 p-6">
+            <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded">
+                Delete
             </button>
-            <button id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" disabled>
-                Submit
-            </button>
+
+            <div class="flex gap-4 ml-auto">
+                <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50" disabled>
+                    Cancel
+                </button>
+                <button id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" disabled>
+                    Submit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 border hidden justify-center items-center flex">
+        <div class="rounded-lg p-6 w-1/3">
+            <h3 class="text-lg font-semibold mb-4">Are you sure you want to delete?</h3>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-delete" class="px-4 py-2 bg-gray-300 text-black rounded">Cancel</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded">OK</button>
+            </div>
         </div>
     </div>
 
     <script>
+        const invoiceId = "{{ invoice.id }}"
         const fieldsContainer = document.querySelector("#fields");
         const servicesContainer = document.querySelector("#services");
+        const deleteBtn = document.querySelector("#delete-btn");
         const submitBtn = document.querySelector("#submit-btn");
         const cancelBtn = document.querySelector("#cancel-btn");
+        const deleteModal = document.querySelector("#delete-modal");
+        const cancelDelete = document.querySelector("#cancel-delete");
+        const confirmDelete = document.querySelector("#confirm-delete");
 
         let edited = false;
 
@@ -150,8 +179,68 @@
                     return acc;
                 }, {});
             });
-            console.log({fields: fieldInputs, services: rowInputs});
-            // TODO edit info in db and redirect ot this page
+
+            // Prepare data for the update
+            const data = {
+                fields: fieldInputs,
+                services: rowInputs
+            };
+
+            // Send the update request to the backend
+            fetch(`/my-invoices/invoice/${invoiceId}/update`, {
+                method: 'PUT',  // Use PUT or PATCH for updates
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Invoice updated successfully!");
+                    window.location.href = `/my-invoices/invoice/${invoiceId}`;
+                } else {
+                    alert("Error updating invoice: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error updating invoice:", error);
+                alert("An error occurred while updating.");
+            });
+        });
+
+        // Show modal on delete button click
+        deleteBtn.addEventListener("click", () => {
+            deleteModal.classList.remove("hidden");
+        });
+
+        // Hide modal on Cancel
+        cancelDelete.addEventListener("click", () => {
+            deleteModal.classList.add("hidden");
+        });
+
+        // Handle OK click to perform delete action
+        confirmDelete.addEventListener("click", () => {
+            // Hide the modal after the fetch
+            deleteModal.classList.add("hidden");
+
+            fetch(`/my-invoices/invoice/${invoiceId}/delete`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Invoice deleted successfully!");
+                    window.location.href = `/my-invoices`;
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting row:", error);
+                alert("An error occurred while deleting.");
+            });
         });
     </script>
 {% endblock %}

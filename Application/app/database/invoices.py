@@ -2,7 +2,6 @@ from app.__init__ import db
 from datetime import datetime
 from .invoices_services import invoices_services
 
-
 class Invoice(db.Model):
     #TODO rework this based on excel "Invoices" in docs
     __tablename__ = 'invoices'
@@ -30,3 +29,71 @@ class Invoice(db.Model):
         for service in self.services:
             total_emissions += service.total_emissions
         return total_emissions
+
+    def delete(self):
+        try:
+            # Delete emissions and services in bulk to reduce commit overhead
+            for service in self.services:
+                # Delete associated emissions first
+                db.session.delete(service.emission)
+
+            # Now delete the services
+            for service in self.services:
+                db.session.delete(service)
+
+            # Finally, delete the invoice itself
+            db.session.delete(self)
+
+            # Commit all deletions in a single transaction
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()  # Rollback if any error occurs
+            print(f"Error deleting invoice: {e}")
+            return False
+
+    def update(self, data):
+        try:
+            # Update invoice fields
+            if 'fields' in data:
+                for field in data['fields']:
+                    key = field['key']
+                    value = field['value']
+
+                    # Skip 'total_emissions' field as it's not editable
+                    if key == 'total_emissions':
+                        continue
+
+                    # If the key is 'issue_date', convert the string to a date object
+                    if key == 'issue_date':
+                        value = datetime.strptime(value, '%Y-%m-%d').date()
+
+                    # Update the invoice field if it exists in the model
+                    if hasattr(self, key):
+                        setattr(self, key, value)
+
+            # Update services and associated emissions
+            if 'services' in data:
+                for updated_service in data['services']:
+                    service_name = updated_service.get('name')  # Assuming 'name' uniquely identifies the service
+                    service = next((s for s in self.services if s.name == service_name), None)
+
+                    if service:
+                        # Update the service attributes
+                        if 'price' in updated_service:
+                            service.price = updated_service['price']
+                        if 'amount' in updated_service:
+                            service.amount = updated_service['amount']
+                        # Update emission related to the service
+                        if 'emission' in updated_service:
+                            service.emission.value = updated_service['emission']  # Update emission value
+                        if 'total_emissions' == updated_service:
+                            continue
+
+            # Commit all changes to the database
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()  # Rollback if any error occurs
+            print(f"Error updating invoice: {e}")
+            return False

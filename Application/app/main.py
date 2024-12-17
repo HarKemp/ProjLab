@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from app.database.models import File, Invoice
 
 from .utils import file_upload, file_download
-from app.celery_tasks import ocr_task
 
 main = Blueprint('main',__name__)
 
@@ -45,7 +44,7 @@ def download_file(file_type):
         return redirect(url_for('main.download_page'))
     return result
 
-@main.route('/my_invoices', methods=['GET'])
+@main.route('/my-invoices', methods=['GET'])
 @login_required
 def my_invoices():
     # Obtain all invoices for current user
@@ -93,3 +92,43 @@ def invoice_status():
 @login_required
 def chart():
     return render_template("chart.html")
+
+def validate_id(invoice_id):
+    try:
+        # Validate if invoice_id can be converted to an integer
+        invoice_id = int(invoice_id)
+        return invoice_id
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'message': 'Invalid ID format. ID must be an integer.'}), 400
+
+@main.route('/my-invoices/invoice/<int:invoice_id>/delete', methods=['DELETE'])
+@login_required
+def delete_fruit(invoice_id):
+    invoice_id = validate_id(invoice_id)
+
+    if invoice_id:
+        invoice_to_delete = Invoice.query.get(int(invoice_id))
+        success = invoice_to_delete.delete()
+        if success:
+            return jsonify({'success': True, 'message': 'Row deleted successfully'}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Row not found'}), 404
+
+    return jsonify({'success': False, 'message': 'No ID provided'}), 400
+
+@main.route('/my-invoices/invoice/<int:invoice_id>/update', methods=['PUT'])
+@login_required
+def update_invoice(invoice_id):
+    data = request.get_json()
+    print(data)
+    invoice_id = validate_id(invoice_id)
+    if invoice_id:
+        invoice_to_update = Invoice.query.get(invoice_id)
+
+        success = invoice_to_update.update(data)
+        if success:
+            return jsonify({'success': True, 'message': 'Invoice updated successfully'}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Error updating invoice'}), 500
+
+    return jsonify({'success': False, 'message': 'Invoice not found'}), 404
