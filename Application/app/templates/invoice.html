@@ -50,58 +50,58 @@
             <h4 class="text-base font-semibold">Services</h4>
             <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
                 <thead>
-                <tr>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Service Name
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Price
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Amount
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Emission per Unit
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
-                        Total Emissions (CO2eq)
-                    </th>
-                    <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
-                </tr>
+                    <tr>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Service Name
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Price
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Amount
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Emission per Unit
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                            Total Emissions (CO2eq)
+                        </th>
+                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                    </tr>
                 </thead>
                 <tbody id="services">
-                {% for service in invoice.services %}
-                    <tr>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.name }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.name }}" data-key="name">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.price }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.price }}" data-key="price">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.amount }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.amount }}" data-key="amount">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.emission }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.emission.value }}" data-key="emission">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
-                            <span class="row-display">{{ service.total_emissions }}</span>
-                            <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ service.total_emissions }}" data-key="total_emissions">
-                        </td>
-                        <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
-                            <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
-                        </td>
-                    </tr>
-                {% endfor %}
+                    {% for service in invoice.services %}
+                        <tr>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.name }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.name }}" data-key="name">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.price }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.price }}" data-key="price">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.amount }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.amount }}" data-key="amount">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.emission.value }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ service.emission.value }}" data-key="emission">
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                                <span class="row-display">{{ service.total_emissions }}</span>
+                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                            </td>
+                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
+                                <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
+                            </td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

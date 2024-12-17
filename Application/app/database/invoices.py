@@ -87,6 +87,8 @@ class Invoice(db.Model):
                         # Update emission related to the service
                         if 'emission' in updated_service:
                             service.emission.value = updated_service['emission']  # Update emission value
+                        if 'total_emissions' == updated_service:
+                            continue
 
             # Commit all changes to the database
             db.session.commit()
