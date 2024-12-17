@@ -51,3 +51,47 @@ class Invoice(db.Model):
             db.session.rollback()  # Rollback if any error occurs
             print(f"Error deleting invoice: {e}")
             return False
+
+    def update(self, data):
+        try:
+            # Update invoice fields
+            if 'fields' in data:
+                for field in data['fields']:
+                    key = field['key']
+                    value = field['value']
+
+                    # Skip 'total_emissions' field as it's not editable
+                    if key == 'total_emissions':
+                        continue
+
+                    # If the key is 'issue_date', convert the string to a date object
+                    if key == 'issue_date':
+                        value = datetime.strptime(value, '%Y-%m-%d').date()
+
+                    # Update the invoice field if it exists in the model
+                    if hasattr(self, key):
+                        setattr(self, key, value)
+
+            # Update services and associated emissions
+            if 'services' in data:
+                for updated_service in data['services']:
+                    service_name = updated_service.get('name')  # Assuming 'name' uniquely identifies the service
+                    service = next((s for s in self.services if s.name == service_name), None)
+
+                    if service:
+                        # Update the service attributes
+                        if 'price' in updated_service:
+                            service.price = updated_service['price']
+                        if 'amount' in updated_service:
+                            service.amount = updated_service['amount']
+                        # Update emission related to the service
+                        if 'emission' in updated_service:
+                            service.emission.value = updated_service['emission']  # Update emission value
+
+            # Commit all changes to the database
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()  # Rollback if any error occurs
+            print(f"Error updating invoice: {e}")
+            return False

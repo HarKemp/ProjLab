@@ -30,11 +30,17 @@
                     <dl class="flex items-center gap-4 px-6">
                         <dt class="text-sm flex-1">{{ field.label }}</dt>
                         <dd class="text-sm flex-1">
-                            <span class="field-display">{{ field.value }}</span>
-                            <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
+                            {% if field.key == 'total_emissions' %}
+                                <span class="field-display">{{ field.value }}</span>
+                            {% else %}
+                                <span class="field-display">{{ field.value }}</span>
+                                <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
                                    value="{{ field.value }}" data-key="{{ field.key }}">
+                            {% endif %}
                         </dd>
-                        <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
+                        {% if field.key != 'total_emissions' %}
+                            <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
+                        {% endif %}
                     </dl>
                 </div>
             {% endfor %}
@@ -174,8 +180,33 @@
                 }, {});
             });
 
-            // TODO edit info in db and redirect to this page
-            //return window.location.href = `/my-invoices/invoice/${invoice.id}`
+            // Prepare data for the update
+            const data = {
+                fields: fieldInputs,
+                services: rowInputs
+            };
+
+            // Send the update request to the backend
+            fetch(`/my-invoices/invoice/${invoiceId}/update`, {
+                method: 'PUT',  // Use PUT or PATCH for updates
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Invoice updated successfully!");
+                    window.location.href = `/my-invoices/invoice/${invoiceId}`;
+                } else {
+                    alert("Error updating invoice: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error updating invoice:", error);
+                alert("An error occurred while updating.");
+            });
         });
 
         // Show modal on delete button click
