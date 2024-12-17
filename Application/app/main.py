@@ -3,7 +3,6 @@ from flask_login import login_required, current_user
 from app.database.models import File, Invoice
 
 from .utils import file_upload, file_download
-from app.celery_tasks import ocr_task
 
 main = Blueprint('main',__name__)
 
@@ -45,7 +44,7 @@ def download_file(file_type):
         return redirect(url_for('main.download_page'))
     return result
 
-@main.route('/my_invoices', methods=['GET'])
+@main.route('/my-invoices', methods=['GET'])
 @login_required
 def my_invoices():
     # Obtain all invoices for current user
@@ -93,3 +92,22 @@ def invoice_status():
 @login_required
 def chart():
     return render_template("chart.html")
+
+@main.route('/my-invoices/invoice/<int:invoice_id>/delete', methods=['DELETE'])
+@login_required
+def delete_fruit(invoice_id):
+    try:
+        # Validate if invoice_id can be converted to an integer
+        invoice_id = int(invoice_id)
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'message': 'Invalid ID format. ID must be an integer.'}), 400
+
+    if invoice_id:
+        invoice_to_Delete = Invoice.query.get(int(invoice_id))
+        success = invoice_to_Delete.delete()  # Your existing delete function
+        if success:
+            return jsonify({'success': True, 'message': 'Row deleted successfully'}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Row not found'}), 404
+
+    return jsonify({'success': False, 'message': 'No ID provided'}), 400

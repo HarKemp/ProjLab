@@ -2,7 +2,6 @@ from app.__init__ import db
 from datetime import datetime
 from .invoices_services import invoices_services
 
-
 class Invoice(db.Model):
     #TODO rework this based on excel "Invoices" in docs
     __tablename__ = 'invoices'
@@ -30,3 +29,25 @@ class Invoice(db.Model):
         for service in self.services:
             total_emissions += service.total_emissions
         return total_emissions
+
+    def delete(self):
+        try:
+            # Delete emissions and services in bulk to reduce commit overhead
+            for service in self.services:
+                # Delete associated emissions first
+                db.session.delete(service.emission)
+
+            # Now delete the services
+            for service in self.services:
+                db.session.delete(service)
+
+            # Finally, delete the invoice itself
+            db.session.delete(self)
+
+            # Commit all deletions in a single transaction
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()  # Rollback if any error occurs
+            print(f"Error deleting invoice: {e}")
+            return False
