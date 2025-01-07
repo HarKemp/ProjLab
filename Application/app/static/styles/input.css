@@ -26,4 +26,20 @@
     .bg-accent-100 {
         background-color: #aad4c9;
     }
+
+    .text-accent-40 {
+        color: #67b4a3;
+    }
+
+    .text-accent-100 {
+        color: #aad4c9;
+    }
+
+    .text-accent-100:hover {
+        color: #67b4a3;
+    }
+
+    .bg-accent-40:hover {
+        background-color: #aad4c9;
+    }
 }

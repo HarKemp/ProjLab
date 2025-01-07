@@ -8,22 +8,22 @@
         <style>
             .invoice-table td {
                 text-align: center;
-                color: black;
+                color: #e5e7eb;
                 padding: 10px;
             }
 
             .invoice-table th {
-                color: black;
-                background-color: #f3f4f6;
+                color: #e5e7eb;
+                font-weight: bold;
+                font-size: medium;
+                text-align: center;
+                background-color: #262c3e;
             }
 
-            .invoice-table tr:nth-child(odd) {
-                background-color: #e5e4e2;
-            }
-
-            .invoice-table tr:hover {
-                background-color: #e5e7eb; /* Lighter grey for hover to ensure it's distinct */
-                cursor: pointer;
+            .invoice-table tr:hover,
+            .invoice-table tr:hover td {
+             background-color: #3e4354; 
+            cursor: pointer;
             }
         </style>
     {% endblock %}
@@ -32,10 +32,10 @@
         <h1 class="text-4xl font-bold mb-6 text-white">My Invoices</h1>
 
         <!-- Invoice Table -->
-        <div class="w-full max-w-4xl bg-white rounded-lg shadow-md mt-6 overflow-x-auto">
-            <table class="invoice-table">
+        <div class="w-full max-w-[95vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">
+            <table class="invoice-table bg-main-20 w-full">
                 <thead>
-                    <tr>
+                    <tr class="bg-main-20 text-gray-200"> 
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">OCR Status</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Carbon Footprint (CO2eq)</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Services</th>
@@ -54,7 +54,8 @@
                     {% for invoice in invoices %}
                     <tr id="invoice-{{ invoice.id }}" class="border-b border-gray-200 text-sm"
                     onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
-                        <td class="border-b border-gray-200 bg-white text-sm invoice-status">
+
+                        <td class="border-b border-gray-200 bg-main-20 text-sm invoice-status">
                         {% if invoice.file and invoice.file.ocr_status == "Pending" %}
                             <span class="text-black font-semibold">Pending</span>
                         {% elif invoice.file and invoice.file.ocr_status == "Processing" %}

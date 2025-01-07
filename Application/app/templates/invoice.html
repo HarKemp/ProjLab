@@ -2,10 +2,11 @@
 {% extends "layout.html" %}
 {% block title %}Invoice{% endblock %}
 {% block body %}
-    <div class="overflow-hidden shadow rounded-lg border box">
+{% include 'navbar.html' %}
+<div class="overflow-hidden rounded-lg box w-full max-w-[60vw] mx-auto mt-20 mb-20 bg-main-20">
         <div class="px-4 py-5 sm:px-6">
             <div class="flex justify-between items-center">
-                <h3 class="text-lg leading-6 font-medium">
+                <h3 class="text-2xl leading-6 font-bold text-center w-full mt-6">
                     Detailed invoice {{ invoice.issue_number }} information
                 </h3>
             </div>
@@ -24,98 +25,102 @@
         {'label': 'Sum Total', 'key': 'sum_total', 'value': invoice.sum_total}
     ] %}
 
-        <div id="fields">
-            {% for field in fields %}
-                <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
-                    <dl class="flex items-center gap-4 px-6">
-                        <dt class="text-sm flex-1">{{ field.label }}</dt>
-                        <dd class="text-sm flex-1">
-                            {% if field.key == 'total_emissions' %}
-                                <span class="field-display">{{ field.value }}</span>
-                            {% else %}
-                                <span class="field-display">{{ field.value }}</span>
-                                <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
+    <div id="fields" class="mx-auto max-w-5xl p-4 rounded  ">
+        {% for field in fields %}
+            <div class="py-3 border-b border-gray-700">
+                <dl class="flex items-center gap-4">
+                    <dt class="text-sm flex-1 text-gray-300">{{ field.label }}</dt>
+                    <dd class="text-sm flex-1">
+                        {% if field.key == 'total_emissions' %}
+                            <span class="field-display text-gray-200">{{ field.value }}</span>
+                        {% else %}
+                            <span class="field-display text-gray-200">{{ field.value }}</span>
+                            <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
                                    value="{{ field.value }}" data-key="{{ field.key }}">
-                            {% endif %}
-                        </dd>
-                        {% if field.key != 'total_emissions' %}
-                            <button class="text-sm font-medium text-gray-500 edit-btn">Edit</button>
                         {% endif %}
-                    </dl>
-                </div>
-            {% endfor %}
-        </div>
-
-        <div class="border-t border-gray-800 px-4 py-5 sm:p-0">
-            <h4 class="text-base font-semibold">Services</h4>
-            <table class="min-w-full leading-normal mt-6 border-t border-gray-100">
-                <thead>
+                    </dd>
+                    {% if field.key != 'total_emissions' %}
+                        <button class="text-sm font-medium text-accent-100 text-accent-100:hover edit-btn">Edit</button>
+                    {% else %}
+                        <div class="w-[23px]"></div>
+                    {% endif %}
+                </dl>
+            </div>
+        {% endfor %}
+    </div>
+    
+        <div class=" px-4 py-5 sm:p-0 flex flex-col items-center mt-10">
+            <h4 class="text-2xl font-bold text-center">Services</h4>
+            <div class="max-w-4xl w-full">
+            <table class=" leading-normal mt-10 border-t  max-w-4xl w-full">
+                <thead class="text-center">
                     <tr>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        <th class="px-6 py-4 border-b  text-xs font-semibold uppercase tracking-wider">
                             Service Name
                         </th>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
                             Price
                         </th>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
                             Amount
                         </th>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
                             Emission per Unit
                         </th>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">
+                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
                             Total Emissions (CO2eq)
                         </th>
-                        <th class="px-6 py-4 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider"></th>
+                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider"></th>
                     </tr>
                 </thead>
                 <tbody id="services">
                     {% for service in invoice.services %}
-                        <tr>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                        <tr class="text-center">
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
                                 <span class="row-display">{{ service.name }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.name }}" data-key="name">
                             </td>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm w-1/6">
                                 <span class="row-display">{{ service.price }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.price }}" data-key="price">
                             </td>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
                                 <span class="row-display">{{ service.amount }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.amount }}" data-key="amount">
                             </td>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
                                 <span class="row-display">{{ service.emission.value }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.emission.value }}" data-key="emission">
                             </td>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-left">
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
                                 <span class="row-display">{{ service.total_emissions }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                            value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
                             </td>
-                            <td class="border-b border-gray-200 px-6 py-4 text-sm text-right">
-                                <button class="text-sm font-medium text-gray-500 edit-row-btn">Edit</button>
+                            <td class="border-b border-gray-700 px-6 py-4 text-sm text-right">
+                                <button class="text-sm font-medium text-accent-100 text-accent-100:hover edit-row-btn">Edit</button>
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+        </div>
 
-        <div class="flex justify-between gap-4 p-6">
+        <div class="flex justify-between gap-4 pt-6 pb-6 max-w-4xl mx-auto mt-6 mb-4">
             <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded">
-                Delete
+                Delete invoice
             </button>
 
             <div class="flex gap-4 ml-auto">
                 <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50" disabled>
                     Cancel
                 </button>
-                <button id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" disabled>
+                <button id="submit-btn" class="px-4 py-2 bg-accent-40 bg-accent-40:hover text-black rounded disabled:opacity-50" disabled>
                     Submit
                 </button>
             </div>

@@ -3,7 +3,7 @@
 {% block title %}Register Page{% endblock %}
 
 {% block body %}
-<div class=" bg-slate-900 h-screen overflow-hidden flex flex-col items-center justify-center">
+<div class=" bg-slate-900  overflow-hidden flex flex-col items-center justify-center">
     <div class="pb-5">
         <svg id="svg" fill="#f3f4f6" 
         width="120" height="120" 
@@ -15,7 +15,7 @@
         <p class="text-center font-semibold text-gray-200 md:text-3xl lg:text-4xl">REGISTER</p>
     </div>
 
-    <div class="bg-gray-100  lg:w-4/12 md:w-5/12 w-6/12 shadow-lg rounded-2xl" style="background-color: #262c3e;">
+    <div class="bg-gray-100 mb-5 lg:w-4/12 md:w-5/12 w-6/12 shadow-lg rounded-2xl" style="background-color: #262c3e;">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <div class="bg-red-600 text-center text-white p-4 rounded  ">
