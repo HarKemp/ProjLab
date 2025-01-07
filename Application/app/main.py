@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, url_for, request, redirect, jsonify
 from flask_login import login_required, current_user
 from app.database.models import File, Invoice
+from decimal import Decimal
+from sqlalchemy import desc
 
 from .utils import file_upload, file_download
 
@@ -14,11 +16,32 @@ def index():
 @login_required
 def homepage():
     if request.method == 'POST':
-            if file_upload():
-                return redirect(url_for('main.homepage'))
-            else:
-                return redirect(request.url)
-    return render_template("homepage.html")
+        if file_upload():
+            return redirect(url_for('main.homepage'))
+        else:
+            return redirect(request.url)
+    
+    # Get all services for current user's invoices
+    invoices = Invoice.query.filter_by(user_id=current_user.id).all()
+    
+    # Store service totals in a dictionary
+    service_totals = {}
+    
+    # Calculate totals for each service type across all invoices
+    for invoice in invoices:
+        for service in invoice.services:
+            service_name = service.name
+            if service_name not in service_totals:
+                service_totals[service_name] = 0
+            service_totals[service_name] += service.total_emissions
+    
+    # Convert to lists for the chart
+    labels = list(service_totals.keys())
+    emissions_data = [float(value) for value in service_totals.values()]
+    
+    return render_template("homepage.html", 
+                         pie_labels=labels,
+                         pie_data=emissions_data)
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
@@ -71,6 +94,9 @@ def invoice_status():
     data = []
     # Send data about invoices in json format
     for inv in invoices:
+        # Display total_emissions with a decimal point - consistent with default display
+        total_emissions = str(round(Decimal(str(inv.total_emissions)), 1))
+        
         data.append({
             'id': inv.id,
             'ocr_status': inv.file.ocr_status if inv.file else 'Error',
@@ -82,7 +108,7 @@ def invoice_status():
             'issue_date': inv.issue_date.strftime('%Y-%m-%d') if inv.issue_date else 'N/A',
             'sum_total': inv.sum_total,
             'services_count': len(inv.services),
-            'total_emissions': inv.total_emissions,
+            'total_emissions': total_emissions,
             'issuer_registration_number': inv.issuer_registration_number,
             'receiver_registration_number': inv.receiver_registration_number,
         })
@@ -91,7 +117,39 @@ def invoice_status():
 @main.route("/chart", methods=['GET', 'POST'])
 @login_required
 def chart():
-    return render_template("chart.html")
+    # Get all invoices and their services for current user
+    invoices = Invoice.query.filter_by(user_id=current_user.id).all()
+    
+    # Create a dictionary to store service totals
+    service_totals = {}
+    
+    # Calculate totals for each service type across all invoices
+    for invoice in invoices:
+        for service in invoice.services:
+            service_name = service.name
+            if service_name not in service_totals:
+                service_totals[service_name] = {
+                    'total_emissions': 0,
+                    'emission_value': service.emission.value if service.emission else 0
+                }
+            
+            service_totals[service_name]['total_emissions'] += service.total_emissions
+    
+    # Get top 5 services
+    top_services = sorted(
+        service_totals.items(), 
+        key=lambda x: x[1]['total_emissions'], 
+        reverse=True
+    )[:5]
+    
+    # Prepare data for the chart
+    labels = [service[0] for service in top_services]
+    emissions_data = [float(service[1]['total_emissions']) for service in top_services]
+    
+    return render_template("chart.html", 
+                         invoices=invoices, 
+                         labels=labels,
+                         emissions_data=emissions_data)
 
 def validate_id(invoice_id):
     try:

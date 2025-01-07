@@ -1,44 +1,107 @@
 {% extends "layout.html" %}
-{% block title %}Home Page{% endblock %}
+{% block title %}Service Emissions{% endblock %}
 {% block body %}
 {% include 'navbar.html' %}
 <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
-<div class="center-element py-10" >
-    <!-- Chart.js test -->
-    <div>work pls</div>
-    <canvas id="myChart" width="400" height="400"></canvas>
+<div class="flex justify-center items-center h-[calc(100vh-6rem)] w-screen">
+    <canvas id="myChart" class="w-full h-3/5"></canvas>
     <script>
+        // Get the data passed from Flask
+        var labels = {{ labels|tojson|safe }};
+        var emissionsData = {{ emissions_data|tojson|safe }};
+
+        const TextColor = 'rgb(229,231,235)';
+        
         var ctx = document.getElementById('myChart').getContext('2d');
         var myChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                labels: labels,
                 datasets: [{
-                    label: 'CO2',
-                    data: [120, 19, 3, 5, 2, 3],
+                    label: 'CO2 Emissions by Service Type',
+                    data: emissionsData,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(255, 206, 86, 0.2)',
                         'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
+                        'rgba(153, 102, 255, 0.2)'
                     ],
                     borderColor: [
                         'rgba(255, 99, 132, 1)',
                         'rgba(54, 162, 235, 1)',
                         'rgba(255, 206, 86, 1)',
                         'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
+                        'rgba(153, 102, 255, 1)'
                     ],
                     borderWidth: 1
                 }]
             },
             options: {
+                responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total CO2 Emissions',
+                            color: TextColor,
+                            font: {
+                                size: 32
+                            }
+                        },
+                        ticks:
+                        {
+                            color: TextColor,
+                            font: {
+                                size: 32
+                            }
+                        },
+                        grid: {
+                        color: TextColor,
+                        drawBorder: false  
+                        },
+                        border: {
+                            display: true,
+                            color: TextColor
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            color: TextColor
+                        },
+                        ticks:
+                        {
+                            color: TextColor,
+                            font: {
+                                size: 20
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                            autoSkip: false
+                        },
+                        grid: {
+                            display: false,  // Hide all vertical grid lines
+                            drawBorder: false  // Hide the border of the x-axis
+                        },
+                        border: {
+                            display: false  // Hide the x-axis line
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Top 5 Services by CO2 Emissions',
+                        color: TextColor,
+                        font: {
+                            size: 32
+                        }
+                    },
+                    legend: {
+                        display: false,
+                        position: 'top'
                     }
                 }
             }

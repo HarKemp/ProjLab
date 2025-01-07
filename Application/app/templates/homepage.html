@@ -16,61 +16,126 @@
 
     <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
 
+        <div class="grid grid-cols-2 gap-4 w-full px-4 mb-6">
+            <!-- Pie Chart -->
+            <div class="bg-main-20 p-6 rounded shadow-md">
+                <canvas id="pieChart"></canvas>
+            </div>
+            
+            <!-- Upload Form -->
+            <div class="bg-main-20 p-6 rounded shadow-md">
+                <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
 
-        <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
-
-        {#  Looks like a nice place for a nest  #}
-        <div class="text-center flex flex-col items-center mx-4 min-h-6">
-            {% with messages = get_flashed_messages(with_categories=True) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        {% if category == 'alert-success' %}
-                            <div id="success-msg" class="text-green-500 font-semibold">
-                                {{ message }}
-                            </div>
-                        {% else %}
-                            <div class="text-red-500 font-bold">
-                                {{ message }}
-                            </div>
+                {#  Looks like a nice place for a nest  #}
+                <div class="text-center flex flex-col items-center mx-4 min-h-6">
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                {% if category == 'alert-success' %}
+                                    <div id="success-msg" class="text-green-500 font-semibold">
+                                        {{ message }}
+                                    </div>
+                                {% else %}
+                                    <div class="text-red-500 font-bold">
+                                        {{ message }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-            <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
-        </div>
-
-
-        <div class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
-            <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
-                <div
-                        id="dropArea"
-                        class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
-                        onclick="document.getElementById('fileInput').click()"
-                >
-                    <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
-                    <input type="file" name="files" id="fileInput" multiple required class="hidden"
-                           onchange="showFileNames()" accept="application/pdf">
+                    {% endwith %}
+                    <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
                 </div>
-
-                <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
-
-                <button type="submit"
-                        class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
-                    Upload
-                </button>
-
-            </form>
-
-            <a href="{{ url_for('main.my_invoices') }}">
-                <button type="submit" id="ocrButton"
-                        class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
-                Go To My Invoices
-                </button>
-            </a>
-
-
+            
+            
+                <div class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
+                    <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
+                        <div
+                                id="dropArea"
+                                class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
+                                onclick="document.getElementById('fileInput').click()"
+                        >
+                            <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
+                            <input type="file" name="files" id="fileInput" multiple required class="hidden"
+                                onchange="showFileNames()" accept="application/pdf">
+                        </div>
+        
+                        <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
+        
+                        <button type="submit"
+                                class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
+                            Upload
+                        </button>
+        
+                    </form>
+        
+                    <a href="{{ url_for('main.my_invoices') }}">
+                        <button type="submit" id="ocrButton"
+                                class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
+                        Go To My Invoices
+                        </button>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
+
+    <script>
+        // Get the data passed from Flask
+        var pieLabels = {{ pie_labels|tojson|safe }};
+        var pieData = {{ pie_data|tojson|safe }};
+        const TextColor = 'rgb(229,231,235)';
+        
+        // Create Pie Chart
+        var ctxPie = document.getElementById('pieChart').getContext('2d');
+        var pieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    data: pieData,
+                    backgroundColor: [
+                        '#4E79A7',  // blue
+                        '#F28E2B',  // orange
+                        '#E15759',  // red
+                        '#76B7B2',  // teal
+                        '#59A14F',  // green
+                        '#EDC948',  // yellow
+                        '#B07AA1',  // purple
+                        '#FF9DA7',  // pink
+                        '#9C755F',  // brown
+                        '#BAB0AC'   // gray
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 0.2)',  // Subtle white border
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Total CO2 Emissions by Service',
+                        color: TextColor,
+                        font: {
+                            size: 32
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: TextColor,
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 
     <script>
         const fileInput = document.getElementById('fileInput');
