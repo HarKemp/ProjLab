@@ -29,7 +29,27 @@
     {% endblock %}
 
     <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
-        <h1 class="text-4xl font-bold mb-6 text-white">My Invoices</h1>
+      <div class="w-full max-w-[95vw] grid grid-cols-3 items-center mb-6">
+          <div></div>
+          
+          <h1 class="text-4xl font-bold text-white text-center">My Invoices</h1>
+          
+          <!-- Download button -->
+          <div class="bg-black-100 justify-self-end">
+              {% with messages = get_flashed_messages() %}
+              {% if messages %}
+              <div class="px-4 py-3 mb-4 rounded bg-red-500 text-white">
+                  {{ messages[0] }}
+              </div>
+              {% endif %}
+              {% endwith %}
+              <div>
+                  <a href="{{ url_for('main.download_file', file_type='summary') }}">
+                      <button type="button" class="btn px-4 py-2 bg-accent-40 hover:bg-accent text-black hover:text-white transition duration-200 rounded ">Download Report</button>
+                  </a>
+              </div>
+          </div>
+      </div>
 
         <!-- Invoice Table -->
         <div class="w-full max-w-[95vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">

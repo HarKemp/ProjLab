@@ -4,83 +4,88 @@
 
     {% include 'navbar.html' %}
     {% block style %}
-        <style>
+    <style>
         #ocrButton {
             display: none;
             padding: 10px 20px;
             justify-content: center;
             margin-top: 20px;
         }
+        
     </style>
     {% endblock %}
 
-    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
+    <div class="flex flex-col items-center justify-center p-20 relative bg-gray-900 ">
 
-        <div class="grid grid-cols-2 gap-4 w-full px-4 mb-6">
-            <!-- Pie Chart -->
-            <div class="bg-main-20 p-6 rounded shadow-md">
-                <canvas id="pieChart"></canvas>
+        <div class="grid grid-cols-2 gap-8 w-full px-4 max-w-[90%]">
+            <!-- Pie Chart Section -->
+            <div class="flex items-center justify-center bg-main-20 p-8 rounded shadow-md">
+                <canvas id="pieChart" width="400" height="300"></canvas>
             </div>
             
-            <!-- Upload Form -->
-            <div class="bg-main-20 p-6 rounded shadow-md">
-                <h1 class="text-4xl font-bold mb-6 text-white">Upload invoice</h1>
-
-                {#  Looks like a nice place for a nest  #}
-                <div class="text-center flex flex-col items-center mx-4 min-h-6">
-                    {% with messages = get_flashed_messages(with_categories=True) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                {% if category == 'alert-success' %}
-                                    <div id="success-msg" class="text-green-500 font-semibold">
-                                        {{ message }}
-                                    </div>
-                                {% else %}
-                                    <div class="text-red-500 font-bold">
-                                        {{ message }}
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
-                    <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
-                </div>
-            
-            
-                <div class="bg-main-20 p-6 rounded shadow-md w-100 mt-6">
-                    <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
-                        <div
+            <!-- Upload Form Section -->
+            <div class="bg-main-20 p-12 rounded shadow-md flex  justify-center">
+                <div class="max-w-lg w-full">
+                    <h1 class="text-3xl font-bold mb-6 text-gray-200 text-center">Upload Invoice</h1>
+    
+                    <!-- Flash Messages -->
+                    <div class="text-center flex flex-col items-center mx-4 min-h-6">
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    {% if category == 'alert-success' %}
+                                        <div id="success-msg" class="text-green-500 font-semibold">
+                                            {{ message }}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-red-500 font-bold">
+                                            {{ message }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
+                    </div>
+    
+                    <!-- Form -->
+                    <div class="mt-6">
+                        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
+                            <div
                                 id="dropArea"
-                                class="border-dashed border-2 border-gray-300 rounded-lg p-4 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
+                                class="border-dashed border-2 border-gray-300 rounded-lg p-8 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
                                 onclick="document.getElementById('fileInput').click()"
-                        >
-                            <p class="text-gray-500 dark:text-white">Drag and drop your files here or click to select</p>
-                            <input type="file" name="files" id="fileInput" multiple required class="hidden"
-                                onchange="showFileNames()" accept="application/pdf">
-                        </div>
-        
-                        <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
-        
-                        <button type="submit"
-                                class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
-                            Upload
-                        </button>
-        
-                    </form>
-        
-                    <a href="{{ url_for('main.my_invoices') }}">
-                        <button type="submit" id="ocrButton"
-                                class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
-                        Go To My Invoices
-                        </button>
-                    </a>
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p class="text-gray-300 text-center">Drag and drop your files here or click to select</p>
+                                <input type="file" name="files" id="fileInput" multiple required class="hidden" 
+                                       onchange="showFileNames()" accept="application/pdf">
+                            </div>
+    
+                            <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
+    
+                            <button type="submit"
+                                    class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
+                                Upload
+                            </button>
+                        </form>
+    
+                        <a href="{{ url_for('main.my_invoices') }}">
+                            <button type="submit" id="ocrButton"
+                                    class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200 hidden mt-4">
+                                Go To My Invoices
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
-
+    
+    <script src="{{ url_for('static', filename='scripts/chart.umd.js') }}"></script>
+    
     <script>
         // Get the data passed from Flask
         var pieLabels = {{ pie_labels|tojson|safe }};
@@ -119,7 +124,7 @@
                         text: 'Total CO2 Emissions by Service',
                         color: TextColor,
                         font: {
-                            size: 32
+                            size: 28
                         }
                     },
                     legend: {
@@ -128,7 +133,7 @@
                         labels: {
                             color: TextColor,
                             font: {
-                                size: 16
+                                size: 12
                             }
                         }
                     }
@@ -136,6 +141,8 @@
             }
         });
     </script>
+    
+    
 
     <script>
         const fileInput = document.getElementById('fileInput');
