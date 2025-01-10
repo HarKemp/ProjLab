@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, url_for, request, redirect, jsonify
 from flask_login import login_required, current_user
-from app.database.models import File, Invoice
+from app.database.models import File, Invoice, Service, Emission, invoices_services
 from decimal import Decimal
-from sqlalchemy import desc
+from sqlalchemy import desc, func
+from datetime import datetime
 
 from .utils import file_upload, file_download
 
@@ -23,17 +24,18 @@ def homepage():
     
     # Get all services for current user's invoices
     invoices = Invoice.query.filter_by(user_id=current_user.id).all()
-    
+
     # Store service totals in a dictionary
     service_totals = {}
-    
+
     # Calculate totals for each service type across all invoices
     for invoice in invoices:
         for service in invoice.services:
-            service_name = service.name
-            if service_name not in service_totals:
-                service_totals[service_name] = 0
-            service_totals[service_name] += service.total_emissions
+            if service.total_emissions > 0:  # Check emissions before adding
+                service_name = service.name
+                if service_name not in service_totals:
+                    service_totals[service_name] = 0
+                service_totals[service_name] += service.total_emissions
     
     # Convert to lists for the chart
     labels = list(service_totals.keys())
@@ -42,6 +44,89 @@ def homepage():
     return render_template("homepage.html", 
                          pie_labels=labels,
                          pie_data=emissions_data)
+    
+# Route for emissions charts - returns data for top 5 services and historical emissions when called by the user
+@main.route("/api/emissions")
+@login_required
+def get_filtered_emissions():
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
+    
+    try:
+        # Base query for filtered data - invoices between start and end date
+        base_query = Invoice.query.filter(
+            Invoice.user_id == current_user.id,
+            Invoice.issue_date >= datetime.strptime(start_date, '%Y-%m-%d'),
+            Invoice.issue_date <= datetime.strptime(end_date, '%Y-%m-%d')
+        )
+
+        if base_query.count() == 0:
+            return jsonify({
+                'labels': [],
+                'emissions_data': [],
+                'timeline_labels': [],
+                'timeline_emissions': [],
+                'message': 'No data found for the selected date range'
+            })
+
+        # Get monthly data
+        monthly_data = (base_query
+            .with_entities(
+                func.extract('year', Invoice.issue_date).label('year'),
+                func.extract('month', Invoice.issue_date).label('month'),
+                func.sum(Service.amount * Emission.value).label('monthly_emissions')
+            )
+            .join(Invoice.services)
+            .join(Service.emission)
+            .group_by('year', 'month')
+            .order_by('year', 'month')
+            .all()
+        )
+
+        # Format monthly data for timeline chart
+        timeline_labels = []
+        timeline_emissions = []
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+        # Append labels to list (used for x-axis)
+        for year, month, emissions in monthly_data:
+            timeline_labels.append(f"{months[int(month)-1]} {int(year)}")
+            timeline_emissions.append(float(emissions))
+
+        # Get top 5 services
+        top_services = (Service.query
+            .with_entities(
+                Service.name,
+                func.sum(Service.amount * Emission.value).label('total_emissions')
+            )
+            .join(Service.emission)
+            .join(Service.invoice)
+            .filter(
+                Invoice.id.in_(base_query.with_entities(Invoice.id))
+            )
+            .group_by(Service.name)
+            .order_by(desc('total_emissions'))
+            .limit(5)
+            .all()
+        )
+
+        # Return data in JSON format
+        return jsonify({
+            'labels': [service[0] for service in top_services],
+            'emissions_data': [float(service[1]) for service in top_services], # Contains total emissions for top 5 services
+            'timeline_labels': timeline_labels, # Contains labels for timeline chart - x-axis data
+            'timeline_emissions': timeline_emissions # Contains emissions data for timeline chart - y-axis data
+        })
+
+    except Exception as e: # On exception, return 400 status code + error message
+        return jsonify({
+            'labels': [],
+            'emissions_data': [],
+            'timeline_labels': [],
+            'timeline_emissions': [],
+            'message': str(e)
+        }), 400 
 
 @main.route('/upload', methods=['GET', 'POST'])
 @login_required
@@ -117,39 +202,49 @@ def invoice_status():
 @main.route("/chart", methods=['GET', 'POST'])
 @login_required
 def chart():
-    # Get all invoices and their services for current user
-    invoices = Invoice.query.filter_by(user_id=current_user.id).all()
-    
-    # Create a dictionary to store service totals
-    service_totals = {}
-    
-    # Calculate totals for each service type across all invoices
-    for invoice in invoices:
-        for service in invoice.services:
-            service_name = service.name
-            if service_name not in service_totals:
-                service_totals[service_name] = {
-                    'total_emissions': 0,
-                    'emission_value': service.emission.value if service.emission else 0
-                }
-            
-            service_totals[service_name]['total_emissions'] += service.total_emissions
-    
-    # Get top 5 services
-    top_services = sorted(
-        service_totals.items(), 
-        key=lambda x: x[1]['total_emissions'], 
-        reverse=True
-    )[:5]
-    
-    # Prepare data for the chart
+    # Get top 5 services with highest emissions
+    top_services = (Service.query
+        .with_entities(
+            Service.name,
+            func.sum(Service.amount * Emission.value).label('total_emissions')
+        )
+        .join(Service.emission)
+        .join(Service.invoice)
+        .filter(Invoice.user_id == current_user.id)
+        .group_by(Service.name)
+        .order_by(desc('total_emissions'))
+        .limit(5)
+        .all()
+    )
+
+    # Convert data to lists for the chart
     labels = [service[0] for service in top_services]
-    emissions_data = [float(service[1]['total_emissions']) for service in top_services]
-    
-    return render_template("chart.html", 
-                         invoices=invoices, 
-                         labels=labels,
-                         emissions_data=emissions_data)
+    emissions_data = [float(service[1]) for service in top_services]
+
+    # Get historical data for historical emission chart - default is yearly
+    historical_data = (Invoice.query
+        .with_entities(
+            func.extract('year', Invoice.issue_date).label('year'),
+            func.sum(Service.amount * Emission.value).label('yearly_emissions')
+        )
+        .join(Invoice.services)
+        .join(Service.emission)
+        .filter(Invoice.user_id == current_user.id)
+        .group_by('year')
+        .order_by('year')
+        .all()
+    )
+
+    years = [int(data[0]) for data in historical_data]
+    yearly_emissions = [float(data[1]) for data in historical_data]
+
+    return render_template(
+        "chart.html",
+        labels=labels, # Contains service names for top 5 services
+        emissions_data=emissions_data, # Contains total emissions for top 5 services
+        years=years, # Contains years for historical emissions
+        yearly_emissions=yearly_emissions # Contains total emissions for each year
+    )
 
 def validate_id(invoice_id):
     try:

@@ -3,108 +3,370 @@
 {% block body %}
 {% include 'navbar.html' %}
 <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
-<div class="flex justify-center items-center h-[calc(100vh-6rem)] w-screen">
-    <canvas id="myChart" class="w-full h-3/5"></canvas>
+<div class="flex flex-col justify-start items-center min-h-screen">
+    <!-- Time filters -->
+    <div class="w-4/5 flex justify-between items-center mt-8 mb-6">
+        <h2 class="text-3xl font-bold text-gray-200">CO2 Emissions Analytics</h2>
+        <div class="flex gap-4 items-center">
+            <div class="flex items-center gap-2">
+                <label for="startDate" class="text-gray-200 text-xl">From:</label>
+                <input type="date" id="startDate" 
+                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="endDate" class="text-gray-200 text-xl">To:</label>
+                <input type="date" id="endDate" 
+                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500">
+            </div>
+            <button id="applyFilter" onclick="applyTimeFilter()" 
+                    class="bg-accent-40 text-black hover:bg-accent px-4 py-2 rounded transition-colors duration-200">
+                Apply
+            </button>
+        </div>
+    </div>
+
+    <div id="noDataMessage" class="hidden w-4/5 text-center text-gray-400 mt-10">
+        No emissions data found for the selected date range
+    </div>
+
+    <!-- Charts Container -->
+    <div class="w-4/5 grid grid-cols-1 gap-8 mb-8">
+        <!-- Top 5 Services Chart -->
+        <div class="bg-slate-800 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-200 mb-4">Top 5 Services by CO2 Emissions</h3>
+            <div class="h-[400px]">
+                <canvas id="servicesChart" class="w-full h-full"></canvas>
+            </div>
+        </div>
+
+        <!-- Historical Emissions Chart -->
+        <div class="bg-slate-800 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-gray-200 mb-4">Historical CO2 Emissions</h3>
+            <div class="h-[400px]">
+                <canvas id="historyChart" class="w-full h-full"></canvas>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Get the data passed from Flask
         var labels = {{ labels|tojson|safe }};
         var emissionsData = {{ emissions_data|tojson|safe }};
-
+        var years = {{ years|tojson|safe }};
+        var yearlyEmissions = {{ yearly_emissions|tojson|safe }};
         const TextColor = 'rgb(229,231,235)';
+        let servicesChart, historyChart;
         
-        var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'CO2 Emissions by Service Type',
-                    data: emissionsData,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Total CO2 Emissions',
-                            color: TextColor,
-                            font: {
-                                size: 32
-                            }
-                        },
-                        ticks:
-                        {
-                            color: TextColor,
-                            font: {
-                                size: 32
-                            }
-                        },
-                        grid: {
-                        color: TextColor,
-                        drawBorder: false  
-                        },
-                        border: {
-                            display: true,
-                            color: TextColor
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            color: TextColor
-                        },
-                        ticks:
-                        {
-                            color: TextColor,
-                            font: {
-                                size: 20
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                            autoSkip: false
-                        },
-                        grid: {
-                            display: false,  // Hide all vertical grid lines
-                            drawBorder: false  // Hide the border of the x-axis
-                        },
-                        border: {
-                            display: false  // Hide the x-axis line
-                        }
-                    }
+        function calculateFontSizes() {
+            const width = window.innerWidth;
+            
+            // Base text sizes (for screen width >= 1500px)
+            let xAxisSize = 20;
+            let yAxisSize = 24;
+            
+            // Text scaling based on breakpoints
+            if (width < 680) {
+                xAxisSize = 8;
+                yAxisSize = 14;
+            } else if (width < 768) {
+                xAxisSize = 10;
+                yAxisSize = 16;
+            } else if (width < 1024) {
+                xAxisSize = 12;
+                yAxisSize = 18;
+            } else if (width < 1200) {
+                xAxisSize = 16;
+                yAxisSize = 20;
+            } else if (width < 1500) {
+                xAxisSize = 18;
+                yAxisSize = 22;
+            }
+            return { xAxisSize, yAxisSize };
+        }
+
+        function updateChartFontSizes() {
+            const { xAxisSize, yAxisSize } = calculateFontSizes();
+            
+            // Update both chart font size depending on screen width
+            servicesChart.options.scales.x.ticks.font.size = xAxisSize;
+            servicesChart.options.scales.y.ticks.font.size = yAxisSize;
+            servicesChart.update('none');
+
+            historyChart.options.scales.x.ticks.font.size = xAxisSize;
+            historyChart.options.scales.y.ticks.font.size = yAxisSize;
+            historyChart.update('none');
+        }
+
+        // Updates chart data based on the filtered date range set by the user
+        function updateChartsData(data) {
+            const noDataMessage = document.getElementById('noDataMessage');
+            const chartsContainer = document.querySelector('.grid');
+            
+            // Show no data message if no data is available
+            if (!data.labels || data.labels.length === 0) {
+                noDataMessage.classList.remove('hidden');
+                chartsContainer.classList.add('hidden');
+                return;
+            }
+            
+            // Hide message and show charts
+            noDataMessage.classList.add('hidden');
+            chartsContainer.classList.remove('hidden');
+            
+            // Update services chart
+            servicesChart.data.labels = data.labels;
+            servicesChart.data.datasets[0].data = data.emissions_data;
+            servicesChart.update();
+
+            // Update history chart with monthly data of year/years
+            if (data.timeline_labels && data.timeline_labels.length > 0) {
+                historyChart.data.labels = data.timeline_labels;
+                historyChart.data.datasets[0].data = data.timeline_emissions;
+                
+                // Find the maximum value to scale against
+                const maxEmission = Math.max(...data.timeline_emissions, 3);
+                historyChart.options.scales.y.suggestedMax = Math.ceil(maxEmission);
+            } else {
+                // Set the default empty state
+                historyChart.data.labels = ['No data'];
+                historyChart.data.datasets[0].data = [];
+                historyChart.options.scales.y.suggestedMax = 3;
+            }
+            
+            // Update the historyChart given the new data
+            historyChart.update();
+        }
+
+        // Applies a time filter to the data and fetches the updated data
+        function applyTimeFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            // URL to use for fetching emissions data
+            const url = `/api/emissions?start=${startDate}&end=${endDate}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    updateChartsData(data);
+                })
+                .catch(error => {
+                    //console.error('Error fetching data:', error); // Debug error
+                    alert('Error fetching data. Please try again.');
+                });
+        }
+
+        function initializeCharts() {
+            const { xAxisSize, yAxisSize } = calculateFontSizes();
+
+            // Initialize services chart
+            const servicesCtx = document.getElementById('servicesChart').getContext('2d');
+            servicesChart = new Chart(servicesCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'CO2 Emissions',
+                        data: emissionsData,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
                 },
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Top 5 Services by CO2 Emissions',
-                        color: TextColor,
-                        font: {
-                            size: 32
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 40  // Add padding for multi-line labels
                         }
                     },
-                    legend: {
-                        display: false,
-                        position: 'top'
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: TextColor,
+                                font: { size: yAxisSize }
+                            },
+                            grid: {
+                                color: TextColor,
+                                drawBorder: false  
+                            },
+                            border: {
+                                display: true,
+                                color: TextColor
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: TextColor,
+                                font: { size: xAxisSize },
+                                maxRotation: 0,  // Prevent label rotation
+                                minRotation: 0,
+                                autoSkip: false,
+                                callback: function(val) {
+                                    // Get the label text
+                                    const label = this.getLabelForValue(val);
+                                    
+                                    // Split the label into words
+                                    const words = label.split(' ');
+                                    
+                                    // Create lines of maximum 2-3 words each
+                                    const lines = [];
+                                    let currentLine = [];
+                                    
+                                    words.forEach(word => {
+                                        if (currentLine.length < 2) {
+                                            currentLine.push(word);
+                                        } else {
+                                            lines.push(currentLine.join(' '));
+                                            currentLine = [word];
+                                        }
+                                    });
+                                    
+                                    // Add any remaining words
+                                    if (currentLine.length > 0) {
+                                        lines.push(currentLine.join(' '));
+                                    }
+                                    
+                                    return lines;
+                                }
+                            },
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            border: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            enabled: true,
+                            displayColors: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: TextColor,
+                            bodyColor: TextColor,
+                            padding: 20,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    // Show full label in tooltip without line breaks
+                                    return tooltipItems[0].label.replace(/\n/g, ' ');
+                                },
+                                label: function(context) {
+                                    let value = context.parsed.y;
+                                    return `CO₂ Emissions: ${value.toLocaleString()} kg`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
                     }
                 }
-            }
+            });
+
+            // Initialize history chart
+            const historyCtx = document.getElementById('historyChart').getContext('2d');
+            historyChart = new Chart(historyCtx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Total CO2 Emissions',
+                        data: yearlyEmissions,
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            ticks: {
+                                color: TextColor,
+                                font: { size: yAxisSize }
+                            },
+                            grid: {
+                                color: 'rgba(229,231,235,0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: TextColor,
+                                font: { size: xAxisSize },
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: TextColor,
+                            bodyColor: TextColor,
+                            padding: 10,
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.parsed.y;
+                                    return `CO₂ Emissions: ${value.toLocaleString()} kg`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize charts on load
+        initializeCharts();
+
+        // Add debounced resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                updateChartFontSizes();
+            }, 250);
         });
     </script>
 </div>
