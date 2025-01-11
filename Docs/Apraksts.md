@@ -120,6 +120,7 @@ graph TD;
     ProduktuPak[Produkts/Pakalpojums] -->|1..1| Izmesi[Izmeši]
     Uznemumi[Uzņēmumi] -->|1..n| Rekini[Rēķini];
     Uznemumi[Uzņēmumi] -->|1..n| Lietotaji[Lietotāji];
+```
 # Risinājuma novērtējums
 
 Risinājuma novērtējuma ietvaros tika veikti 2 ekperimenti.
