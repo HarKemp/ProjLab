@@ -73,7 +73,10 @@ def file_upload():
 
 def create_csv(file_path):
     try:
-        invoices = Invoice.query.join(File, Invoice.file_id == File.id).all()
+        # Get the current user's ID
+        user_id = session.get('user_id')
+
+        invoices = Invoice.query.join(File, Invoice.file_id == File.id).filter(Invoice.user_id == user_id).all()
 
         data = []
         for invoice in invoices:
