@@ -120,3 +120,34 @@ graph TD;
     ProduktuPak[Produkts/Pakalpojums] -->|1..1| Izmesi[Izmeši]
     Uznemumi[Uzņēmumi] -->|1..n| Rekini[Rēķini];
     Uznemumi[Uzņēmumi] -->|1..n| Lietotaji[Lietotāji];
+# Risinājuma novērtējums
+
+Risinājuma novērtējuma ietvaros tika veikti 2 ekperimenti.
+1. eksperimenta ietvaros tika veikta izpēte, kā apstrādātā PDF faila DPI(dots per inches) apstrādes PDF faila algoritmā un threshold teksta sadalījumam pa blokiem ietekmē faila apstrādes laiku.
+2. eksperimenta ietvaros tika veikta izpēte, kā apstrādātā PDF faila DPI(dots per inches) apstrādes PDF faila algoritmā un izvēlētais modelis no Google Gemini API ietekmē faila apstrādes laiku.
+
+## 1. eksperiments
+| NR  | DPI | THRESHOLD | TIME    |
+|-----|-----|-----------|---------|
+| 1   | 100 | 50        | 3.801   |
+| 2   | 100 | 100       | 3.7918  |
+| 3   | 100 | 150       | 3.4549  |
+| 4   | 200 | 50        | 7.6017  |
+| 5   | 200 | 100       | 7.5844  |
+| 6   | 200 | 150       | 7.6027  |
+| 7   | 300 | 50        | 11.9961 |
+| 8   | 300 | 100       | 12.27   |
+| 9   | 300 | 150       | 11.938  |
+## 2. eksperiments
+| NR  | DPI | MODEL             | TIME    |
+|-----|-----|-------------------|---------|
+| 1   | 100 | gemini-1.5-flash  | 5.3917  |
+| 2   | 100 | gemini-1.5-flash-8b | 3.4529  |
+| 3   | 100 | gemini-1.5-pro    | 5.574   |
+| 4   | 200 | gemini-1.5-flash  | 7.664   |
+| 5   | 200 | gemini-1.5-flash-8b | 7.3157  |
+| 6   | 200 | gemini-1.5-pro    | 10.4936 |
+| 7   | 300 | gemini-1.5-flash  | 12.0484 |
+| 8   | 300 | gemini-1.5-flash-8b | 11.67   |
+| 9   | 300 | gemini-1.5-pro    | 14.8651 |
+
