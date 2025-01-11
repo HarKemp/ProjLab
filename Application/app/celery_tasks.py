@@ -15,9 +15,11 @@ def ocr_task(file_id):
         db.session.commit()
 
         # Perform OCR
-        doc2data(file)
-
-        file.ocr_status = "Complete"
+        success = doc2data(file)
+        if success:
+            file.ocr_status = "Complete"
+        else:
+            file.ocr_status = "Failed"
         db.session.commit()
 
         return f"OCR complete for file ID: {file_id}"

@@ -160,9 +160,12 @@ def get_ai_result(ocr_results):
     response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
             response_mime_type="application/json", response_schema=list[Order]
         ))
-    json_data = json.loads(response.text)
+    try:
+        json_data = json.loads(response.text)
+    except:
+        return None, 1
 
-    return json_data[0]
+    return json_data[0], 0
 
 # Example usage
 # pdf_path = 'ocr_test_files/zarum-1-rek_compress.pdf'
@@ -195,30 +198,37 @@ def send_invoice(response, file_id):
     try:
         invoice = Invoice.query.filter_by(file_id=file_id).first()
         if invoice:
-            invoice.issuer = response['Supplier']
-            invoice.issuer_registration_number = response['SupplierRegNumber']
-            invoice.issuer_address = response['SupplierAdress']
-            invoice.receiver = response['Customer']
-            invoice.receiver_registration_number = response['CustomerRegNumber']
-            invoice.receiver_address = response['CustomerAdress']
-            issue_date_str = response['OrderDate']
-            issue_date = datetime.strptime(issue_date_str, "%d.%m.%Y")
-            invoice.issue_date = issue_date
-            invoice.issue_number = response['OrderNumber']
-            invoice.sum_total = response['Cost']
+            invoice.issuer = response.get('Supplier', 'N/A')
+            invoice.issuer_registration_number = response.get('SupplierRegNumber', 'N/A')
+            invoice.issuer_address = response.get('SupplierAdress', 'N/A')
+            invoice.receiver = response.get('Customer', 'N/A')
+            invoice.receiver_registration_number = response.get('CustomerRegNumber', 'N/A')
+            invoice.receiver_address = response.get('CustomerAdress', 'N/A')
+            issue_date_str = response.get('OrderDate', 'N/A')
+            try:
+                invoice.issue_date = datetime.strptime(issue_date_str, "%d.%m.%Y")
+            except Exception as e:
+                print("Error parsing date:", e)
+                # Set the issue date to the current date if parsing fails
+                invoice.issue_date = datetime.now()
+            invoice.issue_number = response.get('OrderNumber', 'N/A')
+            invoice.sum_total = response.get('Cost', 'N/A')
             invoice.services = services
         print("invoice from " + str(invoice.issuer) + " shows that carbon footprint for services is totaling " + str(invoice.total_emissions))
         db.session.commit()
         print("invoice:")
         print(invoice)
+        return True
 
     except Exception as e:
             # Print any other unexpected error
             print("An error occurred:", e)
+            return False
 
 def doc2data(file):
-    # TODO Pārbaudīt vai notika kļūda apstrādes procesā
     ocr_results = extract_text_from_pdf(file.file_data)
-    ai_result = get_ai_result(ocr_results)
+    ai_result, err = get_ai_result(ocr_results)
+    if err == 1:
+        return False
     # Save invoice into DB
-    send_invoice(ai_result, file.id)
+    return send_invoice(ai_result, file.id)

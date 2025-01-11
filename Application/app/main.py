@@ -164,10 +164,13 @@ def my_invoices():
 def invoice(invoice_id):
     if invoice_id is None or not isinstance(invoice_id, int) or invoice_id < 1:
         print("illegal invoice ID")
-        return redirect(url_for('main.homepage'))
+        return redirect(url_for('main.my_invoices'))
     else:
         user_id = current_user.id
         invoice = Invoice.query.filter_by(id=invoice_id, user_id=user_id).first()
+        if invoice is None:
+            return redirect(url_for('main.my_invoices'))
+
         return render_template('invoice.html', invoice=invoice)
 
 # Runs when requested by the client side (usually every 10 seconds when the specific webpage is open)

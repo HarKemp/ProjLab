@@ -52,7 +52,7 @@
       </div>
 
         <!-- Invoice Table -->
-        <div class="w-full max-w-[95vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">
+        <div class="w-full max-w-[60vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">
             <table class="invoice-table bg-main-20 w-full">
                 <thead>
                     <tr class="bg-main-20 text-gray-200"> 
@@ -64,10 +64,10 @@
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver</th>
                         <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Address</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Address</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Registration Number</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Registration Number</th>
+{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Address</th>#}
+{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Address</th>#}
+{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Registration Number</th>#}
+{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Registration Number</th>#}
                     </tr>
                 </thead>
                 <tbody>
@@ -77,9 +77,9 @@
 
                         <td class="border-b border-gray-200 bg-main-20 text-sm invoice-status">
                         {% if invoice.file and invoice.file.ocr_status == "Pending" %}
-                            <span class="text-black font-semibold">Pending</span>
+                            <span class="text-white font-semibold">Pending</span>
                         {% elif invoice.file and invoice.file.ocr_status == "Processing" %}
-                            <span class="text-black font-semibold">Processing</span>
+                            <span class="text-white font-semibold">Processing</span>
                         {% elif invoice.file and invoice.file.ocr_status == "Complete" %}
                             <span class="text-green-500 font-semibold">Complete</span>
                         {% else %}
@@ -93,10 +93,10 @@
                         <td id="invoice-{{ invoice.id }}-issuer">{{ invoice.issuer }}</td>
                         <td id="invoice-{{ invoice.id }}-receiver">{{ invoice.receiver }}</td>
                         <td id="invoice-{{ invoice.id }}-sum_total">{{ invoice.sum_total }}</td>
-                        <td id="invoice-{{ invoice.id }}-issuer_address">{{ invoice.issuer_address }}</td>
-                        <td id="invoice-{{ invoice.id }}-receiver_address">{{ invoice.receiver_address }}</td>
-                        <td id="invoice-{{ invoice.id }}-issuer_registration_number">{{ invoice.issuer_registration_number }}</td>
-                        <td id="invoice-{{ invoice.id }}-receiver_registration_number">{{ invoice.receiver_registration_number }}</td>
+{#                        <td id="invoice-{{ invoice.id }}-issuer_address">{{ invoice.issuer_address }}</td>#}
+{#                        <td id="invoice-{{ invoice.id }}-receiver_address">{{ invoice.receiver_address }}</td>#}
+{#                        <td id="invoice-{{ invoice.id }}-issuer_registration_number">{{ invoice.issuer_registration_number }}</td>#}
+{#                        <td id="invoice-{{ invoice.id }}-receiver_registration_number">{{ invoice.receiver_registration_number }}</td>#}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -113,9 +113,9 @@
         let statusHtml = '';
 
         if (invoice.ocr_status === 'Pending') {
-          statusHtml = '<span class="text-black font-semibold">Pending</span>';
+          statusHtml = '<span class="text-white font-semibold">Pending</span>';
         } else if (invoice.ocr_status === 'Processing') {
-          statusHtml = '<span class="text-black font-semibold">Processing</span>';
+          statusHtml = '<span class="text-white font-semibold">Processing</span>';
         } else if (invoice.ocr_status === 'Complete') {
           statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
         } else {
@@ -128,11 +128,11 @@
         document.getElementById(`invoice-${invoice.id}-issuer`).textContent = invoice.issuer;
         document.getElementById(`invoice-${invoice.id}-receiver`).textContent = invoice.receiver;
         document.getElementById(`invoice-${invoice.id}-sum_total`).textContent = invoice.sum_total;
-        document.getElementById(`invoice-${invoice.id}-issuer_address`).textContent = invoice.issuer_address;
-        document.getElementById(`invoice-${invoice.id}-receiver_address`).textContent = invoice.receiver_address;
+        {#document.getElementById(`invoice-${invoice.id}-issuer_address`).textContent = invoice.issuer_address;#}
+        {#document.getElementById(`invoice-${invoice.id}-receiver_address`).textContent = invoice.receiver_address;#}
         document.getElementById(`invoice-${invoice.id}-services`).textContent = invoice.services_count;
-        document.getElementById(`invoice-${invoice.id}-issuer_registration_number`).textContent = invoice.issuer_registration_number;
-        document.getElementById(`invoice-${invoice.id}-receiver_registration_number`).textContent = invoice.receiver_registration_number;
+        {#document.getElementById(`invoice-${invoice.id}-issuer_registration_number`).textContent = invoice.issuer_registration_number;#}
+        {#document.getElementById(`invoice-${invoice.id}-receiver_registration_number`).textContent = invoice.receiver_registration_number;#}
         document.getElementById(`invoice-${invoice.id}-total_emissions`).textContent = invoice.total_emissions;
       }
 

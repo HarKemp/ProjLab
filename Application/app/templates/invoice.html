@@ -22,7 +22,9 @@
         {'label': 'Receiver', 'key': 'receiver', 'value': invoice.receiver},
         {'label': 'Receiver Registration Number', 'key': 'receiver_registration_number', 'value': invoice.receiver_registration_number},
         {'label': 'Receiver Address', 'key': 'receiver_address', 'value': invoice.receiver_address},
-        {'label': 'Sum Total', 'key': 'sum_total', 'value': invoice.sum_total}
+        {'label': 'Sum Total', 'key': 'sum_total', 'value': invoice.sum_total},
+        {'label': 'File Name', 'key': 'file_name', 'value': invoice.file.title},
+        {'label': 'OCR Status', 'key': 'ocr_status', 'value': invoice.file.ocr_status},
     ] %}
 
     <div id="fields" class="mx-auto max-w-5xl p-4 rounded  ">
@@ -39,7 +41,7 @@
                                    value="{{ field.value }}" data-key="{{ field.key }}">
                         {% endif %}
                     </dd>
-                    {% if field.key != 'total_emissions' %}
+                    {% if field.key not in ['file_name', 'ocr_status', 'total_emissions'] %}
                         <button class="text-sm font-medium text-accent-100 text-accent-100:hover edit-btn">Edit</button>
                     {% else %}
                         <div class="w-[23px]"></div>

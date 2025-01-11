@@ -36,7 +36,7 @@ def file_upload():
             # Place copy of file in database
             file_id = insert_file_in_db(filename, file_data)
             file_ids.append(file_id)
-            file.save(os.path.join(upload_folder, filename))
+            # file.save(os.path.join(upload_folder, filename))
             flash(f"File uploaded successfully: {filename}", 'alert-success')
 
         # Start OCR celery task for each file
@@ -72,14 +72,32 @@ def file_upload():
 
 
 def create_csv(file_path):
-    # TODO Read data from the database
-    data = {
-        'Company': ['LMT', 'CircleK', 'KKas'],
-        'Reg. Number': ['AF123', 'AF234', 'AF345'],
-        'Product': ['Mobilais internets', 'Benzīns', 'Cepumi']
-    }
-    df = pd.DataFrame(data)
-    df.to_csv(file_path, index=False)
+    try:
+        invoices = Invoice.query.join(File, Invoice.file_id == File.id).all()
+
+        data = []
+        for invoice in invoices:
+            data.append({
+                'File Name': (invoice.file.title.strip() if invoice.file and invoice.file.title else 'Unknown').replace("\n", " "),
+                'Issuer': (invoice.issuer.strip() if invoice.issuer else 'N/A').replace("\n", " "),
+                'Issuer Registration Number': (invoice.issuer_registration_number.strip() if invoice.issuer_registration_number else 'N/A').replace("\n", " "),
+                'Issuer Address': (invoice.issuer_address.strip() if invoice.issuer_address else 'N/A').replace("\n"," "),
+                'Receiver': (invoice.receiver.strip() if invoice.receiver else 'N/A').replace("\n", " "),
+                'Receiver Registration Number': (invoice.receiver_registration_number.strip() if invoice.receiver_registration_number else 'N/A').replace("\n", " "),
+                'Receiver Address': (invoice.receiver_address.strip() if invoice.receiver_address else 'N/A').replace("\n", " "),
+                'Issue Date': invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A',
+                'Issue Number': (invoice.issue_number.strip() if invoice.issue_number else 'N/A').replace("\n", " "),
+                'Sum Total': (invoice.sum_total.strip() if invoice.sum_total else 'N/A').replace("\n", " ")
+            })
+
+        # Convert to DataFrame
+        df = pd.DataFrame(data)
+
+        # Write to CSV
+        df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        print(f"CSV created successfully at {file_path}")
+    except Exception as e:
+        print(f"Error creating CSV: {e}")
 
 
 def file_download(file_type):
