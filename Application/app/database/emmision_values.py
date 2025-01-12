@@ -34,5 +34,7 @@ def create_and_populate_table(app, csv_file_path):
 # Finds value in db by getting the name from invoice
 def get_emission_value(name):
     # Search for names that contain the search term, case-insensitive
+    if not name:
+        return 1.0
     result = EmissionValue.query.filter(EmissionValue.name.ilike(f'%{name.lower()}%')).first()
     return result.value if result else 0

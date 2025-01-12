@@ -1,10 +1,10 @@
 name,value
-transportation_services,20
-energy_usage,7
-waste_management,10
+transportation_services,15
+energy_usage,8
+waste_management,7
 food_and_beverage,5
 housing_maintenance,12
-communication_services,8
-appliance_sage,10
-entertainment,7
+communication_services,3
+appliances,7
+entertainment,3
 professional_services,5

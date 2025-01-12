@@ -63,7 +63,7 @@ def image_smoothen(img):
     # Step 4: Apply adaptive thresholding to binarize the image
     th = cv2.adaptiveThreshold(denoised, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-    cv2.imwrite('img.png', th)
+    # cv2.imwrite('img.png', th)
 
     return th
 
@@ -172,6 +172,7 @@ def create_prompt():
     Categories available for services: {category_list}
     Input the extracted information into the provided class structure.
     Output the extracted information in the provided JSON schema.
+    Ensure the JSON output is well-formed and properly escaped. Do not put any escape characters (like quotes or newlines) in the json. Do not put more than one backslash n or backslash t in a row for any of the values in the json.
     """
 
     return prompt
@@ -193,10 +194,11 @@ def get_ai_result(ocr_results):
             response_mime_type="application/json",
             response_schema=list[Order],
             temperature=0.4,
-            max_output_tokens=1000
+            max_output_tokens=500
         )
     )
     try:
+        print("AI response:", response.text)
         json_data = json.loads(response.text)
     except Exception as e:
         print("Error parsing JSON response: ",e)
@@ -206,8 +208,12 @@ def get_ai_result(ocr_results):
 
 def send_invoice(response, file_id):
     print(response)
-    goods = response['Goods']
-    emission_categories = response.get('Categories', [])
+    try:
+        goods = response['Goods']
+        emission_categories = response.get('Categories', [])
+    except Exception as e:
+        print("Error parsing JSON response: ",e)
+        return False
     services = []
 
     for j in range(len(goods)):
