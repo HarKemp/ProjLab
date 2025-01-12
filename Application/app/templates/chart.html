@@ -4,22 +4,23 @@
 {% include 'navbar.html' %}
 <script src="{{ url_for('static',filename='scripts/chart.umd.js') }}"></script>
 <div class="flex flex-col justify-start items-center min-h-screen">
-    <!-- Time filters -->
-    <div class="w-4/5 flex justify-between items-center mt-8 mb-6">
-        <h2 class="text-3xl font-bold text-gray-200">CO2 Emissions Analytics</h2>
-        <div class="flex gap-4 items-center">
-            <div class="flex items-center gap-2">
-                <label for="startDate" class="text-gray-200 text-xl">From:</label>
+    <div class="w-4/5 sm:w-4/5 flex flex-col sm:flex-row justify-between items-start mt-8 mb-6"> 
+        <h2 class="text-3xl font-bold text-gray-200 w-full sm:w-auto text-left mb-6 sm:mb-0">CO2 Emissions Analytics</h2>
+        <div class="flex gap-6 items-start sm:gap-4 flex-wrap justify-start sm:justify-end w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row items-start gap-2 w-2/4 sm:w-auto">
+                <label for="startDate" class="text-gray-200 text-sm sm:text-lg sm:mr-2">From:</label>
                 <input type="date" id="startDate" 
-                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500">
+                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500 w-full sm:w-40 text-sm sm:text-base">
             </div>
-            <div class="flex items-center gap-2">
-                <label for="endDate" class="text-gray-200 text-xl">To:</label>
+
+            <div class="flex flex-col sm:flex-row items-start gap-2 w-2/4 sm:w-auto">
+                <label for="endDate" class="text-gray-200 text-sm sm:text-lg sm:mr-2">To:</label>
                 <input type="date" id="endDate" 
-                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500">
+                       class="bg-slate-700 text-gray-200 px-3 py-2 rounded border border-gray-600 focus:outline-none focus:border-teal-500 w-full sm:w-40 text-sm sm:text-base">
             </div>
+
             <button id="applyFilter" onclick="applyTimeFilter()" 
-                    class="bg-accent-40 text-black hover:bg-accent px-4 py-2 rounded transition-colors duration-200">
+                    class="bg-accent-40 text-black hover:bg-accent px-4 py-2 rounded transition-colors duration-200 w-full sm:w-32 mt-4 sm:mt-0 text-sm sm:text-base">
                 Apply
             </button>
         </div>
@@ -29,24 +30,25 @@
         No emissions data found for the selected date range
     </div>
 
-    <!-- Charts Container -->
+    <!-- Charts Section -->
     <div class="w-4/5 grid grid-cols-1 gap-8 mb-8">
-        <!-- Top 5 Services Chart -->
-        <div class="bg-slate-800 rounded-lg p-6">
-            <h3 class="text-xl font-semibold text-gray-200 mb-4">Top 5 Services by CO2 Emissions</h3>
+        <div class="bg-slate-800 rounded-lg lg:p-6">
+            <h3 class="text-3xl font-semibold text-gray-200 mb-4 pt-4 px-2 text-center">Top 5 Services by CO2 Emissions</h3>
             <div class="h-[400px]">
                 <canvas id="servicesChart" class="w-full h-full"></canvas>
             </div>
         </div>
 
-        <!-- Historical Emissions Chart -->
-        <div class="bg-slate-800 rounded-lg p-6">
-            <h3 class="text-xl font-semibold text-gray-200 mb-4">Historical CO2 Emissions</h3>
+        <div class="bg-slate-800 rounded-lg lg:p-6">
+            <h3 class="text-3xl font-semibold text-gray-200 mb-4 text-center pt-4 px-2">Historical CO2 Emissions</h3>
             <div class="h-[400px]">
                 <canvas id="historyChart" class="w-full h-full"></canvas>
             </div>
         </div>
     </div>
+</div>
+
+<script src="{{ url_for('static', filename='scripts/chartjs-plugin-datalabels.min.js') }}"></script>
 
     <script>
         var labels = {{ labels|tojson|safe }};
@@ -55,46 +57,8 @@
         var yearlyEmissions = {{ yearly_emissions|tojson|safe }};
         const TextColor = 'rgb(229,231,235)';
         let servicesChart, historyChart;
-        
-        function calculateFontSizes() {
-            const width = window.innerWidth;
-            
-            // Base text sizes (for screen width >= 1500px)
-            let xAxisSize = 20;
-            let yAxisSize = 24;
-            
-            // Text scaling based on breakpoints
-            if (width < 680) {
-                xAxisSize = 8;
-                yAxisSize = 14;
-            } else if (width < 768) {
-                xAxisSize = 10;
-                yAxisSize = 16;
-            } else if (width < 1024) {
-                xAxisSize = 12;
-                yAxisSize = 18;
-            } else if (width < 1200) {
-                xAxisSize = 16;
-                yAxisSize = 20;
-            } else if (width < 1500) {
-                xAxisSize = 18;
-                yAxisSize = 22;
-            }
-            return { xAxisSize, yAxisSize };
-        }
 
-        function updateChartFontSizes() {
-            const { xAxisSize, yAxisSize } = calculateFontSizes();
-            
-            // Update both chart font size depending on screen width
-            servicesChart.options.scales.x.ticks.font.size = xAxisSize;
-            servicesChart.options.scales.y.ticks.font.size = yAxisSize;
-            servicesChart.update('none');
-
-            historyChart.options.scales.x.ticks.font.size = xAxisSize;
-            historyChart.options.scales.y.ticks.font.size = yAxisSize;
-            historyChart.update('none');
-        }
+        var isMobile = window.innerWidth < 1024;
 
         // Updates chart data based on the filtered date range set by the user
         function updateChartsData(data) {
@@ -161,12 +125,12 @@
         }
 
         function initializeCharts() {
-            const { xAxisSize, yAxisSize } = calculateFontSizes();
 
             // Initialize services chart
             const servicesCtx = document.getElementById('servicesChart').getContext('2d');
             servicesChart = new Chart(servicesCtx, {
                 type: 'bar',
+                plugins: [ChartDataLabels],
                 data: {
                     labels: labels,
                     datasets: [{
@@ -186,82 +150,87 @@
                             'rgba(75, 192, 192, 1)',
                             'rgba(153, 102, 255, 1)'
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        barPercentage: isMobile < 768 ? 0.98 : 0.8, // Make bars take up more space on mobile
+                        categoryPercentage: isMobile < 768 ? 0.98 : 0.8 // Make bars take up more space on mobile
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    indexAxis: isMobile ? 'y' : 'x',
                     layout: {
                         padding: {
-                            bottom: 40  // Add padding for multi-line labels
-                        }
-                    },
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: TextColor,
-                                font: { size: yAxisSize }
-                            },
-                            grid: {
-                                color: TextColor,
-                                drawBorder: false  
-                            },
-                            border: {
-                                display: true,
-                                color: TextColor
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: TextColor,
-                                font: { size: xAxisSize },
-                                maxRotation: 0,  // Prevent label rotation
-                                minRotation: 0,
-                                autoSkip: false,
-                                callback: function(val) {
-                                    // Get the label text
-                                    const label = this.getLabelForValue(val);
-                                    
-                                    // Split the label into words
-                                    const words = label.split(' ');
-                                    
-                                    // Create lines of maximum 2-3 words each
-                                    const lines = [];
-                                    let currentLine = [];
-                                    
-                                    words.forEach(word => {
-                                        if (currentLine.length < 2) {
-                                            currentLine.push(word);
-                                        } else {
-                                            lines.push(currentLine.join(' '));
-                                            currentLine = [word];
-                                        }
-                                    });
-                                    
-                                    // Add any remaining words
-                                    if (currentLine.length > 0) {
-                                        lines.push(currentLine.join(' '));
-                                    }
-                                    
-                                    return lines;
-                                }
-                            },
-                            grid: {
-                                display: false,
-                                drawBorder: false
-                            },
-                            border: {
-                                display: false
-                            }
+                            top: 20,
+                            right: isMobile ? 60 : 20, // Extra padding for wrapped text on mobile
+                            bottom: 0,
+                            left: 0,
                         }
                     },
                     plugins: {
+                        datalabels: {
+                            color: TextColor,
+                            anchor: function(context) {
+                                if (!isMobile) return 'top';
+                                
+                                // Get the value (width) of the bar
+                                const value = context.dataset.data[context.dataIndex];
+                                const maxValue = Math.max(...context.dataset.data);
+                                
+                                // If the bar is more than 50% of max width, center the label
+                                // Otherwise keep it at the end
+                                return value > maxValue * 0.5 ? 'center' : 'end';
+                            },
+                            align: function(context) {
+                                if (!isMobile) return 'top';
+                                
+                                const value = context.dataset.data[context.dataIndex];
+                                const maxValue = Math.max(...context.dataset.data);
+                                
+                                // Align in the middle of large bars, right-align for smaller ones
+                                return value > maxValue * 0.5 ? 'center' : 'right';
+                            },
+                            offset: function(context) {
+                                if (!isMobile) return 4;
+                                
+                                const value = context.dataset.data[context.dataIndex];
+                                const maxValue = Math.max(...context.dataset.data);
+                                
+                                // No offset needed for centered labels
+                                return value > maxValue * 0.5 ? 0 : 10;
+                            },
+                            font: {
+                                size: isMobile ? 12 : 14
+                            },
+                            formatter: function(value, context) {
+                                const label = context.chart.data.labels[context.dataIndex];
+                                const words = label.split(' ');
+                                const lines = [];
+                                let currentLine = words[0];
+                                
+                                for (let i = 1; i < words.length; i++) {
+                                    if (currentLine.length + words[i].length + 1 <= 20) {
+                                        currentLine += ' ' + words[i];
+                                    } else {
+                                        lines.push(currentLine);
+                                        currentLine = words[i];
+                                    }
+                                }
+                                lines.push(currentLine);
+                                return lines;
+                            },
+                            textAlign: function(context) {
+                                if (!isMobile) return 'center';
+                                
+                                const value = context.dataset.data[context.dataIndex];
+                                const maxValue = Math.max(...context.dataset.data);
+                                
+                                return value > maxValue * 0.5 ? 'center' : 'right';
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
                         tooltip: {
                             enabled: true,
                             displayColors: false,
@@ -271,17 +240,60 @@
                             padding: 20,
                             callbacks: {
                                 title: function(tooltipItems) {
-                                    // Show full label in tooltip without line breaks
-                                    return tooltipItems[0].label.replace(/\n/g, ' ');
+                                    return tooltipItems[0].label;
                                 },
                                 label: function(context) {
-                                    let value = context.parsed.y;
+                                    // Use the actual value from the dataset
+                                    let value = context.raw; // Use raw value instead of parsed
                                     return `CO₂ Emissions: ${value.toLocaleString()} kg`;
                                 }
                             }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: TextColor,
+                                font: { size: isMobile ? 12 : 24 },
+                                callback: function(value) {
+                                    if (isMobile) {
+                                        return '';  // Hide numbers on mobile
+                                    }
+                                    return value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(229,231,235,0.1)',
+                                drawBorder: false,
+                                display: !isMobile
+                            },
+                            border: {
+                                display: false  // Changed from true to false to remove white line
+                            }
                         },
-                        legend: {
-                            display: false
+                        x: {
+                            beginAtZero: true,
+                            max: Math.ceil(Math.max(...emissionsData) / 500) * 500, // Round up to nearest 500
+                            ticks: {
+                                color: TextColor,
+                                font: { size: isMobile ? 16 : 24 },
+                                callback: function(value) {
+                                    // Hide on desktop
+                                    if (!isMobile) {
+                                        return '';
+                                    }
+                                    return value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                display: isMobile,
+                                color: 'rgba(229,231,235,0.1)',
+                                drawTicks: false
+                            },
+                            border: {
+                                display: false
+                            }
                         }
                     }
                 }
@@ -318,7 +330,7 @@
                             min: 0,
                             ticks: {
                                 color: TextColor,
-                                font: { size: yAxisSize }
+                                font: { size: isMobile ? 16 : 24 },  // Changed from 12 to 16 to match
                             },
                             grid: {
                                 color: 'rgba(229,231,235,0.1)'
@@ -327,7 +339,7 @@
                         x: {
                             ticks: {
                                 color: TextColor,
-                                font: { size: xAxisSize },
+                                font: { size: isMobile ? 16 : 24 },
                                 maxRotation: 45,
                                 minRotation: 45
                             },
@@ -341,7 +353,7 @@
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             titleColor: TextColor,
                             bodyColor: TextColor,
-                            padding: 10,
+                            padding: 0,
                             callbacks: {
                                 label: function(context) {
                                     let value = context.parsed.y;
@@ -359,15 +371,6 @@
 
         // Initialize charts on load
         initializeCharts();
-
-        // Add debounced resize handler
-        let resizeTimeout;
-        window.addEventListener('resize', function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(function() {
-                updateChartFontSizes();
-            }, 250);
-        });
     </script>
 </div>
 {% endblock %}
