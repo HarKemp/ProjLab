@@ -236,3 +236,6 @@ fabric.properties
 temp/
 app/__pycache__/
 app/database/__pycache__/
+
+# Do not ignore favicon.png
+!favicon.png
