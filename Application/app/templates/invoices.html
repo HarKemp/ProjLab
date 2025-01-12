@@ -22,81 +22,74 @@
 
             .invoice-table tr:hover,
             .invoice-table tr:hover td {
-             background-color: #3e4354; 
-            cursor: pointer;
+                background-color: #3e4354; 
+                cursor: pointer;
             }
         </style>
     {% endblock %}
 
-    <div class="flex flex-col items-center justify-start min-h-screen pt-10 relative">
-      <div class="w-full max-w-[95vw] grid grid-cols-3 items-center mb-6">
-          <div></div>
-          
-          <h1 class="text-4xl font-bold text-white text-center">My Invoices</h1>
-          
-          <!-- Download button -->
-          <div class="bg-black-100 justify-self-end">
-              {% with messages = get_flashed_messages() %}
-              {% if messages %}
-              <div class="px-4 py-3 mb-4 rounded bg-red-500 text-white">
-                  {{ messages[0] }}
-              </div>
-              {% endif %}
-              {% endwith %}
-              <div>
-                  <a href="{{ url_for('main.download_file', file_type='summary') }}">
-                      <button type="button" class="btn px-4 py-2 bg-accent-40 hover:bg-accent text-black hover:text-white transition duration-200 rounded ">Download Report</button>
-                  </a>
-              </div>
-          </div>
-      </div>
+    <div class="flex flex-col items-center justify-start min-h-screen pt-10 px-4 md:px-10 relative">
+        <div class="w-full grid grid-cols-1 md:grid-cols-3 items-center mb-6 gap-4">
+            <div></div>
+
+            <h1 class="text-2xl md:text-4xl font-bold text-white text-center">My Invoices</h1>
+
+            <!-- Download button -->
+            <div class="w-full flex justify-center md:justify-end">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="px-4 py-3 mb-4 rounded bg-red-500 text-white">
+                    {{ messages[0] }}
+                </div>
+                {% endif %}
+                {% endwith %}
+                <div>
+                    <a href="{{ url_for('main.download_file', file_type='summary') }}">
+                        <button type="button" class="btn px-4 py-2 bg-accent-40 hover:bg-accent text-black hover:text-white transition duration-200 rounded">
+                            Download Report
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- Invoice Table -->
-        <div class="w-full max-w-[60vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">
-            <table class="invoice-table bg-main-20 w-full">
+        <div class="w-full max-w-full md:max-w-[60vw] bg-white rounded-lg shadow-md mt-6 mb-20 overflow-x-auto">
+            <table class="invoice-table bg-main-20 w-full text-sm md:text-base">
                 <thead>
-                    <tr class="bg-main-20 text-gray-200"> 
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">OCR Status</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Carbon Footprint (CO2eq)</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Services</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issue Date</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Invoice Number</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver</th>
-                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Total</th>
-{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Address</th>#}
-{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Address</th>#}
-{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Issuer Registration Number</th>#}
-{#                        <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold uppercase tracking-wider">Receiver Registration Number</th>#}
+                    <tr class="bg-main-20 text-gray-200">
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">OCR Status</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Carbon Footprint</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Services</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Issue Date</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Invoice Number</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Issuer</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Receiver</th>
+                        <th class="px-3 md:px-5 py-2 border-b-2 border-gray-200">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for invoice in invoices %}
-                    <tr id="invoice-{{ invoice.id }}" class="border-b border-gray-200 text-sm"
-                    onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
-
-                        <td class="border-b border-gray-200 bg-main-20 text-sm invoice-status">
-                        {% if invoice.file and invoice.file.ocr_status == "Pending" %}
-                            <span class="text-white font-semibold">Pending</span>
-                        {% elif invoice.file and invoice.file.ocr_status == "Processing" %}
-                            <span class="text-white font-semibold">Processing</span>
-                        {% elif invoice.file and invoice.file.ocr_status == "Complete" %}
-                            <span class="text-green-500 font-semibold">Complete</span>
-                        {% else %}
-                            <span class="text-red-500 font-semibold">Error</span>
-                        {% endif %}
+                    <tr id="invoice-{{ invoice.id }}" class="border-b border-gray-200 bg-main-20 text-sm hover:bg-gray-700 transition"
+                        onclick="window.location.href='/my-invoices/invoice/{{ invoice.id }}'">
+                        <td class="px-3 py-2">
+                            {% if invoice.file and invoice.file.ocr_status == "Pending" %}
+                                <span class="text-white font-semibold">Pending</span>
+                            {% elif invoice.file and invoice.file.ocr_status == "Processing" %}
+                                <span class="text-white font-semibold">Processing</span>
+                            {% elif invoice.file and invoice.file.ocr_status == "Complete" %}
+                                <span class="text-green-500 font-semibold">Complete</span>
+                            {% else %}
+                                <span class="text-red-500 font-semibold">Error</span>
+                            {% endif %}
                         </td>
-                        <td id="invoice-{{ invoice.id }}-total_emissions">{{ invoice.total_emissions }}</td>
-                        <td id="invoice-{{ invoice.id }}-services">{{ invoice.services | length }}</td>
-                        <td id="invoice-{{ invoice.id }}-issue_date">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
-                        <td id="invoice-{{ invoice.id }}-issue_number">{{ invoice.issue_number }}</td>
-                        <td id="invoice-{{ invoice.id }}-issuer">{{ invoice.issuer }}</td>
-                        <td id="invoice-{{ invoice.id }}-receiver">{{ invoice.receiver }}</td>
-                        <td id="invoice-{{ invoice.id }}-sum_total">{{ invoice.sum_total }}</td>
-{#                        <td id="invoice-{{ invoice.id }}-issuer_address">{{ invoice.issuer_address }}</td>#}
-{#                        <td id="invoice-{{ invoice.id }}-receiver_address">{{ invoice.receiver_address }}</td>#}
-{#                        <td id="invoice-{{ invoice.id }}-issuer_registration_number">{{ invoice.issuer_registration_number }}</td>#}
-{#                        <td id="invoice-{{ invoice.id }}-receiver_registration_number">{{ invoice.receiver_registration_number }}</td>#}
+                        <td class="px-3 py-2">{{ invoice.total_emissions }}</td>
+                        <td class="px-3 py-2">{{ invoice.services | length }}</td>
+                        <td class="px-3 py-2">{{ invoice.issue_date.strftime('%Y-%m-%d') if invoice.issue_date else 'N/A' }}</td>
+                        <td class="px-3 py-2">{{ invoice.issue_number }}</td>
+                        <td class="px-3 py-2">{{ invoice.issuer }}</td>
+                        <td class="px-3 py-2">{{ invoice.receiver }}</td>
+                        <td class="px-3 py-2">{{ invoice.sum_total }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

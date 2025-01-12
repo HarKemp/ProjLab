@@ -338,45 +338,54 @@
         const errorMessage = document.getElementById('fileMessage');
         let selectedFiles = [];
 
-    function showFileNames() {
-        const fileNamesDisplay = document.getElementById('fileNames');
+        function showFileNames() {
+    const fileNamesDisplay = document.getElementById('fileNames');
 
-        fileNamesDisplay.innerHTML = '';
+    fileNamesDisplay.innerHTML = ''; // Clear the current list
 
-        // Hide the error message
-        errorMessage.style.display = 'none';
+    // Hide the error message initially
+    errorMessage.style.display = 'none';
 
-        // Display loop for selected files
-        if (selectedFiles.length > 0) {
-            selectedFiles.forEach((file, index) => {
-                // If the file is not a PDF, display an error message and remove it from the selectedFiles array
-                if (file.type !== 'application/pdf') {
-                    errorMessage.style.display = 'block';
-                    // Remove the invalid file from the selectedFiles array
-                    selectedFiles.splice(index, 1);
-                }
-                else
-                {
-                    const li = document.createElement('li');
-                    li.classList.add('flex', 'justify-between', 'items-center');
+    // Display selected files
+    if (selectedFiles.length > 0) {
+        selectedFiles.forEach((file, index) => {
+            // Check for PDF file type
+            if (file.type !== 'application/pdf') {
+                errorMessage.style.display = 'block';
+                selectedFiles.splice(index, 1); // Remove non-PDF files
+            } else {
+                // Create list item for each file
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center border-b border-gray-500 py-2'; // Tailwind for alignment and spacing
 
-                    const fileName = document.createElement('span');
-                    fileName.textContent = file.name;
-                    li.appendChild(fileName);
+                // File name container
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+                fileName.className = 'truncate max-w-[70%] text-gray-200'; // Tailwind for truncation and width
+                li.appendChild(fileName);
 
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
-                    deleteButton.className = 'text-red-500 ml-4 hover:underline';
-                    deleteButton.onclick = () => {
-                        deleteFile(index);
-                    };
-                    
-                    li.appendChild(deleteButton);
-                    fileNamesDisplay.appendChild(li);
-                }
-            });
-        }
+                // Delete button
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'text-red-500 hover:underline'; // Tailwind for styling the delete button
+                deleteButton.onclick = () => {
+                    deleteFile(index);
+                };
+
+                // Ensure delete button is aligned to the right
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'flex-shrink-0'; // Prevents shrinking of the delete button
+                buttonContainer.appendChild(deleteButton);
+
+                li.appendChild(buttonContainer); // Append button container to the list item
+                fileNamesDisplay.appendChild(li);
+            }
+        });
     }
+}
+
+
+
 
     function deleteFile(index) {
         selectedFiles.splice(index, 1);

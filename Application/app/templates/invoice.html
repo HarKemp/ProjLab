@@ -1,12 +1,12 @@
-{#https://tailwindflex.com/@boxdemo/show-user-details-2#}
 {% extends "layout.html" %}
 {% block title %}Invoice{% endblock %}
 {% block body %}
 {% include 'navbar.html' %}
-<div class="overflow-hidden rounded-lg box w-full max-w-[60vw] mx-auto mt-20 mb-20 bg-main-20">
+<div class="container mx-auto px-4">
+    <div class="overflow-hidden rounded-lg box w-full p-4 lg:max-w-[60vw] mx-auto mt-10 lg:mt-20 mb-10 lg:mb-20 bg-main-20">
         <div class="px-4 py-5 sm:px-6">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl leading-6 font-bold text-center w-full mt-6">
+                <h3 class="text-xl sm:text-2xl leading-6 font-bold text-center w-full mt-4">
                     Detailed invoice {{ invoice.issue_number }} information
                 </h3>
             </div>
@@ -25,113 +25,148 @@
         {'label': 'Sum Total', 'key': 'sum_total', 'value': invoice.sum_total},
         {'label': 'File Name', 'key': 'file_name', 'value': invoice.file.title},
         {'label': 'OCR Status', 'key': 'ocr_status', 'value': invoice.file.ocr_status},
-    ] %}
+        ] %}
 
-    <div id="fields" class="mx-auto max-w-5xl p-4 rounded  ">
-        {% for field in fields %}
-            <div class="py-3 border-b border-gray-700">
-                <dl class="flex items-center gap-4">
-                    <dt class="text-sm flex-1 text-gray-300">{{ field.label }}</dt>
-                    <dd class="text-sm flex-1">
-                        {% if field.key == 'total_emissions' %}
-                            <span class="field-display text-gray-200">{{ field.value }}</span>
+        <div id="fields" class="w-full p-4 rounded">
+            {% for field in fields %}
+                <div class="py-3 border-b border-gray-700">
+                    <dl class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                        <dt class="text-sm sm:flex-1 text-gray-300">{{ field.label }}</dt>
+                        <dd class="text-sm sm:flex-1">
+                            {% if field.key == 'total_emissions' %}
+                                <span class="field-display text-gray-200">{{ field.value }}</span>
+                            {% else %}
+                                <span class="field-display text-gray-200">{{ field.value }}</span>
+                                <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
+                                       value="{{ field.value }}" data-key="{{ field.key }}">
+                            {% endif %}
+                        </dd>
+                        {% if field.key not in ['file_name', 'ocr_status', 'total_emissions'] %}
+                            <button class="text-sm font-medium text-accent-100 hover:text-accent-100 edit-btn w-fit">Edit</button>
                         {% else %}
-                            <span class="field-display text-gray-200">{{ field.value }}</span>
-                            <input type="text" class="field-input hidden border rounded px-2 py-1 w-full text-black"
-                                   value="{{ field.value }}" data-key="{{ field.key }}">
+                            <div class="w-[23px]"></div>
                         {% endif %}
-                    </dd>
-                    {% if field.key not in ['file_name', 'ocr_status', 'total_emissions'] %}
-                        <button class="text-sm font-medium text-accent-100 text-accent-100:hover edit-btn">Edit</button>
-                    {% else %}
-                        <div class="w-[23px]"></div>
-                    {% endif %}
-                </dl>
+                    </dl>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="px-4 py-5 sm:p-0 flex flex-col items-center mt-10">
+            <h4 class="text-xl sm:text-2xl font-bold text-center">Services</h4>
+            
+            <!-- Desktop Table View -->
+            <div class="hidden lg:block max-w-4xl w-full">
+                <table class="leading-normal mt-10 border-t max-w-4xl w-full">
+                    <thead class="text-center">
+                        <tr>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider">Service Name</th>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider">Price</th>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider">Amount</th>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider">Emission per Unit</th>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider">Total Emissions (CO2eq)</th>
+                            <th class="px-6 py-4 border-b text-xs font-semibold uppercase tracking-wider"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="services">
+                        {% for service in invoice.services %}
+                            <tr class="text-center">
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm">
+                                    <span class="row-display">{{ service.name }}</span>
+                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.name }}" data-key="name">
+                                </td>
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm">
+                                    <span class="row-display">{{ service.price }}</span>
+                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.price }}" data-key="price">
+                                </td>
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm">
+                                    <span class="row-display">{{ service.amount }}</span>
+                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.amount }}" data-key="amount">
+                                </td>
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm">
+                                    <span class="row-display">{{ service.emission.value }}</span>
+                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.emission.value }}" data-key="emission">
+                                </td>
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm">
+                                    <span class="row-display">{{ service.total_emissions }}</span>
+                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                           value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                                </td>
+                                <td class="border-b border-gray-700 px-6 py-4 text-sm text-right">
+                                    <button class="text-sm font-medium text-accent-100 hover:text-accent-100 edit-row-btn">Edit</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-        {% endfor %}
-    </div>
-    
-        <div class=" px-4 py-5 sm:p-0 flex flex-col items-center mt-10">
-            <h4 class="text-2xl font-bold text-center">Services</h4>
-            <div class="max-w-4xl w-full">
-            <table class=" leading-normal mt-10 border-t  max-w-4xl w-full">
-                <thead class="text-center">
-                    <tr>
-                        <th class="px-6 py-4 border-b  text-xs font-semibold uppercase tracking-wider">
-                            Service Name
-                        </th>
-                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
-                            Price
-                        </th>
-                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
-                            Amount
-                        </th>
-                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
-                            Emission per Unit
-                        </th>
-                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider">
-                            Total Emissions (CO2eq)
-                        </th>
-                        <th class="px-6 py-4 border-b border-gray-200 text-center text-xs font-semibold uppercase tracking-wider"></th>
-                    </tr>
-                </thead>
-                <tbody id="services">
-                    {% for service in invoice.services %}
-                        <tr class="text-center">
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
-                                <span class="row-display">{{ service.name }}</span>
+
+            <!-- Mobile Card View -->
+            <div class="lg:hidden w-full mt-6 space-y-4">
+                {% for service in invoice.services %}
+                    <div class="bg-[#262c3e] rounded-lg p-4 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <span class="row-display font-semibold">{{ service.name }}</span>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.name }}" data-key="name">
-                            </td>
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm w-1/6">
-                                <span class="row-display">{{ service.price }}</span>
+                            </div>
+                            <button class="text-sm font-medium text-accent-100 hover:text-accent-100 edit-row-btn ml-2">Edit</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p class="text-gray-300">Price</p>
+                                <p class="row-display">{{ service.price }}</p>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.price }}" data-key="price">
-                            </td>
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
-                                <span class="row-display">{{ service.amount }}</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-300">Amount</p>
+                                <p class="row-display">{{ service.amount }}</p>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.amount }}" data-key="amount">
-                            </td>
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
-                                <span class="row-display">{{ service.emission.value }}</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-300">Emission per Unit</p>
+                                <p class="row-display">{{ service.emission.value }}</p>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
                                        value="{{ service.emission.value }}" data-key="emission">
-                            </td>
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm ">
-                                <span class="row-display">{{ service.total_emissions }}</span>
+                            </div>
+                            <div>
+                                <p class="text-gray-300">Total Emissions</p>
+                                <p class="row-display">{{ service.total_emissions }}</p>
                                 <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                           value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
-                            </td>
-                            <td class="border-b border-gray-700 px-6 py-4 text-sm text-right">
-                                <button class="text-sm font-medium text-accent-100 text-accent-100:hover edit-row-btn">Edit</button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                                       value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
-        <div class="flex justify-between gap-4 pt-6 pb-6 max-w-4xl mx-auto mt-6 mb-4">
-            <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded">
-                Delete invoice
-            </button>
-
-            <div class="flex gap-4 ml-auto">
-                <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50" disabled>
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-4 max-w-4xl mx-auto mt-8 mb-4 px-4 sm:px-6">
+            <div class="flex gap-4 w-full sm:w-auto">
+                <button id="cancel-btn" class="px-4 py-2 border rounded text-gray-600 disabled:opacity-50 text-sm sm:text-base flex-1 sm:flex-none">
                     Cancel
                 </button>
-                <button id="submit-btn" class="px-4 py-2 bg-accent-40 bg-accent-40:hover text-black rounded disabled:opacity-50" disabled>
+                <button id="submit-btn" class="px-4 py-2 bg-accent-40 hover:bg-accent text-black rounded disabled:opacity-50 text-sm sm:text-base flex-1 sm:flex-none">
                     Submit
                 </button>
             </div>
+            
+            <button id="delete-btn" class="px-4 py-2 bg-red-600 text-white rounded text-sm sm:text-base w-full sm:w-auto mt-4 sm:mt-0">
+                Delete invoice
+            </button>
         </div>
     </div>
+</div>
 
-    <!-- Modal Structure -->
-    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 border hidden justify-center items-center flex">
-        <div class="rounded-lg p-6 w-1/3">
+<!-- Delete Modal Structure -->
+    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 border hidden justify-center items-center flex p-4">
+        <div class="rounded-lg p-6 w-full max-w-sm bg-main-20">
             <h3 class="text-lg font-semibold mb-4">Are you sure you want to delete?</h3>
             <div class="flex justify-end gap-4">
                 <button id="cancel-delete" class="px-4 py-2 bg-gray-300 text-black rounded">Cancel</button>
@@ -140,114 +175,202 @@
         </div>
     </div>
 
-    <script>
-        const invoiceId = "{{ invoice.id }}"
-        const fieldsContainer = document.querySelector("#fields");
-        const servicesContainer = document.querySelector("#services");
-        const deleteBtn = document.querySelector("#delete-btn");
-        const submitBtn = document.querySelector("#submit-btn");
-        const cancelBtn = document.querySelector("#cancel-btn");
-        const deleteModal = document.querySelector("#delete-modal");
-        const cancelDelete = document.querySelector("#cancel-delete");
-        const confirmDelete = document.querySelector("#confirm-delete");
+    <!-- Error Modal Structure -->
+    <div id="error-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 border hidden justify-center items-center flex p-4">
+        <div class="rounded-lg p-6 w-full max-w-sm bg-main-20">
+            <h3 class="text-lg font-semibold mb-4">Error</h3>
+            <p id="error-message" class="mb-4 text-sm"></p>
+            <div class="flex justify-end">
+                <button id="close-error" class="px-4 py-2 bg-gray-300 text-black rounded">OK</button>
+            </div>
+        </div>
+    </div>
 
-        let edited = false;
 
-        function toggleEditMode(container, btnSelector, displaySelector, inputSelector) {
-            container.addEventListener("click", (event) => {
-                if (event.target.matches(btnSelector)) {
-                    const parent = event.target.closest("dl, tr");
-                    const displays = parent.querySelectorAll(displaySelector);
-                    const inputs = parent.querySelectorAll(inputSelector);
-                    displays.forEach(d => d.classList.toggle("hidden"));
-                    inputs.forEach(i => i.classList.toggle("hidden"));
+
+<script>
+    const invoiceId = "{{ invoice.id }}";
+    const fieldsContainer = document.querySelector("#fields");
+    const deleteBtn = document.querySelector("#delete-btn");
+    const submitBtn = document.querySelector("#submit-btn");
+    const cancelBtn = document.querySelector("#cancel-btn");
+    const deleteModal = document.querySelector("#delete-modal");
+    const cancelDelete = document.querySelector("#cancel-delete");
+    const confirmDelete = document.querySelector("#confirm-delete");
+
+    let edited = false;
+    submitBtn.disabled = true;
+    cancelBtn.disabled = false;
+
+    // Function to toggle edit mode for fields and services
+    function setupEditHandlers() {
+        // Field edit handlers
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parent = this.closest('dl');
+                const display = parent.querySelector('.field-display');
+                const input = parent.querySelector('.field-input');
+                
+                if (display && input) {
+                    display.classList.toggle('hidden');
+                    input.classList.toggle('hidden');
+                    
+                    if (this.textContent === 'Edit') {
+                        this.textContent = 'Save';
+                        input.dataset.originalValue = input.value;
+                        edited = true;
+                        submitBtn.disabled = false;
+                        cancelBtn.disabled = false;
+                    } else {
+                        // Update display value when saving
+                        display.textContent = input.value;
+                        this.textContent = 'Edit';
+                    }
+                }
+            });
+        });
+
+        // Service edit handlers (both desktop and mobile)
+        document.querySelectorAll('.edit-row-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Handle both desktop (tr) and mobile (div) containers
+                const parent = this.closest('tr') || this.closest('.bg-\\[\\#262c3e\\]');
+                if (!parent) return;
+
+                const displays = parent.querySelectorAll('.row-display');
+                const inputs = parent.querySelectorAll('.row-input');
+                
+                // Toggle visibility
+                displays.forEach(display => display.classList.toggle('hidden'));
+                inputs.forEach(input => {
+                    input.classList.toggle('hidden');
+                    if (!input.classList.contains('hidden')) {
+                        input.dataset.originalValue = input.value;
+                    }
+                });
+                
+                if (this.textContent === 'Edit') {
+                    this.textContent = 'Save';
                     edited = true;
                     submitBtn.disabled = false;
                     cancelBtn.disabled = false;
+                } else {
+                    // Update display values when saving
+                    displays.forEach((display, index) => {
+                        const input = inputs[index];
+                        if (input) {
+                            display.textContent = input.value;
+                        }
+                    });
+                    this.textContent = 'Edit';
+                }
+            });
+        });
+    }
+
+    // Initialize edit handlers
+    setupEditHandlers();
+
+    // Cancel button handler
+    cancelBtn.addEventListener("click", () => {
+        location.reload();
+    });
+
+    // Submit button handler
+    submitBtn.addEventListener("click", () => {
+        const fieldInputs = [...document.querySelectorAll(".field-input")].map(input => ({
+            key: input.dataset.key,
+            value: input.value
+        }));
+
+        // Collect services data based on viewport
+        const servicesData = [];
+        const isMobileView = window.innerWidth < 1024; // lg breakpoint
+
+        if (isMobileView) {
+            // Mobile view data collection
+            document.querySelectorAll(".lg\\:hidden .bg-\\[\\#262c3e\\]").forEach(row => {
+                const serviceData = {};
+                row.querySelectorAll('.row-input').forEach(input => {
+                    if (input.dataset.key) {
+                        serviceData[input.dataset.key] = input.value;
+                    }
+                });
+                if (Object.keys(serviceData).length > 0) {
+                    servicesData.push(serviceData);
+                }
+            });
+        } else {
+            // Desktop view data collection
+            document.querySelectorAll("#services tr").forEach(row => {
+                const serviceData = {};
+                row.querySelectorAll('.row-input').forEach(input => {
+                    if (input.dataset.key) {
+                        serviceData[input.dataset.key] = input.value;
+                    }
+                });
+                if (Object.keys(serviceData).length > 0) {
+                    servicesData.push(serviceData);
                 }
             });
         }
 
-        toggleEditMode(fieldsContainer, ".edit-btn", ".field-display", ".field-input");
-        toggleEditMode(servicesContainer, ".edit-row-btn", ".row-display", ".row-input");
+        const data = {
+            fields: fieldInputs,
+            services: servicesData
+        };
 
-        cancelBtn.addEventListener("click", () => {
-            location.reload();
+        fetch(`/my-invoices/invoice/${invoiceId}/update`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // alert("Invoice updated successfully!");
+                window.location.href = `/my-invoices/invoice/${invoiceId}`;
+            } else {
+                alert("Error updating invoice: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error updating invoice:", error);
+            alert("An error occurred while updating.");
         });
+    });
 
-        submitBtn.addEventListener("click", () => {
-            const fieldInputs = [...document.querySelectorAll(".field-input")].map(input => ({
-                key: input.dataset.key,
-                value: input.value
-            }));
-            const rowInputs = [...document.querySelectorAll("#services tr")].map(row => {
-                return [...row.querySelectorAll(".row-input")].reduce((acc, input) => {
-                    acc[input.dataset.key] = input.value;
-                    return acc;
-                }, {});
-            });
+    // Delete modal handlers
+    deleteBtn.addEventListener("click", () => {
+        deleteModal.classList.remove("hidden");
+    });
 
-            // Prepare data for the update
-            const data = {
-                fields: fieldInputs,
-                services: rowInputs
-            };
+    cancelDelete.addEventListener("click", () => {
+        deleteModal.classList.add("hidden");
+    });
 
-            // Send the update request to the backend
-            fetch(`/my-invoices/invoice/${invoiceId}/update`, {
-                method: 'PUT',  // Use PUT or PATCH for updates
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Invoice updated successfully!");
-                    window.location.href = `/my-invoices/invoice/${invoiceId}`;
-                } else {
-                    alert("Error updating invoice: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error updating invoice:", error);
-                alert("An error occurred while updating.");
-            });
+    confirmDelete.addEventListener("click", () => {
+        deleteModal.classList.add("hidden");
+        
+        fetch(`/my-invoices/invoice/${invoiceId}/delete`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Invoice deleted successfully!");
+                window.location.href = `/my-invoices`;
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error deleting row:", error);
+            alert("An error occurred while deleting.");
         });
-
-        // Show modal on delete button click
-        deleteBtn.addEventListener("click", () => {
-            deleteModal.classList.remove("hidden");
-        });
-
-        // Hide modal on Cancel
-        cancelDelete.addEventListener("click", () => {
-            deleteModal.classList.add("hidden");
-        });
-
-        // Handle OK click to perform delete action
-        confirmDelete.addEventListener("click", () => {
-            // Hide the modal after the fetch
-            deleteModal.classList.add("hidden");
-
-            fetch(`/my-invoices/invoice/${invoiceId}/delete`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Invoice deleted successfully!");
-                    window.location.href = `/my-invoices`;
-                } else {
-                    alert("Error: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error deleting row:", error);
-                alert("An error occurred while deleting.");
-            });
-        });
-    </script>
+    });
+</script>
 {% endblock %}
