@@ -15,7 +15,7 @@ Kursa darba apraksts pieejams /Docs/
 FLASK_ENV=development
 pytesseract.pytesseract.tesseract_cmd = C:\Program Files\Tesseract-OCR\tesseract.exe <<-- iespējams, ka strādā arī bez šī
 API_KEY=TAVA_GEMINI_API_ATSLĒGA
-PATH_TO_DEFAULT_SERVICE_VALUES_CSV=C:\User\Lietotajs\PyCharm\PycharmProjects\ProjLab\Application\app\static\assets\services.csv <<-- modificējiet lai atbilst jūsu faila atrašanās vietai
+PATH_TO_DEFAULT_SERVICE_VALUES_CSV=C:\User\Lietotajs\PyCharm\PycharmProjects\ProjLab\Application\app\static\assets\categories.csv <<-- modificējiet lai atbilst jūsu faila atrašanās vietai
 ```
 ### Tesseract instalācija
 #### UNIX sistēmām (Piemērā instalēta tikai latviešu valodas rīki)
