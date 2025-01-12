@@ -15,91 +15,176 @@
     </style>
     {% endblock %}
 
-    <div class="flex flex-col items-center justify-center p-20 relative bg-gray-900 ">
-
-        <div class="grid grid-cols-2 gap-8 w-full px-4 max-w-[90%]">
-            <!-- Pie Chart Section -->
-            <div class="flex items-center justify-center bg-main-20 p-8 rounded shadow-md">
-                <canvas id="pieChart" width="400" height="300"></canvas>
-            </div>
+    <div class="flex flex-col items-center justify-center p-4 lg:p-12 relative bg-gray-900">
+        <div class="grid grid-cols-1 2xl:grid-cols-2 gap-8 w-full px-2 lg:px-4 max-w-full 2xl:max-w-[90%] {% if not pie_data %}2xl:place-items-center{% endif %}">
+            {% if pie_data %}
+                <!-- Pie Chart Section -->
+                <div class="order-2 bg-main-20 p-4 sm:p-8 lg:p-12 rounded shadow-md">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-200 text-center">Total CO2 Emissions by Service</h1>
+                    <div class="flex flex-col items-center justify-center w-full h-[35rem] lg:h-[50rem]">
+                        <div class="w-full h-full max-w-[1200px] mx-auto">
+                            <canvas id="pieChart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             
             <!-- Upload Form Section -->
-            <div class="bg-main-20 p-12 rounded shadow-md flex  justify-center">
-                <div class="max-w-lg w-full">
-                    <h1 class="text-3xl font-bold mb-6 text-gray-200 text-center">Upload Invoice</h1>
+            <div class="bg-main-20 p-4 sm:p-8 lg:p-12 rounded shadow-md flex justify-center {% if not pie_data %}2xl:col-span-2 2xl:w-1/2{% endif %}">
+                <div class="w-[90%] sm:w-[85%] lg:w-[75%]">
+                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-200 text-center">Upload Invoice</h1>
     
-                    <!-- Flash Messages -->
-                    <div class="text-center flex flex-col items-center mx-4 min-h-6">
-                        {% with messages = get_flashed_messages(with_categories=True) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    {% if category == 'alert-success' %}
-                                        <div id="success-msg" class="text-green-500 font-semibold">
-                                            {{ message }}
-                                        </div>
-                                    {% else %}
-                                        <div class="text-red-500 font-bold">
-                                            {{ message }}
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
-                        <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
+                    {# Rest of the form content... #}
+                    <div id="dropArea" class="border-dashed border-2 border-gray-300 rounded-lg p-4 sm:p-8 mb-4 sm:mb-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-12 sm:w-12 lg:h-12 lg:w-12 mb-2 sm:mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p class="text-gray-300 text-center text-base sm:text-xl lg:text-base">Drag and drop your files here or click to select</p>
                     </div>
     
-                    <!-- Form -->
-                    <div class="mt-6">
-                        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
-                            <div
-                                id="dropArea"
-                                class="border-dashed border-2 border-gray-300 rounded-lg p-8 mb-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
-                                onclick="document.getElementById('fileInput').click()"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                </svg>
-                                <p class="text-gray-300 text-center">Drag and drop your files here or click to select</p>
-                                <input type="file" name="files" id="fileInput" multiple required class="hidden" 
-                                       onchange="showFileNames()" accept="application/pdf">
-                            </div>
+                    {# Update file list styling #}
+                    <ul id="fileNames" class="mb-4 sm:mb-6 text-gray-100 pl-4 text-sm sm:text-lg lg:text-base"></ul>
     
-                            <ul id="fileNames" class="mb-4 text-gray-100 pl-4"></ul>
+                    {# Update button styling #}
+                    <button type="submit" class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200">
+                        Upload
+                    </button>
     
-                            <button type="submit"
-                                    class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200">
-                                Upload
-                            </button>
-                        </form>
-    
-                        <a href="{{ url_for('main.my_invoices') }}">
-                            <button type="submit" id="ocrButton"
-                                    class="w-full bg-accent-40 text-black py-2 rounded hover:bg-accent hover:text-white transition duration-200 hidden mt-4">
-                                Go To My Invoices
-                            </button>
-                        </a>
-                    </div>
+                    {# Update OCR button styling #}
+                    <button id="ocrButton" class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200 hidden mt-4 sm:mt-6 lg:mt-4">
+                        Go To My Invoices
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     
     <script src="{{ url_for('static', filename='scripts/chart.umd.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     
     <script>
+        // Register a custom plugin for rendering labels and interactivity
+        Chart.register({
+            id: 'customLegendPlugin',
+            afterDraw(chart) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+                const labels = chart.data.labels;
+                const colors = chart.data.datasets[0].backgroundColor;
+                const hiddenIndices = chart._hiddenIndices || {};
+
+                const legendX = chartArea.left;
+                const legendY = chartArea.bottom + 10;
+                
+                // Adjust sizes based on screen size
+                const isMobile = window.innerWidth < 1024; // lg breakpoint
+                const lineHeight = 30;
+                const boxSize = isMobile ? 20 : 16;
+                const fontSize = isMobile ? '0.8rem' : '1.5rem';
+                const labelPadding = 4;
+
+                ctx.save();
+                labels.forEach((label, index) => {
+                    // Draw color box
+                    ctx.fillStyle = hiddenIndices[index] ? '#ccc' : colors[index];
+                    ctx.fillRect(legendX, legendY + index * lineHeight, boxSize, boxSize);
+
+                    // Draw label text
+                    ctx.fillStyle = hiddenIndices[index] ? '#888' : '#fff';
+                    ctx.font = `${fontSize} sans-serif`;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(label, legendX + boxSize + labelPadding, legendY + index * lineHeight + boxSize / 2);
+
+                    // Update click detection bounds to make them filterable by clicking/tapping
+                    chart._legendBounds = chart._legendBounds || [];
+                    chart._legendBounds[index] = {
+                        x: legendX,
+                        y: legendY + index * lineHeight,
+                        width: boxSize + (isMobile ? 700 : 600), // Wider click area for mobile - easier to filter
+                        height: lineHeight,
+                    };
+                });
+                ctx.restore();
+            },
+        });
+    
+        // Click handling for the custom legend plugin
+        document.getElementById('pieChart').addEventListener('click', function (e) {
+            const chart = pieChart;
+            const rect = chart.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const legendBounds = chart._legendBounds || [];
+            const hiddenIndices = chart._hiddenIndices || (chart._hiddenIndices = {});
+
+            // Check if the click is within any legend item
+            legendBounds.forEach((bounds, index) => {
+                if (
+                    x >= bounds.x &&
+                    x <= bounds.x + bounds.width &&
+                    y >= bounds.y &&
+                    y <= bounds.y + bounds.height
+                ) {
+                    // Toggles visibility of corresponding chart segment
+                    hiddenIndices[index] = !hiddenIndices[index];
+                    
+                    const meta = chart.getDatasetMeta(0);
+                    meta.data[index].hidden = hiddenIndices[index];
+                    
+                    chart.update();
+                }
+            });
+        });
+    
         // Get the data passed from Flask
         var pieLabels = {{ pie_labels|tojson|safe }};
         var pieData = {{ pie_data|tojson|safe }};
         const TextColor = 'rgb(229,231,235)';
-        
-        // Create Pie Chart
+        const isMobile = window.innerWidth < 1024; // lg breakpoint for mobile devices
+
+        // Top 5 services displayed, rest are grouped into 'Other' with no minimum threshold
+        function groupSmallSegments(data, labels) {
+            // Create array of objects - value and label pairs
+            let pairs = data.map((value, index) => ({
+                value: value,
+                label: labels[index]
+            }));
+            
+            // Sort by value in descending order
+            pairs.sort((a, b) => b.value - a.value);
+            
+            // Take top 5 items
+            const topPairs = pairs.slice(0, 5);
+            
+            // Sum the non-top 5 items into 'Other'
+            const otherValue = pairs.slice(5).reduce((sum, pair) => sum + pair.value, 0);
+            
+            // Separate into final data and labels
+            const groupedData = topPairs.map(pair => pair.value);
+            const groupedLabels = topPairs.map(pair => pair.label);
+            
+            // Add "Other" category if there are more than 5 items
+            if (pairs.length > 5) {
+                groupedData.push(otherValue);
+                groupedLabels.push('Other');
+            }
+            
+            return { data: groupedData, labels: groupedLabels };
+        }
+
+        // Groups the data and returns data and labels for it
+        const { data: groupedData, labels: groupedLabels } = groupSmallSegments(pieData, pieLabels);
+    
+        // Creates the Pie Chart in the given canvas element
         var ctxPie = document.getElementById('pieChart').getContext('2d');
         var pieChart = new Chart(ctxPie, {
             type: 'pie',
             data: {
-                labels: pieLabels,
+                labels: groupedLabels,
                 datasets: [{
-                    data: pieData,
+                    data: groupedData,
                     backgroundColor: [
                         '#4E79A7',  // blue
                         '#F28E2B',  // orange
@@ -112,36 +197,110 @@
                         '#9C755F',  // brown
                         '#BAB0AC'   // gray
                     ],
-                    borderColor: 'rgba(255, 255, 255, 0.2)',  // Subtle white border
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
                     borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        text: 'Total CO2 Emissions by Service',
-                        color: TextColor,
-                        font: {
-                            size: 28
+                    tooltip: {
+                        titleFont: {
+                            size: isMobile ? 16 : 24,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: isMobile ? 16 : 24
+                        },
+                        padding: isMobile ? 10 : 20,
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                                return `${value.toLocaleString()} kg CO₂`;
+                            }
                         }
                     },
                     legend: {
-                        display: true,
-                        position: 'right',
-                        labels: {
-                            color: TextColor,
-                            font: {
-                                size: 12
+                        display: false,
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        textAlign: 'center',
+                        formatter: function(value, context) {
+                            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            const label = context.chart.data.labels[context.dataIndex];
+                            
+                            // Split long labels into multiple lines
+                            const words = label.split(' ');
+                            const lines = [];
+                            let currentLine = words[0];
+                            
+                            for (let i = 1; i < words.length; i++) {
+                                const word = words[i];
+                                if (currentLine.length + word.length < 15) {
+                                    currentLine += ' ' + word;
+                                } else {
+                                    lines.push(currentLine);
+                                    currentLine = word;
+                                }
                             }
-                        }
-                    }
-                }
-            }
+                            lines.push(currentLine);
+                            
+                            // Add percentage as the last line
+                            return [...lines, percentage + '%'];
+                        },
+                        font: function(context) {
+                            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                            const value = context.dataset.data[context.dataIndex];
+                            const percentage = (value / total) * 100;
+                            
+                            // Base size on percentage with min and max limits
+                            const baseSize = isMobile ? 24 : 16;
+                            const minSize = baseSize * 0.75;
+                            const maxSize = baseSize * 1.5;
+
+                            // Scaling based on ifMobile
+                            scaling = isMobile ? 0.2 : 0.7;
+                            
+                            // Scale font size based on percentage
+                            const fontSize = Math.max(
+                                minSize,
+                                Math.min(maxSize, baseSize * (scaling + percentage / 100))
+                            );
+                            
+                            return {
+                                size: fontSize,
+                                weight: 'bold'
+                            };
+                        },
+                        anchor: 'center',
+                        align: 'center',
+                        offset: 8,
+                        display: function(context) {
+                            const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
+                            const value = context.dataset.data[context.dataIndex];
+                            const percentage = (value / total) * 100;
+                            // Only show labels for segments larger than 5% or, on mobile, 20
+                            if(isMobile) {
+                                return percentage > 20;
+                            }
+                            return percentage > 5;
+                        },
+                    },
+                },
+                layout: {
+                    padding: {
+                        top: 0,
+                        bottom: 185,
+                    },
+                },
+            },
+            plugins: [ChartDataLabels]
         });
     </script>
-    
     
 
     <script>
