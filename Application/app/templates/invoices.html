@@ -98,49 +98,73 @@
     </div>
 
     <script>
-      function updateInvoiceRow(invoice) {
-        const row = document.getElementById(`invoice-${invoice.id}`);
-        if (!row) return;
+        function updateInvoiceRow(invoice) {
+            const row = document.getElementById(`invoice-${invoice.id}`);
+            if (!row) return;
 
-        const statusCell = row.querySelector('.invoice-status');
-        let statusHtml = '';
+            // Updates all cells using literal objects
+            const cells = {
+                status: row.cells[0],
+                total_emissions: row.cells[1],
+                services: row.cells[2],
+                issue_date: row.cells[3],
+                issue_number: row.cells[4],
+                issuer: row.cells[5],
+                receiver: row.cells[6],
+                sum_total: row.cells[7]
+            };
 
-        if (invoice.ocr_status === 'Pending') {
-          statusHtml = '<span class="text-white font-semibold">Pending</span>';
-        } else if (invoice.ocr_status === 'Processing') {
-          statusHtml = '<span class="text-white font-semibold">Processing</span>';
-        } else if (invoice.ocr_status === 'Complete') {
-          statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
-        } else {
-          statusHtml = '<span class="text-red-500 font-semibold">Error</span>';
+            // Update OCR status with styling
+            let statusHtml = '';
+            switch(invoice.ocr_status) {
+                case 'Pending':
+                case 'Processing':
+                    statusHtml = `<span class="text-white font-semibold">${invoice.ocr_status}</span>`;
+                    break;
+                case 'Complete':
+                    statusHtml = '<span class="text-green-500 font-semibold">Complete</span>';
+                    break;
+                default:
+                    statusHtml = '<span class="text-red-500 font-semibold">Error</span>';
+            }
+            cells.status.innerHTML = statusHtml;
+
+            // Update other cells
+            cells.total_emissions.textContent = invoice.total_emissions;
+            cells.services.textContent = invoice.services_count;
+            cells.issue_date.textContent = invoice.issue_date;
+            cells.issue_number.textContent = invoice.issue_number;
+            cells.issuer.textContent = invoice.issuer;
+            cells.receiver.textContent = invoice.receiver;
+            cells.sum_total.textContent = invoice.sum_total;
         }
-        statusCell.innerHTML = statusHtml;
 
-        document.getElementById(`invoice-${invoice.id}-issue_date`).textContent = invoice.issue_date;
-        document.getElementById(`invoice-${invoice.id}-issue_number`).textContent = invoice.issue_number;
-        document.getElementById(`invoice-${invoice.id}-issuer`).textContent = invoice.issuer;
-        document.getElementById(`invoice-${invoice.id}-receiver`).textContent = invoice.receiver;
-        document.getElementById(`invoice-${invoice.id}-sum_total`).textContent = invoice.sum_total;
-        {#document.getElementById(`invoice-${invoice.id}-issuer_address`).textContent = invoice.issuer_address;#}
-        {#document.getElementById(`invoice-${invoice.id}-receiver_address`).textContent = invoice.receiver_address;#}
-        document.getElementById(`invoice-${invoice.id}-services`).textContent = invoice.services_count;
-        {#document.getElementById(`invoice-${invoice.id}-issuer_registration_number`).textContent = invoice.issuer_registration_number;#}
-        {#document.getElementById(`invoice-${invoice.id}-receiver_registration_number`).textContent = invoice.receiver_registration_number;#}
-        document.getElementById(`invoice-${invoice.id}-total_emissions`).textContent = invoice.total_emissions;
-      }
+        function fetchStatusUpdates() {
+            fetch("{{ url_for('main.invoice_status') }}")
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(invoice => {
+                        updateInvoiceRow(invoice);
+                    });
+                })
+                .catch(err => console.error('Error fetching invoice status:', err));
+        }
 
-      function fetchStatusUpdates() {
-        fetch("{{ url_for('main.invoice_status') }}")
-          .then(response => response.json())
-          .then(data => {
-            data.forEach(invoice => {
-              updateInvoiceRow(invoice);
-            });
-          })
-          .catch(err => console.error('Error fetching invoice status:', err));
-      }
+        // Initial fetch when page loads
+        fetchStatusUpdates();
 
-      // Send GET request to server every 10 seconds
-      setInterval(fetchStatusUpdates, 10000);
+        // Send GET request to server every 10 seconds for the latest processing updates
+        const updateInterval = setInterval(fetchStatusUpdates, 10000);
+
+        // Stop updates when page is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(updateInterval);
+            } else {
+                // Restart updates when page becomes visible again
+                fetchStatusUpdates();
+                setInterval(fetchStatusUpdates, 10000);
+            }
+        });
     </script>
 {% endblock %}
