@@ -9,4 +9,4 @@ from .invoices import Invoice
 from .services import Service
 from .emissions import Emission
 from .invoices_services import invoices_services
-from .emmision_values import create_and_populate_table, get_emission_value
+from .emmision_values import create_and_populate_table, get_emission_value, EmissionValue

@@ -70,6 +70,9 @@
                     <tbody id="services">
                         {% for service in invoice.services %}
                             <tr class="text-center">
+                                <!-- Hidden ID input -->
+                                <input type="hidden" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                                value="{{ service.id }}" data-key="id">
                                 <td class="border-b border-gray-700 px-6 py-4 text-sm">
                                     <span class="row-display">{{ service.name }}</span>
                                     <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
@@ -91,9 +94,7 @@
                                            value="{{ service.emission.value }}" data-key="emission">
                                 </td>
                                 <td class="border-b border-gray-700 px-6 py-4 text-sm">
-                                    <span class="row-display">{{ service.total_emissions }}</span>
-                                    <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                           value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                                    <span>{{ service.total_emissions }}</span>
                                 </td>
                                 <td class="border-b border-gray-700 px-6 py-4 text-sm text-right">
                                     <button class="text-sm font-medium text-accent-100 hover:text-accent-100 edit-row-btn">Edit</button>
@@ -108,6 +109,9 @@
             <div class="lg:hidden w-full mt-6 space-y-4">
                 {% for service in invoice.services %}
                     <div class="bg-[#262c3e] rounded-lg p-4 space-y-3">
+                        <!-- Hidden ID input -->
+                        <input type="hidden" class="row-input hidden border rounded px-2 py-1 w-full text-black"
+                        value="{{ service.id }}" data-key="id">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <span class="row-display font-semibold">{{ service.name }}</span>
@@ -137,9 +141,7 @@
                             </div>
                             <div>
                                 <p class="text-gray-300">Total Emissions</p>
-                                <p class="row-display">{{ service.total_emissions }}</p>
-                                <input type="text" class="row-input hidden border rounded px-2 py-1 w-full text-black"
-                                       value="{{ service.total_emissions }}" data-key="total_emissions" readonly>
+                                <p>{{ service.total_emissions }}</p>
                             </div>
                         </div>
                     </div>
@@ -291,11 +293,20 @@
             // Mobile view data collection
             document.querySelectorAll(".lg\\:hidden .bg-\\[\\#262c3e\\]").forEach(row => {
                 const serviceData = {};
-                row.querySelectorAll('.row-input').forEach(input => {
-                    if (input.dataset.key) {
+                    row.querySelectorAll('input[data-key]').forEach(input => {
                         serviceData[input.dataset.key] = input.value;
-                    }
                 });
+
+                const serviceIdInput = row.querySelector('input[data-key="id"]');
+                if (serviceIdInput) {
+                    serviceData.id = serviceIdInput.value;
+                }
+                
+                const validationErrors = validateServiceFields(serviceData);
+                if (validationErrors.length) {
+                    alert(validationErrors.join("\n"));
+                    return;
+                }
                 if (Object.keys(serviceData).length > 0) {
                     servicesData.push(serviceData);
                 }
@@ -309,6 +320,17 @@
                         serviceData[input.dataset.key] = input.value;
                     }
                 });
+
+                const serviceIdInput = row.querySelector('input[data-key="id"]');
+                if (serviceIdInput) {
+                    serviceData.id = serviceIdInput.value;
+                }
+
+                const validationErrors = validateServiceFields(serviceData);
+                if (validationErrors.length) {
+                    alert(validationErrors.join("\n"));
+                    return;
+                }
                 if (Object.keys(serviceData).length > 0) {
                     servicesData.push(serviceData);
                 }
@@ -330,7 +352,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // alert("Invoice updated successfully!");
+                //alert("Invoice updated successfully!");
                 window.location.href = `/my-invoices/invoice/${invoiceId}`;
             } else {
                 alert("Error updating invoice: " + data.message);
@@ -372,5 +394,19 @@
             alert("An error occurred while deleting.");
         });
     });
+
+    function validateServiceFields(serviceData) {
+        const errors = [];
+        if (isNaN(parseFloat(serviceData.price)) || serviceData.price < 0) {
+            errors.push("Price must be a positive number.");
+        }
+        if (isNaN(parseInt(serviceData.amount)) || serviceData.amount <= 0) {
+            errors.push("Amount must be a positive integer.");
+        }
+        if (isNaN(parseFloat(serviceData.emission)) || serviceData.emission < 0) {
+            errors.push("Emission per unit must be a positive number.");
+        }
+        return errors;
+    }
 </script>
 {% endblock %}

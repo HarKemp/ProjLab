@@ -7,7 +7,7 @@ import google.generativeai as genai
 import json
 from datetime import datetime
 import typing_extensions as typing
-from app.database.models import Service, Invoice, Emission, get_emission_value
+from app.database.models import Service, Invoice, Emission, get_emission_value, EmissionValue
 from app.__init__ import db
 import os
 from dotenv import load_dotenv
@@ -28,6 +28,7 @@ class Order(typing.TypedDict):
     SupplierAdress: str
     SupplierRegNumber: str
     CustomerRegNumber: str
+    Categories: list[str]
 
 model = genai.GenerativeModel(model_name="gemini-1.5-flash")
 
@@ -146,51 +147,87 @@ def combine_text_by_word_clustering(ocr_results, proximity_threshold=10):
 
     return combined_blocks
 
+
+def create_prompt():
+
+    categories = EmissionValue.query.all()
+    category_list = "; ".join(f"{category.name}" for category in categories)
+
+    prompt = f"""
+    Extract the following information from the invoice text provided, using only the information present in the text. 
+    If a piece of information cannot be found, indicate it with 'N/A'.
+    Info required from invoice
+    1. Buyer (Pircējs): The individual or organization making the purchase and paying the invoice.
+    2. Service Provider (Pakalpojuma sniedzējs): The individual or organization providing the service or goods - if there are multiple headers, evaluate and include only the most logical ones for a given price or quantity.   
+    3. Supplier Registration Number (SupplierRegNumber): The registration number of the service provider.
+    4. Items/Services (Pakalpojums/Prece): A list of all items or services purchased. If multiple items are ordered, list each one and its price.
+    If the service is electricity, specify the Item Quantity (Amount) in kilowatt-hours (kWh) only for the main electricity consumption statistic itself (Elektroenerģija or similar).
+    5. Item Quantity (Amount): The quantity of each item ordered. If the quantity cannot be determined, assume it is 1.
+    6. Price per Item with VAT (SeparateCosts): The price of each item or service, including VAT. Include the currency symbol or denominator (like EUR) if it's in the text.
+    7. Total Cost with VAT (Cost): The total amount due on the invoice, including VAT. Include the currency symbol if it's in the text.
+    8. Invoice Number (Rēķina numurs): The invoice's unique identifying number.  
+    9. Invoice Date (Rēķina datums): The date the invoice was issued as %dd.%mm.%yyyy if found.
+    10. Currency (Valūta): The currency in which the invoice is issued.
+    11. Categories: The category of the service or item. Guess a category for each service in the invoice. If multiple items are ordered, provide a category for each one. If the category is not clear, use the most likely one.
+    Categories available for services: {category_list}
+    Input the extracted information into the provided class structure.
+    Output the extracted information in the provided JSON schema.
+    """
+
+    return prompt
+
 def get_ai_result(ocr_results):
     # Combine text by clustering nearby words
     combined_blocks = combine_text_by_word_clustering(ocr_results, proximity_threshold=20)
 
-    # Output: combined_blocks will contain combined text for clustered words
     total_text = ""
     for block in combined_blocks:
         total_text += block['combined_text']
-    # total_text = ocr_pdf_to_text('ocr_test_files/LMT.pdf')
-    prompt = "Iegūsti informāciju no rēķina teksta un izmanto informāciju tikai no piedāvātā teksta.: Kas ir pasūtītājs/kas apmaksā/kas ir pircējs?- Kas sniedz pakalpojumu?- Par ko tiek maksāts un cik tas maksā ar PVN?- kāds ir rēķina numurs? -kāds ir rēķina datums? Ievadi atbildes piedāvātajā klasē. Ja tiek pasūtītas vairākas lietas, tad ievieto tās un to cenas attiecīgajā klases sarakstā, kā arī nosaki kopējo sūtījuma summu. Ja nav iespējams noteikt katra pakalpojuma vai preču skaitu, tad pieņem, ka tas ir 1 sadaļā OrderedAmount. Costs un SeparateCosts daļā mēģini arī ievietot valūtas apzīmējumu. Cost sadaļā ievieto kopējo rēķina summu. SeparateCosts sadaļā ievieto katras rēķina pozīcijas cenu ar PVN. Ja tekstā neatrodi vērtību kādam parametram, ievieto tekstu 'not found' Amount ir pasūtītās rēķina pozīcijas daudzums."
 
-    response = model.generate_content([prompt,total_text], generation_config=genai.GenerationConfig(
-            response_mime_type="application/json", response_schema=list[Order]
-        ))
+    prompt = create_prompt()
+    print(prompt)
+
+    response = model.generate_content(
+        [prompt, total_text],
+        generation_config=genai.GenerationConfig(
+            response_mime_type="application/json",
+            response_schema=list[Order],
+            temperature=0.4,
+            max_output_tokens=1000
+        )
+    )
     try:
         json_data = json.loads(response.text)
-    except:
+    except Exception as e:
+        print("Error parsing JSON response: ",e)
         return None, 1
 
     return json_data[0], 0
 
-# Example usage
-# pdf_path = 'ocr_test_files/zarum-1-rek_compress.pdf'
-
-# ocr_results = extract_text_from_pdf(pdf_path)
-# print(get_ai_result(ocr_results))
 def send_invoice(response, file_id):
     print(response)
     goods = response['Goods']
+    emission_categories = response.get('Categories', [])
     services = []
+
     for j in range(len(goods)):
         try:
             name = goods[j]
+            emission_category = emission_categories[j] if j < len(emission_categories) else None
             price = response['SeparateCosts'][j]
             amount = response['OrderedAmount'][j]
             service = Service(name=name, price=price, amount=amount)
             db.session.add(service)
             db.session.commit()
 
-            print("emission_value = " + str(get_emission_value(name)))
-            emission = Emission(service_id=service.id, value=get_emission_value(name))
+            emission_coefficient = get_emission_value(emission_category)
+            print("emission coefficient = " + str(emission_coefficient))
+            emission = Emission(service_id=service.id, value=emission_coefficient)
             db.session.add(emission)
             db.session.commit()
 
-            print("service " + str(service.name) + " has emission " + str(service.emission.value) + " amount = " + str(service.amount) + " totaling " + str(service.total_emissions))
+            print(f"Service {service.name} (category: {emission_category}) has emission {emission_coefficient} "
+                  f""f"amount={service.amount}, totaling {service.total_emissions}")
             services.append(service)
         except Exception as e:
             # Print any other unexpected error

@@ -1,6 +1,7 @@
 from app.__init__ import db
 from datetime import datetime
 from .invoices_services import invoices_services
+import re
 
 class Invoice(db.Model):
     #TODO rework this based on excel "Invoices" in docs
@@ -60,11 +61,11 @@ class Invoice(db.Model):
                     key = field['key']
                     value = field['value']
 
-                    # Skip 'total_emissions' field as it's not editable
+                    # Skip non-editable fields
                     if key == 'total_emissions':
                         continue
 
-                    # If the key is 'issue_date', convert the string to a date object
+                    # If the key is 'issue_date', convert the string to a correct date format
                     if key == 'issue_date':
                         value = datetime.strptime(value, '%Y-%m-%d').date()
 
@@ -74,21 +75,47 @@ class Invoice(db.Model):
 
             # Update services and associated emissions
             if 'services' in data:
-                for updated_service in data['services']:
-                    service_name = updated_service.get('name')  # Assuming 'name' uniquely identifies the service
-                    service = next((s for s in self.services if s.name == service_name), None)
+                # Define field handlers - type safety and validation
+                field_handlers = {
+                    'name': lambda x: str(x),
+                    'price': lambda x: str(x),  # Model is string
+                    'amount': lambda x: str(x),  # Model is string
+                    'emission': lambda x: float(x)  # Convert emissions to float
+                }
 
-                    if service:
-                        # Update the service attributes
-                        if 'price' in updated_service:
-                            service.price = updated_service['price']
-                        if 'amount' in updated_service:
-                            service.amount = updated_service['amount']
-                        # Update emission related to the service
-                        if 'emission' in updated_service:
-                            service.emission.value = updated_service['emission']  # Update emission value
-                        if 'total_emissions' == updated_service:
-                            continue
+                # Create a mapping of service IDs to their updates
+                service_updates = {str(s['id']): s for s in data['services']}
+                
+                # Update all services in a single pass
+                for service in self.services:
+                    if str(service.id) in service_updates:
+                        update_data = service_updates[str(service.id)]
+                        
+                        for field, handler in field_handlers.items():
+                            if field in update_data:
+                                try:
+                                    # Validate the amount contains a number - can include non-numeric characters to designate electricity, etc.
+                                    if field == 'amount':
+                                        value = handler(update_data[field])
+                                        # Just verify there is at least one number in the string
+                                        if not re.search(r"[-+]?\d*\.?\d+", value):
+                                            raise ValueError("Amount must contain at least one number")
+                                        service.amount = value
+                                    elif field == 'emission':
+                                        try:
+                                            value = handler(update_data[field])  # Convert emission to a float value
+                                            if value < 0:
+                                                raise ValueError("Emission value must be positive")
+                                            service.emission.value = value
+                                        except ValueError as e:
+                                            print(f"Error updating emission for service {service.id}: {e}")
+                                            continue
+                                    else:
+                                        setattr(service, field, handler(update_data[field]))
+                                except (ValueError, TypeError) as e:
+                                    print(f"Error updating {field} for service {service.id}: {e}")
+                                    # On error - continue to the next field
+                                    continue
 
             # Commit all changes to the database
             db.session.commit()
