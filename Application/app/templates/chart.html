@@ -151,18 +151,29 @@
                             'rgba(153, 102, 255, 1)'
                         ],
                         borderWidth: 1,
-                        barPercentage: isMobile < 768 ? 0.98 : 0.8, // Make bars take up more space on mobile
-                        categoryPercentage: isMobile < 768 ? 0.98 : 0.8 // Make bars take up more space on mobile
+                        barPercentage: isMobile < 768 ? 0.98 : 0.8, // Bars take up more space on mobile
+                        categoryPercentage: isMobile < 768 ? 0.98 : 0.8 // Bars take up more space on mobile
                     }]
                 },
                 options: {
+                    interaction: {
+                        mode: 'nearest',
+                        axis: isMobile ? 'y' : 'x',  // Changed based on chart orientation - mobile or desktop
+                        intersect: false,  // Makes the tooltip appear on hover
+                    },
+                    elements: {
+                        bar: {
+                            borderRadius: 4,
+                            hitRadius: 30  // Increases the hit area for the bars
+                        }
+                    },
                     responsive: true,
                     maintainAspectRatio: false,
                     indexAxis: isMobile ? 'y' : 'x',
                     layout: {
                         padding: {
                             top: 20,
-                            right: isMobile ? 60 : 20, // Extra padding for wrapped text on mobile
+                            right: isMobile ? 0 : 20, // Extra padding for wrapped text on mobile
                             bottom: 0,
                             left: 0,
                         }
@@ -177,8 +188,7 @@
                                 const value = context.dataset.data[context.dataIndex];
                                 const maxValue = Math.max(...context.dataset.data);
                                 
-                                // If the bar is more than 50% of max width, center the label
-                                // Otherwise keep it at the end
+                                // If the bar is more than 50% of max width, label is centered
                                 return value > maxValue * 0.5 ? 'center' : 'end';
                             },
                             align: function(context) {
@@ -187,7 +197,7 @@
                                 const value = context.dataset.data[context.dataIndex];
                                 const maxValue = Math.max(...context.dataset.data);
                                 
-                                // Align in the middle of large bars, right-align for smaller ones
+                                // Align in the middle of large bars, right-align for small bars
                                 return value > maxValue * 0.5 ? 'center' : 'right';
                             },
                             offset: function(context) {
@@ -196,7 +206,7 @@
                                 const value = context.dataset.data[context.dataIndex];
                                 const maxValue = Math.max(...context.dataset.data);
                                 
-                                // No offset needed for centered labels
+                                // No offset for centered labels
                                 return value > maxValue * 0.5 ? 0 : 10;
                             },
                             font: {
@@ -238,17 +248,20 @@
                             titleColor: TextColor,
                             bodyColor: TextColor,
                             padding: 20,
+                            titleSpacing: 10,
+                            bodySpacing: 10,
+                            caretSize: 10,
+                            caretPadding: 2,
                             callbacks: {
                                 title: function(tooltipItems) {
                                     return tooltipItems[0].label;
                                 },
                                 label: function(context) {
-                                    // Use the actual value from the dataset
-                                    let value = context.raw; // Use raw value instead of parsed
+                                    let value = context.raw;
                                     return `CO₂ Emissions: ${value.toLocaleString()} kg`;
                                 }
                             }
-                        }
+                        },
                     },
                     scales: {
                         y: {
@@ -269,7 +282,7 @@
                                 display: !isMobile
                             },
                             border: {
-                                display: false  // Changed from true to false to remove white line
+                                display: false 
                             }
                         },
                         x: {
@@ -330,7 +343,7 @@
                             min: 0,
                             ticks: {
                                 color: TextColor,
-                                font: { size: isMobile ? 16 : 24 },  // Changed from 12 to 16 to match
+                                font: { size: isMobile ? 16 : 24 },
                             },
                             grid: {
                                 color: 'rgba(229,231,235,0.1)'
@@ -371,6 +384,14 @@
 
         // Initialize charts on load
         initializeCharts();
+
+        // OnResize event listener to re-render the charts
+        window.addEventListener('resize', function() {
+            isMobile = window.innerWidth < 1024;
+            servicesChart.destroy();
+            historyChart.destroy();
+            initializeCharts();
+        });
     </script>
 </div>
 {% endblock %}
