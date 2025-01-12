@@ -58,7 +58,7 @@
         const TextColor = 'rgb(229,231,235)';
         let servicesChart, historyChart;
 
-        var isMobile = window.innerWidth < 1024;
+        let isMobile = window.innerWidth < 1024;
 
         // Updates chart data based on the filtered date range set by the user
         function updateChartsData(data) {
@@ -384,13 +384,34 @@
 
         // Initialize charts on load
         initializeCharts();
+        let lastWidth = window.innerWidth;
 
-        // OnResize event listener to re-render the charts
+        // OnResize event listener to re-render the charts with a debounce for scroll-based resizing prevention
         window.addEventListener('resize', function() {
-            isMobile = window.innerWidth < 1024;
-            servicesChart.destroy();
-            historyChart.destroy();
-            initializeCharts();
+            clearTimeout(window.resizedFinished);
+            window.resizedFinished = setTimeout(function(){
+                const currentWidth = window.innerWidth;
+                if((currentWidth < 1024 && lastWidth >= 1024) || 
+                (currentWidth >= 1024 && lastWidth < 1024)) {
+                    
+                    isMobile = currentWidth < 1024;
+                    
+                    // Store current data and labels
+                    const currentData = servicesChart.data.datasets[0].data;
+                    const currentLabels = servicesChart.data.labels;
+                    
+                    // Destroy and reinitialize charts
+                    servicesChart.destroy();
+                    historyChart.destroy();
+                    
+                    // Reinitialize with current data
+                    labels = currentLabels;
+                    emissionsData = currentData;
+                    initializeCharts();
+                    
+                    lastWidth = currentWidth;
+                }
+            }, 250);
         });
     </script>
 </div>
