@@ -17,43 +17,72 @@
 
     <div class="flex flex-col items-center justify-center p-4 lg:p-12 relative bg-gray-900">
         <div class="grid grid-cols-1 2xl:grid-cols-2 gap-8 w-full px-2 lg:px-4 max-w-full 2xl:max-w-[90%] {% if not pie_data %}2xl:place-items-center{% endif %}">
-            {% if pie_data %}
-                <!-- Pie Chart Section -->
-                <div class="order-2 bg-main-20 p-4 sm:p-8 lg:p-12 rounded shadow-md">
-                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-200 text-center">Total CO2 Emissions by Service</h1>
-                    <div class="flex flex-col items-center justify-center w-full h-[35rem] lg:h-[50rem]">
-                        <div class="w-full h-full max-w-[1200px] mx-auto">
-                            <canvas id="pieChart" class="w-full h-full"></canvas>
-                        </div>
+            <!-- Pie Chart Section -->
+            <div class="order-2 bg-main-20 p-4 sm:p-8 lg:p-12 rounded shadow-md {% if not pie_data %}hidden{% endif %}">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-200 text-center">Total CO2 Emissions by Service</h1>
+                <div class="flex flex-col items-center justify-center w-full h-[35rem] lg:h-[50rem]">
+                    <div class="w-full h-full max-w-[1200px] mx-auto">
+                        <canvas id="pieChart" class="w-full h-full"></canvas>
                     </div>
                 </div>
-            {% endif %}
+            </div>
             
             <!-- Upload Form Section -->
             <div class="bg-main-20 p-4 sm:p-8 lg:p-12 rounded shadow-md flex justify-center {% if not pie_data %}2xl:col-span-2 2xl:w-1/2{% endif %}">
                 <div class="w-[90%] sm:w-[85%] lg:w-[75%]">
                     <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 text-gray-200 text-center">Upload Invoice</h1>
-    
-                    {# Rest of the form content... #}
-                    <div id="dropArea" class="border-dashed border-2 border-gray-300 rounded-lg p-4 sm:p-8 mb-4 sm:mb-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-12 sm:w-12 lg:h-12 lg:w-12 mb-2 sm:mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                        </svg>
-                        <p class="text-gray-300 text-center text-base sm:text-xl lg:text-base">Drag and drop your files here or click to select</p>
+
+                    <!-- Flash Messages -->
+                    <div class="text-center flex flex-col items-center mx-4 min-h-6">
+                        {% with messages = get_flashed_messages(with_categories=True) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    {% if category == 'alert-success' %}
+                                        <div id="success-msg" class="text-green-500 font-semibold">
+                                            {{ message }}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-red-500 font-bold">
+                                            {{ message }}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <div class="text-red-500 hidden" id="fileMessage">Only PDF files are allowed</div>
                     </div>
-    
-                    {# Update file list styling #}
-                    <ul id="fileNames" class="mb-4 sm:mb-6 text-gray-100 pl-4 text-sm sm:text-lg lg:text-base"></ul>
-    
-                    {# Update button styling #}
-                    <button type="submit" class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200">
-                        Upload
-                    </button>
-    
-                    {# Update OCR button styling #}
-                    <button id="ocrButton" class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200 hidden mt-4 sm:mt-6 lg:mt-4">
-                        Go To My Invoices
-                    </button>
+
+                    <!-- Form -->
+                    <div class="mt-8 lg:mt-6">
+                        <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.homepage') }}">
+                            <div
+                                id="dropArea"
+                                class="border-dashed border-2 border-gray-300 rounded-lg p-4 sm:p-8 mb-4 sm:mb-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-500 transition duration-200"
+                                onclick="document.getElementById('fileInput').click()"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 sm:h-12 sm:w-12 lg:h-12 lg:w-12 mb-2 sm:mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <p class="text-gray-300 text-center text-base sm:text-xl lg:text-base">Drag and drop your files here or click to select</p>
+                                <input type="file" name="files" id="fileInput" multiple required class="hidden" 
+                                       onchange="showFileNames()" accept="application/pdf">
+                            </div>
+
+                            <ul id="fileNames" class="mb-4 sm:mb-6 text-gray-100 pl-4 text-sm sm:text-lg lg:text-base"></ul>
+
+                            <button type="submit"
+                                    class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200">
+                                Upload
+                            </button>
+                        </form>
+
+                        <a href="{{ url_for('main.my_invoices') }}">
+                            <button id="ocrButton"
+                                    class="w-full bg-accent-40 text-black py-2 sm:py-4 lg:py-3 text-base sm:text-xl lg:text-lg rounded-lg hover:bg-accent hover:text-white transition duration-200 hidden mt-4 sm:mt-6 lg:mt-4">
+                                Go To My Invoices
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
