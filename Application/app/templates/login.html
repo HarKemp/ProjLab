@@ -6,11 +6,11 @@
         <div class="pb-5 w-full max-w-[160px] sm:max-w-[180px] md:max-w-[200px]">
             <svg id="svg" fill="#f3f4f6"
             viewBox="144 144 512 512" stroke-width="0"
-            class="w-full h-auto">
+            class=" w-full h-auto">
                 <path d="m609.92 400c0 115.93-93.984 209.92-209.92 209.92-115.94 0-209.92-93.984-209.92-209.92 0-115.94 93.984-209.92 209.92-209.92 115.93 0 209.92 93.984 209.92 209.92zm-209.92-20.992c-34.785 0-62.977-28.195-62.977-62.977s28.191-62.977 62.977-62.977c34.781 0 62.977 28.195 62.977 62.977s-28.195 62.977-62.977 62.977zm138.87 115.45c-30.227 44.355-81.148 73.473-138.87 73.473-57.723 0-108.64-29.117-138.87-73.473 30.227-44.352 81.148-73.469 138.87-73.469 57.719 0 108.64 29.117 138.87 73.469z" fill-rule="evenodd"></path>
             </svg>
        
-            <p class="text-center font-semibold text-gray-200 text-3xl sm:text-4xl md:text-5xl mt-6">LOGIN</p>
+            <p class="text-center font-semibold text-gray-200 text-3xl sm:text-4xl md:text-5xl">LOGIN</p>
         </div>
         
         <div class="bg-[#262c3e] w-full max-w-md rounded-2xl shadow-lg">
@@ -23,7 +23,7 @@
             {% endwith %}
      
             <form action="{{ url_for('auth.login_post') }}" method="post" class="p-6 sm:p-8">
-                <div class="flex items-center mb-6 relative">
+                <div class="flex items-center mb-4 relative">
                     <svg class="absolute left-3 w-6 sm:w-8" viewBox="0 0 24 24">
                         <path d="M20.822 18.096c-3.439-.794-6.64-1.49-5.09-4.418 4.72-8.912 1.251-13.678-3.732-13.678-5.082 0-8.464 4.949-3.732 13.678 1.597 2.945-1.725 3.641-5.09 4.418-3.073.71-3.188 2.236-3.178 4.904l.004 1h23.99l.004-.969c.012-2.688-.092-4.222-3.176-4.935z"/>
                     </svg>
@@ -31,13 +31,13 @@
                         type="text" 
                         name="username" 
                         id="username" 
-                        class="bg-gray-200 dark:bg-zinc-300 text-black dark:placeholder-gray-400 rounded-lg pl-12 sm:pl-16 pr-4 py-4 sm:py-6 focus:outline-none w-full text-base sm:text-xl" 
+                        class="bg-gray-200 dark:bg-zinc-300 text-black dark:placeholder-gray-400 rounded-lg pl-12 sm:pl-16 pr-4 py-2 sm:py-4 focus:outline-none w-full text-base sm:text-xl" 
                         placeholder="Username" 
                         autocomplete="off" 
                         autofocus 
                     />
                 </div>
-                <div class="flex items-center mb-6 relative">
+                <div class="flex items-center mb-4 relative">
                     <svg class="absolute left-3 w-6 sm:w-8" viewBox="0 0 24 24">
                         <path d="m18.75 9h-.75v-3c0-3.309-2.691-6-6-6s-6 2.691-6 6v3h-.75c-1.24 0-2.25 1.009-2.25 2.25v10.5c0 1.241 1.01 2.25 2.25 2.25h13.5c1.24 0 2.25-1.009 2.25-2.25v-10.5c0-1.241-1.01-2.25-2.25-2.25zm-10.75-3c0-2.206 1.794-4 4-4s4 1.794 4 4v3h-8zm5 10.722v2.278c0 .552-.447 1-1 1s-1-.448-1-1v-2.278c-.595-.347-1-.985-1-1.722 0-1.103.897-2 2-2s2 .897 2 2c0 .737-.405 1.375-1 1.722z"/>
                     </svg>
@@ -45,14 +45,14 @@
                         type="password" 
                         name="password" 
                         id="password" 
-                        class="bg-gray-200 dark:bg-zinc-300 text-black dark:placeholder-gray-400 rounded-lg pl-12 sm:pl-16 pr-4 py-4 sm:py-6 focus:outline-none w-full text-base sm:text-xl" 
+                        class="bg-gray-200 dark:bg-zinc-300 text-black dark:placeholder-gray-400 rounded-lg pl-12 sm:pl-16 pr-4 py-2 sm:py-4 focus:outline-none w-full text-base sm:text-xl" 
                         placeholder="Password" 
                         autocomplete="off" 
                     />
                 </div>
                 <button 
                     type="submit" 
-                    class="font-bold py-4 sm:py-6 text-[#080a0a] uppercase w-full rounded-lg bg-accent-40 hover:bg-accent transition-colors duration-200 text-base sm:text-xl"
+                    class="font-bold py-2 sm:py-4 text-[#080a0a] uppercase w-full rounded-lg bg-accent-40 hover:bg-accent transition-colors duration-200 text-base sm:text-xl"
                 >
                     Login
                 </button>
