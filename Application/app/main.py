@@ -183,7 +183,7 @@ def invoice_status():
     # Send data about invoices in json format
     for inv in invoices:
         # Display total_emissions with a decimal point - consistent with default display
-        total_emissions = str(round(Decimal(str(inv.total_emissions)), 1))
+        total_emissions = str(round(Decimal(str(inv.total_emissions)), 2))
         
         data.append({
             'id': inv.id,
@@ -276,8 +276,8 @@ def delete_fruit(invoice_id):
 @login_required
 def update_invoice(invoice_id):
     data = request.get_json()
-    print(data)
     invoice_id = validate_id(invoice_id)
+    
     if invoice_id:
         invoice_to_update = Invoice.query.get(invoice_id)
 

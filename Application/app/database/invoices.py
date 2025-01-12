@@ -25,11 +25,10 @@ class Invoice(db.Model):
 
     @property
     def total_emissions(self):
-        """Calculate the total emission value of all services related to this invoice."""
         total_emissions = 0.0
         for service in self.services:
             total_emissions += service.total_emissions
-        return total_emissions
+        return f"{total_emissions:.2f}"  # Returns formatted string
 
     def delete(self):
         try:
