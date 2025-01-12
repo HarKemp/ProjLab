@@ -89,7 +89,8 @@
     </div>
     
     <script src="{{ url_for('static', filename='scripts/chart.umd.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="{{ url_for('static', filename='scripts/chartjs-plugin-datalabels.min.js') }}"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script> --> <!-- CDN for dev -->
     
     <script>
         // Register a custom plugin for rendering labels and interactivity
