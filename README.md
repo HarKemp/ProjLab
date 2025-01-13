@@ -1,6 +1,8 @@
 # ProjLab
 Projektēšanas laboratorijas kursa darbs
 
+https://pdf2co2.lat
+
 # Apraksts
 Kursa darba apraksts pieejams /Docs/
 
