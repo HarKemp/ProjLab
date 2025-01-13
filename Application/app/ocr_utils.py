@@ -177,16 +177,16 @@ def create_prompt():
 
     return prompt
 
-# def clean_json_response(json_data):
-#     if isinstance(json_data, dict):
-#         return {k: clean_json_response(v) for k, v in json_data.items()}
-#     elif isinstance(json_data, list):
-#         return [clean_json_response(v) for v in json_data]
-#     elif isinstance(json_data, str):
-#         # Replace \n and strip excessive whitespace
-#         return json_data.replace('\n', ' ').replace('\\n', ' ').strip()
-#     else:
-#         return json_data
+def clean_json_response(json_data):
+    if isinstance(json_data, dict):
+        return {k: clean_json_response(v) for k, v in json_data.items()}
+    elif isinstance(json_data, list):
+        return [clean_json_response(v) for v in json_data]
+    elif isinstance(json_data, str):
+        # Replace \n and strip excessive whitespace
+        return json_data.replace('\n', ' ').replace('\\n', ' ').strip()
+    else:
+        return json_data
 
 def get_ai_result(ocr_results):
     # Combine text by clustering nearby words
@@ -211,11 +211,12 @@ def get_ai_result(ocr_results):
     try:
         print("AI response:", response.text)
         json_data = json.loads(response.text)
+        clean_json = clean_json_response(json_data)
     except Exception as e:
         print("Error parsing JSON response: ",e)
         return None, 1
 
-    return json_data[0], 0
+    return clean_json[0], 0
 
 def send_invoice(response, file_id):
     print(response)
