@@ -177,6 +177,17 @@ def create_prompt():
 
     return prompt
 
+# def clean_json_response(json_data):
+#     if isinstance(json_data, dict):
+#         return {k: clean_json_response(v) for k, v in json_data.items()}
+#     elif isinstance(json_data, list):
+#         return [clean_json_response(v) for v in json_data]
+#     elif isinstance(json_data, str):
+#         # Replace \n and strip excessive whitespace
+#         return json_data.replace('\n', ' ').replace('\\n', ' ').strip()
+#     else:
+#         return json_data
+
 def get_ai_result(ocr_results):
     # Combine text by clustering nearby words
     combined_blocks = combine_text_by_word_clustering(ocr_results, proximity_threshold=20)
@@ -193,8 +204,8 @@ def get_ai_result(ocr_results):
         generation_config=genai.GenerationConfig(
             response_mime_type="application/json",
             response_schema=list[Order],
-            temperature=0.4,
-            max_output_tokens=500
+            # temperature=0.4,
+            # max_output_tokens=500
         )
     )
     try:
