@@ -27,7 +27,6 @@ def file_upload():
 
         for file in files:
             if file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
-                # flash(f'Invalid file format for {file.filename}', 'alert-danger')
                 return False  # Stop processing
             # If file is allowed
             # Secure the filename and save it to the upload folder
@@ -36,7 +35,6 @@ def file_upload():
             # Place copy of file in database
             file_id = insert_file_in_db(filename, file_data)
             file_ids.append(file_id)
-            # file.save(os.path.join(upload_folder, filename))
             flash(f"File uploaded successfully: {filename}", 'alert-success')
 
         # Start OCR celery task for each file
@@ -155,6 +153,4 @@ def insert_file_in_db(filename, file_data):
     new_file = File(user_id=user_id, title=filename, file_data=file_data)
     db.session.add(new_file)
     db.session.commit()
-    # session['file_id'] = new_file.id
     return new_file.id
-

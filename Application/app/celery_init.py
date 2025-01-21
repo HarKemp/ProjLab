@@ -38,4 +38,3 @@ celery = Celery(
 
 celery.conf.update(broker_connection_retry_on_startup=True)
 celery.autodiscover_tasks(['app.celery_tasks'], force=True)
-

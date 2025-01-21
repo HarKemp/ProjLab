@@ -13,7 +13,6 @@ def create_app():
     app = Flask(__name__)
 
     ### Set up database
-    # env = os.environ.get('FLASK_ENV', 'development')
     env = os.getenv('FLASK_ENV', 'development')
     if env == 'production':
         from app.prodConfig import ProdConfig
