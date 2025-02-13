@@ -197,18 +197,20 @@ def get_ai_result(ocr_results):
         total_text += block['combined_text']
 
     prompt = create_prompt()
-    print(prompt)
-
-    response = model.generate_content(
-        [prompt, total_text],
-        generation_config=genai.GenerationConfig(
-            response_mime_type="application/json",
-            response_schema=list[Order],
-            # temperature=0.4,
-            # max_output_tokens=500
-        )
-    )
+    #print(prompt)
+    
     try:
+        response = model.generate_content(
+            [prompt, total_text],
+            generation_config=genai.GenerationConfig(
+                response_mime_type="application/json",
+                response_schema=list[Order],
+                stop_sequences=["\n","\n\n","\\n"],
+                # temperature=0.4,
+                # max_output_tokens=500
+            )
+        )
+        
         print("AI response:", response.text)
         json_data = json.loads(response.text)
         clean_json = clean_json_response(json_data)
