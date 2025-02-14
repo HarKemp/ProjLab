@@ -1,12 +1,4 @@
-# ProjLab
-Projektēšanas laboratorijas kursa darbs
-
-https://pdf2co2.lat
-
-# Apraksts
-Kursa darba apraksts pieejams /Docs/
-
-# Uzstādīšana
+# Uzstādīšana uz Windows
 ## Nepieciešams
 * Python 3.12.4 vai jaunāks bet vecāks par 6.13
 * Microsoft Visual C++ 14.0 vai jaunāks - priekš Greenlet
