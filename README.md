@@ -1,5 +1,5 @@
-* Projektēšanas laboratorijas kursa darbs
-* PDF Rēķinu apstrāde ar OCR un emisiju noteikšana
+Projektēšanas laboratorijas kursa darbs <br>
+PDF Rēķinu apstrāde ar OCR un emisiju noteikšana
 
 ## Piekļuve (Website)
 https://pdf2co2.lat
